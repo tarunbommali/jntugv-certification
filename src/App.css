@@ -1,0 +1,17 @@
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll var(--animation-duration, 40s) linear infinite;
+  animation-direction: var(--animation-direction, forwards);
+}
+
+html {
+  scroll-behavior: smooth;
+}
