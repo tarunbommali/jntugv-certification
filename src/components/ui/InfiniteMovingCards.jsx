@@ -7,9 +7,9 @@ function cn(...inputs) {
 }
 
 const InfiniteMovingCards = ({
-  items,
+  items = [],            // Accept array of project objects
   direction = "left",
-  speed = "fast",
+  speed = "normal",
   pauseOnHover = true,
   className,
 }) => {
@@ -33,11 +33,14 @@ const InfiniteMovingCards = ({
   const addAnimation = () => {
     if (!containerRef.current || !scrollerRef.current) return;
 
+    // Prevent unnecessary duplicates
     while (scrollerRef.current.children.length > items.length) {
       scrollerRef.current.removeChild(scrollerRef.current.lastChild);
     }
 
     const scrollerContent = Array.from(scrollerRef.current.children);
+
+    // Duplicate content to enable infinite scroll effect
     scrollerContent.forEach((item) => {
       const clone = item.cloneNode(true);
       scrollerRef.current.appendChild(clone);
@@ -63,7 +66,7 @@ const InfiniteMovingCards = ({
     <div
       ref={containerRef}
       className={cn(
-        "scroller relative z-20 max-w-7xl overflow-hidden",
+        "scroller relative z-20 max-w-full overflow-hidden",
         "[mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
         className
       )}
@@ -76,44 +79,38 @@ const InfiniteMovingCards = ({
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
       >
-        {items.map((course) => {
-          const IconComponent = course.icon;
-          return (
-            <li
-              key={course.id}
-              className="relative w-[300px] md:w-[350px] max-w-full shrink-0 rounded-2xl border bg-white text-black shadow-md px-6 py-4 transition duration-300 hover:shadow-lg"
-              style={{ borderColor: "#e0e7ff" }}
-            >
-              <div
-                className="flex items-center justify-center w-16 h-16 rounded-lg mb-4"
-                style={{
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                }}
-              >
-                <IconComponent className="h-8 w-8 text-white" />
-              </div>
+        {items.map((project) => (
+          <li
+            key={project.id}
+            className="relative w-[300px] md:w-[350px] max-w-full shrink-0 rounded-2xl border bg-white text-black shadow-md px-6 py-4 transition duration-300 hover:shadow-lg"
+            style={{ borderColor: "#e0e7ff" }}
+          >
+            {/* Image */}
+            <img
+              src={project.imageUrl}
+              alt={project.title}
+              className="w-full h-40 object-cover rounded-lg mb-4"
+            />
 
-              <h3 className="text-lg font-semibold mb-2">{course.title}</h3>
-              <p className="text-sm text-neutral-600 mb-2">
-                {course.subtitle}
-              </p>
-              <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                <span>{course.duration}</span>
-                <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                  {course.mode}
-                </span>
-              </div>
+            {/* Project Details */}
+            <h3 className="text-lg font-semibold mb-2">{project.title}</h3>
+            <p className="text-sm text-gray-600 mb-2">{project.description}</p>
 
-              <button className="w-full bg-primary text-white text-sm py-2 rounded hover:bg-primary/90">
-                View Course
-              </button>
-            </li>
-          );
-        })}
+            <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+              <span>{project.duration}</span>
+              <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                {project.mode}
+              </span>
+            </div>
+
+            <button className="w-full bg-primary text-white text-sm py-2 rounded hover:bg-primary/90">
+              View Project
+            </button>
+          </li>
+        ))}
       </ul>
     </div>
   );
 };
 
-
-export default InfiniteMovingCards
+export default InfiniteMovingCards;

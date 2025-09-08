@@ -1,5 +1,5 @@
 import Hero from "../components/Hero.jsx";
-import CourseCarousel from "../components/CourseCarousel.jsx";
+import Courses from "../components/Courses.jsx";
 import CourseOverview from "../components/CourseOverview.jsx";
 import ModulesSection from "../components/ModulesSection.jsx";
 import ContactSection from "../components/ContactSection.jsx";
@@ -18,7 +18,7 @@ const Website = () => {
     <main className="min-h-screen bg-background text-foreground">
        <Hero />
       <Hero2/>
-      <CourseCarousel />
+      <Courses />
       <CourseOverview />
       <Skills/>
       <CapstoneSection/>

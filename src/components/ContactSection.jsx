@@ -18,7 +18,7 @@ const ContactSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div className="md:text-center mb-12">
           <h2
             className="text-3xl sm:text-4xl font-bold mb-4"
             style={{ color: global_classnames.heading.primary }}

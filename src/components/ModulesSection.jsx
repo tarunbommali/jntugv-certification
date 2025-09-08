@@ -20,9 +20,9 @@ const ModulesSection = () => {
         backgroundColor: global_classnames.background?.secondary || "#f3f4f6",
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
-        <div className="text-center mb-10 sm:mb-12">
+        <div className="md:text-center mb-10 sm:mb-12">
           <h2
             className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
             style={{ color: global_classnames.heading.primary }}
@@ -38,15 +38,23 @@ const ModulesSection = () => {
         </div>
 
         {/* Modules List */}
-        <div className="grid grid-cols-1 gap-6 sm:gap-8">
-          {modules.map((module) => {
+        <div className="grid grid-cols-1">
+          {modules.map((module, index) => {
             const IconComponent = module.icon;
             const isOpen = openAccordions.includes(module.id);
+
+            // Apply rounded corners to first and last accordion items
+            const borderRadiusClasses =
+              index === 0
+                ? "rounded-t-lg"
+                : index === modules.length - 1
+                ? "rounded-b-lg"
+                : "";
 
             return (
               <div
                 key={module.id}
-                className="rounded-xl border transition-shadow hover:shadow-lg shadow-md overflow-hidden"
+                className={`border transition-shadow hover:shadow-lg shadow-md overflow-hidden ${borderRadiusClasses}`}
                 style={{
                   borderColor: global_classnames.container.border,
                 }}
@@ -94,11 +102,11 @@ const ModulesSection = () => {
                       : "0",
                   }}
                 >
-                  {module.content.map((item, index) => (
+                  {module.content.map((item, idx) => (
                     <div
-                      key={index}
+                      key={idx}
                       className={`flex items-start text-sm sm:text-base p-3 sm:p-4 w-full ${
-                        index !== module.content.length - 1
+                        idx !== module.content.length - 1
                           ? `border-b`
                           : ""
                       }`}

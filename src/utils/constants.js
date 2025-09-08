@@ -1,11 +1,14 @@
-import { Clock, Globe, Briefcase } from "lucide-react";
+import { Clock, Globe, Briefcase ,Computer} from "lucide-react";
 import { Brain, Cpu, Shield, Wifi, Zap, } from "lucide-react";
 
 export const cardList = [
   { title: "3 Months", icon: Clock, subtitle: "Intensive Program" },
   { title: "Hybrid Mode", icon: Globe, subtitle: "Online & Offline" },
   { title: "Industry Ready", icon: Briefcase, subtitle: "Practical Projects" },
+  {title:"Labs", icon:Computer, subtitle:"Campus Labs"}
 ];
+
+export const DISCORD_SERVER_URL = "https://discord.gg/E9dckgdNKw"
 
 export const website = "http://nxtgencertificationbyjntugv.com"
 

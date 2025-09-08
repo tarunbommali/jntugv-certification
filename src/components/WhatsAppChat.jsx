@@ -1,17 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { global_classnames } from "../utils/classnames";
 
 const cn = (...classes) => classes.filter(Boolean).join(" ");
 
+const queryOptions = [
+  { value: "callback-request", label: "Callback Request" },
+  { value: "course-fee", label: "Course Fee Inquiry" },
+  { value: "other-query", label: "Other Query" },
+];
+
 const WhatsAppChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    qualification: "",
-    query: "",
+    queryType: "",
   });
   const [errors, setErrors] = useState({});
+  const nameInputRef = useRef(null);
 
   const showToast = (options) => {
     const title = options.title || "";
@@ -19,26 +25,16 @@ const WhatsAppChat = () => {
     alert(`${title}\n${description}`);
   };
 
-  const qualifications = [
-    { value: "graduation-completed", label: "Graduation Completed" },
-    { value: "graduation-ongoing", label: "Graduation Ongoing" },
-    { value: "pg-completed", label: "PG Completed" },
-    { value: "pg-ongoing", label: "PG Ongoing" },
-    { value: "12-intermediate", label: "12th/Intermediate" },
-    { value: "diploma", label: "Diploma" },
-  ];
+  useEffect(() => {
+    if (isOpen && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isOpen]);
 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.whatsappNumber.trim()) {
-      newErrors.whatsappNumber = "WhatsApp number is required";
-    } else if (!/^\d{10}$/.test(formData.whatsappNumber.replace(/\s/g, ""))) {
-      newErrors.whatsappNumber = "Please enter a valid 10-digit number";
-    }
-    if (!formData.qualification)
-      newErrors.qualification = "Qualification is required";
-    if (!formData.query.trim()) newErrors.query = "Query is required";
+    if (!formData.queryType) newErrors.queryType = "Query type is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -53,16 +49,17 @@ const WhatsAppChat = () => {
       return;
     }
 
-    const selectedQualification =
-      qualifications.find((q) => q.value === formData.qualification)?.label ||
-      formData.qualification;
-    const message = `Hi! I'm interested in the Certification in Emerging Technologies course.\n\n*Name:* ${formData.name}\n*WhatsApp Number:* ${formData.whatsappNumber}\n*Highest Qualification:* ${selectedQualification}\n*Query:* ${formData.query}\n\nPlease provide more information about the course.`;
+    const selectedQuery = queryOptions.find(
+      (q) => q.value === formData.queryType
+    )?.label;
+
+    const message = `Hi! I'm interested in the Certification in Emerging Technologies course.\n\n*Name:* ${formData.name}\n*Query Type:* ${selectedQuery}\n\nPlease provide more information.`;
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/919876543210?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
 
     window.open(whatsappUrl, "_blank");
 
-    setFormData({ name: "", whatsappNumber: "", qualification: "", query: "" });
+    setFormData({ name: "", queryType: "" });
     setErrors({});
     setIsOpen(false);
 
@@ -104,8 +101,9 @@ const WhatsAppChat = () => {
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setIsOpen(false)}
           />
+
           <div
-            className="fixed bottom-6 right-6 w-96 max-w-[calc(100vw-2rem)] bg-white border rounded-lg shadow-2xl z-50 animate-scale-in"
+            className="fixed bottom-0 right-0 w-full sm:max-w-[calc(100vw-2rem)] md:w-96 bg-white border rounded-t-lg shadow-2xl z-50 animate-scale-in"
             style={{ borderColor: global_classnames.container.border }}
           >
             {/* Header */}
@@ -117,9 +115,8 @@ const WhatsAppChat = () => {
                 <MessageCircle className="h-5 w-5" />
                 <div className="flex flex-col">
                   <h3 className="font-semibold">WhatsApp Us</h3>
-
                   <p
-                    className="text-sm "
+                    className="text-sm"
                     style={{ color: global_classnames.text.muted }}
                   >
                     We'd love to hear from you
@@ -143,10 +140,12 @@ const WhatsAppChat = () => {
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
+                    ref={nameInputRef}
                     value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("name", e.target.value)
+                    }
                     placeholder="Enter your full name"
-                    
                     className={cn(
                       baseInputClasses,
                       `border  border-[${global_classnames.container.border}]`,
@@ -158,57 +157,35 @@ const WhatsAppChat = () => {
                   )}
                 </div>
 
-                {/* Qualification */}
+                {/* Query Type Dropdown */}
                 <div>
                   <label className="text-sm font-medium">
-                    Highest Qualification{" "}
-                    <span className="text-red-500">*</span>
+                    Query Type <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={formData.qualification}
+                    value={formData.queryType}
                     onChange={(e) =>
-                      handleInputChange("qualification", e.target.value)
+                      handleInputChange("queryType", e.target.value)
                     }
                     className={cn(
                       baseInputClasses,
                       `border  border-[${global_classnames.container.border}]`,
-                      errors.qualification && "border-red-500"
+                      errors.queryType && "border-red-500"
                     )}
                   >
                     <option value="" disabled>
-                      Select your qualification
+                      Select query type
                     </option>
-                    {qualifications.map((qual) => (
-                      <option key={qual.value} value={qual.value}>
-                        {qual.label}
+                    {queryOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
-                  {errors.qualification && (
+                  {errors.queryType && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.qualification}
+                      {errors.queryType}
                     </p>
-                  )}
-                </div>
-
-                {/* Query */}
-                <div>
-                  <label className="text-sm font-medium">
-                    Query <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={formData.query}
-                    onChange={(e) => handleInputChange("query", e.target.value)}
-                    placeholder="Tell us about your query or interest in the course"
-                    rows={3}
-                    className={cn(
-                      baseInputClasses,
-                      `border  border-[${global_classnames.container.border}]`,
-                      errors.query && "border-red-500"
-                    )}
-                  />
-                  {errors.query && (
-                    <p className="text-red-500 text-xs mt-1">{errors.query}</p>
                   )}
                 </div>
               </div>

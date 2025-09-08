@@ -16,17 +16,17 @@ const Hero = () => {
         {/* Heading */}
         <h1
           style={{ color: global_classnames.heading.primary }}
-          className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight text-center sm:text-left"
+          className="text-2xl lg:text-5xl font-semibold leading-tight sm:text-left"
         >
           CERTIFICATION IN EMERGING TECHNOLOGIES
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mt-2 md:mt-8">
           {/* Text Content */}
           <div className="space-y-6">
             <p
               style={{ color: global_classnames.description_text }}
-              className="text-lg sm:text-xl text-center sm:text-left"
+              className="text-lg sm:text-xl  sm:text-left"
             >
               Artificial Intelgence, Machine Learning, Internet of Things,
               Cybersecurity, Quantum
@@ -34,7 +34,7 @@ const Hero = () => {
 
             <p
               style={{ color: global_classnames.text.primary }}
-              className="text-base sm:text-lg leading-relaxed text-center sm:text-left"
+              className="text-base sm:text-lg leading-relaxed  sm:text-left"
             >
               Advance your career with cutting-edge skills in the most
               sought-after technologies. This comprehensive certification

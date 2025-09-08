@@ -20,12 +20,12 @@ const Testimonial = () => {
   const { name, image, text } = testimonials[currentIndex];
 
   return (
-    <section className="max-w-7xl mx-auto p-6 text-center">
+    <section className="max-w-7xl mx-auto p-2 py-8 md:p-6 text-center">
       <h2 className="text-2xl font-bold mb-6 text-[#004080]">
         What Our Students Say
       </h2>
 
-      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-6 p-6 rounded-lg ">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-6 p-2 md:p-6 rounded-lg ">
         
         {/* Testimonial Content */}
         <div className="flex items-center space-x-6">

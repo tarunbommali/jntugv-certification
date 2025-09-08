@@ -30,9 +30,9 @@ const Skills = () => {
       className="py-16 lg:py-20"
       style={{ backgroundColor: global_classnames.background?.secondary || "#f3f4f6" }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div className="md:text-center mb-12">
           <motion.h2
             className="text-3xl sm:text-4xl font-bold mb-4"
             style={{ color: global_classnames.heading.primary }}
@@ -43,7 +43,7 @@ const Skills = () => {
             Skills & Technologies
           </motion.h2>
           <motion.p
-            className="text-lg max-w-3xl mx-auto"
+            className="text-lg max-w-3xl md:mx-auto"
             style={{ color: global_classnames.text.secondary }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
