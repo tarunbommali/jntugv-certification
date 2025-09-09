@@ -28,7 +28,7 @@ const qualifications = [
 const courses = [
   "IoT Systems and Applications",
   "Fundamentals of Quantum Computing",
-  "Principles of Machine Learning & Deep Learning",
+  "Principles of Quantum Computing",
   "AI and Its Tools",
   "Applied Cybersecurity and Network Defense",
   "Emerging Technologies (3 months course)",
@@ -36,6 +36,7 @@ const courses = [
 
 const RegisterForm = () => {
   const [tab, setTab] = useState(0);
+  const [loading, setLoading] = useState(false);  // Added loading state
   const [formData, setFormData] = useState({
     fullName: "",
     gender: "",
@@ -55,7 +56,7 @@ const RegisterForm = () => {
     applicationForm: null,
   });
 
-  const [errors, setErrors] = useState({}); // store errors
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -69,7 +70,6 @@ const RegisterForm = () => {
 
   const tabs = ["Profile", "Education", "Payments"];
 
-  // Validate all fields on submit
   const validateAll = () => {
     const newErrors = {};
     if (!formData.fullName) newErrors.fullName = "Full Name is required";
@@ -91,11 +91,11 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateAll()) {
-       return;
-    }
+    if (!validateAll()) return;
 
-    const scriptURL = "YOUR_SCRIPT_URL_HERE";
+    setLoading(true);  // Set loading to true when submission starts
+
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwmEEb4JOrKePOKxi7WKOGA-l5D23pxGjUWps0avUqIOTwbviN1Ien8luPVuYt17kus8g/exec";
     const form = new FormData();
     Object.keys(formData).forEach((key) => form.append(key, formData[key]));
     Object.keys(files).forEach((key) => files[key] && form.append(key, files[key]));
@@ -120,21 +120,24 @@ const RegisterForm = () => {
         setFiles({ paymentReceipt: null, applicationForm: null });
         setErrors({});
         setTab(0);
-      } else alert("Submission failed!");
+      } else {
+        alert("Submission failed!");
+      }
     } catch (err) {
       console.error(err);
       alert("Error submitting form.");
+    } finally {
+      setLoading(false);  // Reset loading after submission finishes
     }
   };
 
   return (
     <div className={`max-w-7xl mx-auto p-8 my-4 rounded shadow bg-[${global_classnames.background.secondary}]`}>
-      <h1 className={`text-3xl font-bold mb-8 text-[${global_classnames.heading.primary}] `}>
+      <h1 className={`text-3xl font-bold mb-8 text-[${global_classnames.heading.primary}]`}>
         Emerging & Advanced Technologies Course Registration
       </h1>
 
-      {/* Step Indicator */}
-      <div className="flex mb-6 space-x-4 ">
+      <div className="flex mb-6 space-x-4">
         {tabs.map((t, idx) => (
           <div
             key={idx}
@@ -150,12 +153,14 @@ const RegisterForm = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {tab === 0 && (
           <div className="grid md:grid-cols-2 gap-4">
+            {/* Full Name */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Full Name *</label>
               <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className={errors.fullName ? inputErrorClass : inputClass} />
               {errors.fullName && <span className="text-red-500 text-sm">{errors.fullName}</span>}
             </div>
 
+            {/* Gender */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Gender *</label>
               <select name="gender" value={formData.gender} onChange={handleChange} className={errors.gender ? inputErrorClass : inputClass}>
@@ -168,24 +173,28 @@ const RegisterForm = () => {
               {errors.gender && <span className="text-red-500 text-sm">{errors.gender}</span>}
             </div>
 
+            {/* Category */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Category *</label>
               <input type="text" name="category" value={formData.category} onChange={handleChange} className={errors.category ? inputErrorClass : inputClass} />
               {errors.category && <span className="text-red-500 text-sm">{errors.category}</span>}
             </div>
 
+            {/* Contact Number */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Contact Number *</label>
               <input type="tel" name="contactNumber" value={formData.contactNumber} onChange={handleChange} className={errors.contactNumber ? inputErrorClass : inputClass} />
               {errors.contactNumber && <span className="text-red-500 text-sm">{errors.contactNumber}</span>}
             </div>
 
+            {/* Email */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Email *</label>
               <input type="email" name="email" value={formData.email} onChange={handleChange} className={errors.email ? inputErrorClass : inputClass} />
               {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
             </div>
 
+            {/* Address */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Address *</label>
               <input type="text" name="address" value={formData.address} onChange={handleChange} className={errors.address ? inputErrorClass : inputClass} />
@@ -196,6 +205,7 @@ const RegisterForm = () => {
 
         {tab === 1 && (
           <div className="grid md:grid-cols-2 gap-4">
+            {/* College */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">College/University *</label>
               <select name="college" value={formData.college} onChange={handleChange} className={errors.college ? inputErrorClass : inputClass}>
@@ -205,6 +215,7 @@ const RegisterForm = () => {
               {errors.college && <span className="text-red-500 text-sm">{errors.college}</span>}
             </div>
 
+            {/* Qualification */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Highest Qualification *</label>
               <select name="qualification" value={formData.qualification} onChange={handleChange} className={errors.qualification ? inputErrorClass : inputClass}>
@@ -214,6 +225,7 @@ const RegisterForm = () => {
               {errors.qualification && <span className="text-red-500 text-sm">{errors.qualification}</span>}
             </div>
 
+            {/* Course */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Course *</label>
               <select name="course" value={formData.course} onChange={handleChange} className={errors.course ? inputErrorClass : inputClass}>
@@ -227,18 +239,21 @@ const RegisterForm = () => {
 
         {tab === 2 && (
           <div className="grid md:grid-cols-2 gap-4">
+            {/* Payment Date */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Payment Date *</label>
               <input type="date" name="paymentDate" value={formData.paymentDate} onChange={handleChange} className={errors.paymentDate ? inputErrorClass : inputClass} />
               {errors.paymentDate && <span className="text-red-500 text-sm">{errors.paymentDate}</span>}
             </div>
 
+            {/* Payment Reference */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Payment Reference Number *</label>
               <input type="text" name="paymentRef" value={formData.paymentRef} onChange={handleChange} className={errors.paymentRef ? inputErrorClass : inputClass} />
               {errors.paymentRef && <span className="text-red-500 text-sm">{errors.paymentRef}</span>}
             </div>
 
+            {/* Payment Receipt Upload */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Upload Payment Receipt *</label>
               <label className={`flex items-center p-3 border rounded cursor-pointer w-full hover:bg-gray-200 ${errors.paymentReceipt ? "border-red-500" : ""}`}>
@@ -249,6 +264,7 @@ const RegisterForm = () => {
               {errors.paymentReceipt && <span className="text-red-500 text-sm">{errors.paymentReceipt}</span>}
             </div>
 
+            {/* Application Form Upload */}
             <div className="flex flex-col">
               <label className="mb-1 font-semibold">Upload Filled Application Form *</label>
               <label className={`flex items-center p-3 border rounded cursor-pointer w-full hover:bg-gray-200 ${errors.applicationForm ? "border-red-500" : ""}`}>
@@ -262,16 +278,22 @@ const RegisterForm = () => {
         )}
 
         <div className="flex justify-between mt-6">
-          <button type="button" onClick={() => setTab(Math.max(tab - 1, 0))} className={`${buttonClass} ${tab === 0 ? "opacity-50 cursor-not-allowed" : ""}`}>
+          <button
+            type="button"
+            onClick={() => setTab(Math.max(tab - 1, 0))}
+            className={`${buttonClass} ${tab === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={loading}
+          >
             Previous
           </button>
+
           {tab < 2 ? (
-            <button type="button" onClick={() => setTab(Math.min(tab + 1, 2))} className={buttonClass}>
+            <button type="button" onClick={() => setTab(Math.min(tab + 1, 2))} className={buttonClass} disabled={loading}>
               Next
             </button>
           ) : (
-            <button type="submit" className={buttonClass}>
-              Submit Registration
+            <button type="submit" className={buttonClass} disabled={loading}>
+              {loading ? "Submitting..." : "Submit Registration"}
             </button>
           )}
         </div>

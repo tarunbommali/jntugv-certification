@@ -7,10 +7,8 @@ const Footer = () => {
       style={{ backgroundColor: global_classnames.button.primary.bg }}
       className="text-sm"
     >
-      <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="sm:px-6 lg:px-8 pt-8">
 
-        {/* University Info */}
-        <div>
           <h3
             className="text-lg font-bold mb-2"
             style={{ color: global_classnames.button.primary.text }}
@@ -21,6 +19,9 @@ const Footer = () => {
             Committed to excellence in technical education and research.
           </p>
         </div>
+
+             <div className="sm:px-6 lg:px-8 mx-auto px-8 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+
 
         {/* Quick Links */}
         <div>
@@ -77,7 +78,7 @@ const Footer = () => {
                 style={{ color: global_classnames.button.primary.text }}
               />
               <span style={{ color: global_classnames.button.primary.text }}>
-                +91-8922-248001
+                +91-7780351078
               </span>
             </div>
 
@@ -92,14 +93,17 @@ const Footer = () => {
             </div>
           </div>
         </div>
+
+
       </div>
 
       {/* Footer Bottom */}
+ 
       <div
-        className="border-t py-4"
+        className="border-t  sm:px-6 lg:px-8  px-8 py-2"
         style={{ borderColor: `${global_classnames.button.primary.text}33` }}
       >
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
+        <div className=" mx-auto flex flex-col md:flex-row justify-between items-center ">
           <p style={{ color: global_classnames.button.primary.text }}>
             © {new Date().getFullYear()} JNTU-GV, Vizianagaram. All rights reserved.
           </p>

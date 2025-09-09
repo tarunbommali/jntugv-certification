@@ -1,7 +1,6 @@
 import Hero from "../components/Hero.jsx";
 import Courses from "../components/Courses.jsx";
-import CourseOverview from "../components/CourseOverview.jsx";
-import ModulesSection from "../components/ModulesSection.jsx";
+import About from "../components/About.jsx";
 import ContactSection from "../components/ContactSection.jsx";
 import Footer from "../components/Footer.jsx";
 import WhatsAppChat from "../components/WhatsAppChat.jsx";
@@ -19,15 +18,14 @@ const Website = () => {
        <Hero />
       <Hero2/>
       <Courses />
-      <CourseOverview />
       <Skills/>
       <CapstoneSection/>
-      <ModulesSection />
-      <JoinCommunity/>
+            <About />
+
+       <JoinCommunity/>
       <Testimonial/>
       <ContactSection />
-      <Footer />
-      <WhatsAppChat />
+      
     </main>
   );
 };

@@ -10,11 +10,21 @@ const queryOptions = [
   { value: "other-query", label: "Other Query" },
 ];
 
+const qualificationOptions = [
+  { value: "12", label: "12th Completed" },
+  { value: "graduation-complete", label: "Graduation Completed" },
+  { value: "graduation-ongoing", label: "Graduation Ongoing" },
+  { value: "pg-complete", label: "PG Completed" },
+  { value: "pg-ongoing", label: "PG Ongoing" },
+  { value: "professional", label: "Professional" },
+];
+
 const WhatsAppChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     queryType: "",
+    qualification: "",
   });
   const [errors, setErrors] = useState({});
   const nameInputRef = useRef(null);
@@ -35,6 +45,7 @@ const WhatsAppChat = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.queryType) newErrors.queryType = "Query type is required";
+    if (!formData.qualification) newErrors.qualification = "Qualification is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -53,13 +64,18 @@ const WhatsAppChat = () => {
       (q) => q.value === formData.queryType
     )?.label;
 
-    const message = `Hi! I'm interested in the Certification in Emerging Technologies course.\n\n*Name:* ${formData.name}\n*Query Type:* ${selectedQuery}\n\nPlease provide more information.`;
+    const selectedQualification = qualificationOptions.find(
+      (q) => q.value === formData.qualification
+    )?.label;
+
+    const message = `Hi! I'm interested in the Certification in Emerging Technologies course.\n\n*Name:* ${formData.name}\n*Qualification:* ${selectedQualification}\n*Query Type:* ${selectedQuery}\n\nPlease provide more information.`;
+
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/7780351078?text=${encodedMessage}`;
 
     window.open(whatsappUrl, "_blank");
 
-    setFormData({ name: "", queryType: "" });
+    setFormData({ name: "", queryType: "", qualification: "" });
     setErrors({});
     setIsOpen(false);
 
@@ -98,7 +114,7 @@ const WhatsAppChat = () => {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             onClick={() => setIsOpen(false)}
           />
 
@@ -132,62 +148,80 @@ const WhatsAppChat = () => {
             </div>
 
             {/* Content */}
-            <div className="p-4 max-h-96 overflow-y-auto">
-              <div className="space-y-4">
-                {/* Name */}
-                <div>
-                  <label className="text-sm font-medium">
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    ref={nameInputRef}
-                    value={formData.name}
-                    onChange={(e) =>
-                      handleInputChange("name", e.target.value)
-                    }
-                    placeholder="Enter your full name"
-                    className={cn(
-                      baseInputClasses,
-                      `border  border-[${global_classnames.container.border}]`,
-                      errors.name && "border-red-500"
-                    )}
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            <div className="p-4 max-h-96 overflow-y-auto space-y-4">
+              {/* Name */}
+              <div>
+                <label className="text-sm font-medium">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  ref={nameInputRef}
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  placeholder="Enter your full name"
+                  className={cn(
+                    baseInputClasses,
+                    `border border-[${global_classnames.container.border}]`,
+                    errors.name && "border-red-500"
                   )}
-                </div>
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                )}
+              </div>
 
-                {/* Query Type Dropdown */}
-                <div>
-                  <label className="text-sm font-medium">
-                    Query Type <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={formData.queryType}
-                    onChange={(e) =>
-                      handleInputChange("queryType", e.target.value)
-                    }
-                    className={cn(
-                      baseInputClasses,
-                      `border  border-[${global_classnames.container.border}]`,
-                      errors.queryType && "border-red-500"
-                    )}
-                  >
-                    <option value="" disabled>
-                      Select query type
-                    </option>
-                    {queryOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.queryType && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.queryType}
-                    </p>
+              {/* Highest Qualification Dropdown */}
+              <div>
+                <label className="text-sm font-medium">
+                  Highest Qualification <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.qualification}
+                  onChange={(e) =>
+                    handleInputChange("qualification", e.target.value)
+                  }
+                  className={cn(
+                    baseInputClasses,
+                    `border border-[${global_classnames.container.border}]`,
+                    errors.qualification && "border-red-500"
                   )}
-                </div>
+                >
+                  <option value="" disabled>Select your qualification</option>
+                  {qualificationOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.qualification && (
+                  <p className="text-red-500 text-xs mt-1">{errors.qualification}</p>
+                )}
+              </div>
+
+              {/* Query Type Dropdown */}
+              <div>
+                <label className="text-sm font-medium">
+                  Query Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.queryType}
+                  onChange={(e) => handleInputChange("queryType", e.target.value)}
+                  className={cn(
+                    baseInputClasses,
+                    `border border-[${global_classnames.container.border}]`,
+                    errors.queryType && "border-red-500"
+                  )}
+                >
+                  <option value="" disabled>Select query type</option>
+                  {queryOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.queryType && (
+                  <p className="text-red-500 text-xs mt-1">{errors.queryType}</p>
+                )}
               </div>
             </div>
 

@@ -2,6 +2,9 @@ import React from "react";
 import { global_classnames } from "../utils/classnames";
 import { capstoneProjects } from "../utils/constants";
 import InfiniteMovingCards from "./ui/InfiniteMovingCards";
+import bg from './vector_white_bg.png'
+
+
 
 const CapstoneSection = () => {
   return (
@@ -9,7 +12,10 @@ const CapstoneSection = () => {
       id="capstone"
       className="py-16 lg:py-20"
       style={{
-        backgroundColor: global_classnames.background?.secondary || "#f3f4f6",
+        // backgroundColor: global_classnames.background?.secondary || "#f3f4f6",
+        backgroundImage: `url(${bg})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
       }}
     >
       <div className="max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,24 +45,7 @@ const CapstoneSection = () => {
           pauseOnHover={false}
           className="my-10"
         />
-
-        {/* Assessment Criteria */}
-        <div className="mt-10">
-          <h4
-            className="text-2xl font-semibold mb-4"
-            style={{ color: global_classnames.text.primary }}
-          >
-            Assessment Criteria
-          </h4>
-          <ul
-            className="list-disc list-inside text-base space-y-2"
-            style={{ color: global_classnames.text.primary }}
-          >
-            <li>Project Development & Presentation – 30%</li>
-            <li>Final MCQ Exam – 30%</li>
-            <li>Assignments & Quizzes – 40%</li>
-          </ul>
-        </div>
+ 
       </div>
     </section>
   );
