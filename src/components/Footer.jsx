@@ -1,110 +1,99 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import { global_classnames } from "../utils/classnames";
+import { FaLinkedin, FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
+  const textColor = global_classnames.button.primary.text;
+
   return (
-    <footer
-      style={{ backgroundColor: global_classnames.button.primary.bg }}
-      className="text-sm"
-    >
-            <div className="sm:px-6 lg:px-8 pt-8">
+    <footer className="bg-[#004080] text-white text-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h3 className="text-xl md:text-2xl font-bold mb-3" style={{ color: textColor }}>
+          JAWAHARLAL NEHRU TECHNOLOGICAL UNIVERSITY - GURAJADA VIZIANAGARAM
+        </h3>
+        <p className="mb-6" style={{ color: textColor }}>
+          Committed to excellence in technical education and research.
+        </p>
 
-          <h3
-            className="text-lg font-bold mb-2"
-            style={{ color: global_classnames.button.primary.text }}
-          >
-            JAWAHARLAL NEHRU TECHNOLOGICAL UNIVERSITY - GURAJADA VIZIANAGARAM
-          </h3>
-          <p style={{ color: global_classnames.button.primary.text }}>
-            Committed to excellence in technical education and research.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-2" style={{ color: textColor }}>
+              Quick Links
+            </h4>
+            <ul className="space-y-1">
+              {[
+                { text: "Course Overview", href: "#overview" },
+                { text: "Modules", href: "#modules" },
+                { text: "Practical Experiments", href: "#practicals" },
+                { text: "Capstone Projects", href: "#capstone" },
+                { text: "Contact Us", href: "#contact" },
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <a href={link.href} style={{ color: textColor }} className="hover:underline">
+                    {link.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-             <div className="sm:px-6 lg:px-8 mx-auto px-8 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-
-
-        {/* Quick Links */}
-        <div>
-          <h3
-            className="text-lg font-semibold mb-2"
-            style={{ color: global_classnames.button.primary.text }}
-          >
-            Quick Links
-          </h3>
-          <ul className="space-y-1">
-            {[
-              { text: "Course Overview", href: "#overview" },
-              { text: "Modules", href: "#modules" },
-              { text: "Practical Experiments", href: "#practicals" },
-              { text: "Capstone Projects", href: "#capstone" },
-              { text: "Contact Us", href: "#contact" },
-            ].map((link, index) => (
-              <li key={index}>
-                <a
-                  href={link.href}
-                  style={{ color: global_classnames.button.primary.text }}
-                  className="hover:underline"
-                >
-                  {link.text}
+          {/* Administration Wing */}
+          <div>
+            <h4 className="text-lg font-semibold mb-2" style={{ color: textColor }}>
+              Administration Wing
+            </h4>
+            <div className="flex flex-col space-y-1">
+              {["Chancellor", "Vice Chancellor", "Registrar", "Program Offered", "Affiliated Colleges"].map((item, idx) => (
+                <a key={idx} href="#" className="hover:underline" style={{ color: textColor }}>
+                  {item}
                 </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Contact Info */}
-        <div>
-          <h3
-            className="text-lg font-semibold mb-2"
-            style={{ color: global_classnames.button.primary.text }}
-          >
-            Contact Information
-          </h3>
-
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Mail
-                className="h-4 w-4"
-                style={{ color: global_classnames.button.primary.text }}
-              />
-              <span style={{ color: global_classnames.button.primary.text }}>
-                certifications@jntugv.edu.in
-              </span>
+              ))}
             </div>
+          </div>
 
-            <div className="flex items-center space-x-2">
-              <Phone
-                className="h-4 w-4"
-                style={{ color: global_classnames.button.primary.text }}
-              />
-              <span style={{ color: global_classnames.button.primary.text }}>
-                +91-7780351078
-              </span>
+          {/* Contact Information */}
+          <div>
+            <h4 className="text-lg font-semibold mb-2" style={{ color: textColor }}>
+              Contact Information
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Mail className="h-5 w-5" style={{ color: textColor }} />
+                <span style={{ color: textColor }}>certifications@jntugv.edu.in</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone className="h-5 w-5" style={{ color: textColor }} />
+                <span style={{ color: textColor }}>+91-7780351078</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <MapPin className="h-5 w-5 mt-1" style={{ color: textColor }} />
+                <span style={{ color: textColor }}>
+                  Dwarapudi, Vizianagaram, AP - 535003
+                </span>
+              </div>
             </div>
+          </div>
 
-            <div className="flex items-start space-x-2">
-              <MapPin
-                className="h-4 w-4 mt-1"
-                style={{ color: global_classnames.button.primary.text }}
-              />
-              <span style={{ color: global_classnames.button.primary.text }}>
-                Dwarapudi, Vizianagaram, AP - 535003
-              </span>
+          {/* Social Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-2" style={{ color: textColor }}>
+              Social Links
+            </h4>
+            <div className="flex space-x-4 text-xl">
+              {[FaLinkedin, FaFacebook, FaTwitter, FaInstagram].map((Icon, idx) => (
+                <a key={idx} href="https://www.jntugv.edu.in" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">
+                  <Icon />
+                </a>
+              ))}
             </div>
           </div>
         </div>
-
-
       </div>
 
-      {/* Footer Bottom */}
- 
-      <div
-        className="border-t  sm:px-6 lg:px-8  px-8 py-2"
-        style={{ borderColor: `${global_classnames.button.primary.text}33` }}
-      >
-        <div className=" mx-auto flex flex-col md:flex-row justify-between items-center ">
-          <p style={{ color: global_classnames.button.primary.text }}>
+      <div className="border-t border-gray-600 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+          <p style={{ color: textColor }}>
             © {new Date().getFullYear()} JNTU-GV, Vizianagaram. All rights reserved.
           </p>
 
@@ -112,14 +101,8 @@ const Footer = () => {
             {[
               { text: "Privacy Policy", href: "#" },
               { text: "Terms of Service", href: "#" },
-              
-            ].map((link, index) => (
-              <a
-                key={index}
-                href={link.href}
-                style={{ color: global_classnames.button.primary.text }}
-                className="hover:underline"
-              >
+            ].map((link, idx) => (
+              <a key={idx} href={link.href} style={{ color: textColor }} className="hover:underline">
                 {link.text}
               </a>
             ))}

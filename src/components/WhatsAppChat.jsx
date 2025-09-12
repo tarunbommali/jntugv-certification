@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import {  X, Send } from "lucide-react";
 import { global_classnames } from "../utils/classnames";
+import { FaWhatsapp } from "react-icons/fa";
 
 const cn = (...classes) => classes.filter(Boolean).join(" ");
 
@@ -106,7 +107,7 @@ const WhatsAppChat = () => {
           onClick={() => setIsOpen(true)}
           className="inline-flex items-center justify-center rounded-full h-14 w-14 bg-green-500 hover:bg-green-600 text-white shadow-lg"
         >
-          <MessageCircle className="h-6 w-6" />
+          <FaWhatsapp className="h-6 w-6" />
         </button>
       </div>
 
@@ -128,7 +129,7 @@ const WhatsAppChat = () => {
               style={{ backgroundColor: global_classnames.button.primary.bg }}
             >
               <div className="flex items-center space-x-2">
-                <MessageCircle className="h-5 w-5" />
+                <FaWhatsapp className="h-5 w-5" />
                 <div className="flex flex-col">
                   <h3 className="font-semibold">WhatsApp Us</h3>
                   <p
@@ -234,7 +235,7 @@ const WhatsAppChat = () => {
             >
               <button
                 onClick={handleSubmit}
-                className="inline-flex items-center justify-center text-white bg-green-500 hover:bg-green-600 rounded-md text-sm font-medium w-full h-10 px-4 py-2"
+                className="inline-flex items-center justify-center text-white bg-[#0d542b] hover:bg-green-600 rounded-md text-sm font-medium w-full h-10 px-4 py-2"
               >
                 <Send className="h-4 w-4 mr-2" />
                 WhatsApp Us

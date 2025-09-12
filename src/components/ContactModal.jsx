@@ -1,3 +1,6 @@
+import { FcCustomerSupport } from "react-icons/fc";
+
+
 const ContactModal = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -9,20 +12,22 @@ const ContactModal = ({ onClose }) => {
       ></div>
 
       {/* Modal Content */}
-      <div className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6 z-10">
-        <h2 className="text-xl font-bold mb-4">Contact  24x7</h2>
+      <div className="relative text-[#42526e] bg-white rounded-lg shadow-lg max-w-md w-full p-6 z-10">
+
+        <FcCustomerSupport className="text-4xl mb-4 " />
+        <h2 className="text-xl text-[#192f60]  font-bold mb-4">Contact  24x7</h2>
 
         <p className="mb-2">
           JNTUGV Certification course counsellors and learner support agents are available 24x7 to help with your learning needs.
         </p>
 
-        <div className="mb-2">
-          <strong>For New Course Enquiry:</strong><br />
+        <div className="mb-2 rounded-2xl p-4 border border-[#d4d7de]">
+          <strong>For New Course Enquiry</strong><br />
           India: +91 7780351078
         </div>
 
-        <div className="mb-4">
-          <strong>For Support (Already enrolled learners only):</strong><br />
+        <div className="mb-4 rounded-2xl p-4 border border-[#d4d7de]">
+          <strong>For Support (Already enrolled learners only)</strong><br />
           India: +91  7780351078
         </div>
 

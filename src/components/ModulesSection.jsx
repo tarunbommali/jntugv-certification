@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { global_classnames } from "../utils/classnames";
-import { modules } from "../utils/constants";
 
-const ModulesSection = () => {
-  const [openAccordions, setOpenAccordions] = useState([modules[0].id]);
+const ModulesSection = ({ modules }) => {
+  const [openAccordions, setOpenAccordions] = useState(
+    modules.length > 0 ? [modules[0].id] : []
+  );
 
   const toggleAccordion = (id) => {
     setOpenAccordions((prev) =>
@@ -20,30 +21,22 @@ const ModulesSection = () => {
         backgroundColor: global_classnames.background?.secondary || "#f3f4f6",
       }}
     >
-      <div className="max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl md:mx-auto px-4  lg:px-8">
         {/* Section Heading */}
-        <div className="md:text-center mb-10 sm:mb-12">
+        <div className="mb-8">
           <h2
-            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"
+            className="text-lg md:text-2xl font-semibold"
             style={{ color: global_classnames.heading.primary }}
           >
-            Modules Covered
+            Modules 
           </h2>
-          <p
-            className="text-base sm:text-lg max-w-3xl mx-auto"
-            style={{ color: global_classnames.text.secondary }}
-          >
-            Comprehensive curriculum covering five essential domains of emerging technologies with hands-on practical experience and real-world applications.
-          </p>
         </div>
 
         {/* Modules List */}
         <div className="grid grid-cols-1">
           {modules.map((module, index) => {
-            const IconComponent = module.icon;
             const isOpen = openAccordions.includes(module.id);
 
-            // Apply rounded corners to first and last accordion items
             const borderRadiusClasses =
               index === 0
                 ? "rounded-t-lg"
@@ -64,27 +57,18 @@ const ModulesSection = () => {
                   onClick={() => toggleAccordion(module.id)}
                   className="flex items-center justify-between w-full p-4 sm:p-6 bg-white cursor-pointer"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div
-                      className="p-2 sm:p-3 rounded-full"
-                      style={{
-                        backgroundColor: global_classnames.button.primary.bg,
-                      }}
+                  <div className="text-left">
+                    <h3 className="text-lg sm:text-xl font-semibold text-[#132639]">
+                      {module.title}
+                    </h3>
+                    <p
+                      className="text-xs sm:text-sm"
+                      style={{ color: global_classnames.text.muted }}
                     >
-                      <IconComponent className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="text-lg sm:text-xl font-semibold text-[#132639]">
-                        {module.title}
-                      </h3>
-                      <p
-                        className="text-xs sm:text-sm"
-                        style={{ color: global_classnames.text.muted }}
-                      >
-                        {module.description}
-                      </p>
-                    </div>
+                      {module.description}
+                    </p>
                   </div>
+
                   <ChevronDown
                     className={`h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 ${
                       isOpen ? "rotate-180" : ""
@@ -97,18 +81,14 @@ const ModulesSection = () => {
                 <div
                   className={`transition-max-height duration-500 ease-in-out overflow-hidden`}
                   style={{
-                    maxHeight: isOpen
-                      ? `${module.content.length * 3}rem`
-                      : "0",
+                    maxHeight: isOpen ? `${module.content.length * 3}rem` : "0",
                   }}
                 >
                   {module.content.map((item, idx) => (
                     <div
                       key={idx}
                       className={`flex items-start text-sm sm:text-base p-3 sm:p-4 w-full ${
-                        idx !== module.content.length - 1
-                          ? `border-b`
-                          : ""
+                        idx !== module.content.length - 1 ? `border-b` : ""
                       }`}
                       style={{
                         borderColor: global_classnames.container.border,

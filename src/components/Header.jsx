@@ -35,16 +35,16 @@ const Header = () => {
       )}
 
       {/* Top Bar */}
-      <div className="max-w-full mx-auto px-4 lg:py-2 sm:px-6 lg:px-8 flex text-sm py-2 justify-between bg-[#004080] text-white">
+      <div className="max-w-full mx-auto md:px-4 lg:py-2 sm:px-6 lg:px-8 flex text-sm py-2 justify-between bg-[#004080] text-white">
         <h1
-          className="cursor-pointer"
+          className="cursor-pointer hidden md:flex"
           onClick={() => setIsContactModalOpen(true)}
         >
           New Course Enquiry : India - INR+91 7780351078
         </h1>
 
         <button
-          className=" text-white px-3 cursor-pointer rounded"
+          className=" text-white md:px-3 cursor-pointer rounded"
           onClick={() => setIsOfferModalOpen(true)}
         >
           Career level Up Offer - Flat 10% + Buy 1 Get 1 Ends in : {formattedTime} GRAB NOW
@@ -52,7 +52,7 @@ const Header = () => {
       </div>
 
       {/* Main Header */}
-      <div className="max-w-full mx-auto px-4 lg:py-2 sm:px-6 lg:px-6">
+      <div className="max-w-full mx-auto px-2 md:px-4  lg:py-2 sm:px-6 lg:px-6 border-b  border-[#d1d9e0]">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3 cursor-pointer" href={website}>
@@ -108,13 +108,13 @@ const Header = () => {
         {isMenuOpen && (
           <>
             <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+              className="fixed inset-0  bg-black/50 backdrop-blur-sm z-40"
               onClick={() => setIsMenuOpen(false)}
             />
-            <div className="fixed top-0 left-0 right-0 bg-white z-50 animate-slide-in-top border-b shadow-lg">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex h-16 items-center justify-between border-b border-[#d1d9e0]">
-                  <div className="flex items-center space-x-3 cursor-pointer" href={website}>
+            <div className="fixed top-0 left-0 right-0 bg-[#f0f4f8] w-full z-50 h-full animate-slide-in-top  shadow-lg">
+              <div className="mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex h-16 items-center justify-between  ">
+                  <div className="flex items-center space-x-3  cursor-pointer" href={website}>
                     <img src={logo} alt="JNTU-GV Logo" className="w-16 h-16 mr-2" />
                     <div className="flex flex-col leading-tight">
                       <span className="text-xl pb-2 font-bold" style={{ color: "#004080" }}>
@@ -137,7 +137,7 @@ const Header = () => {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                      className="text-4xl font-light border-t border-[#d1d9e0]  text-foreground hover:text-primary transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.name}

@@ -6,7 +6,7 @@ export default function CourseCard({ course }) {
   const IconComponent = course.icon;
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col border border-gray-200 w-[300px] h-[300px]">
+    <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col border border-gray-200  sm:w-full md:w-[300px] h-[300px]">
       {/* Course Image */}
       <div className="relative h-1/2 overflow-hidden">
         <img
