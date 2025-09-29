@@ -7,7 +7,7 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signin, currentUser } = useAuth();
+  const { signin, signinWithGoogle, currentUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,6 +17,17 @@ const SignIn = () => {
       await signin(email, password);
     } catch (err) {
       setError('Failed to log in: ' + (err?.message || String(err)));
+    }
+    setLoading(false);
+  };
+
+  const handleGoogle = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await signinWithGoogle();
+    } catch (err) {
+      setError('Google sign-in failed: ' + (err?.message || String(err)));
     }
     setLoading(false);
   };
@@ -34,6 +45,9 @@ const SignIn = () => {
           {loading ? 'Logging in...' : 'Sign In'}
         </button>
       </form>
+      <button onClick={handleGoogle} disabled={loading} className="w-full mt-3 bg-white border text-gray-800 py-2 rounded">
+        Continue with Google
+      </button>
       <p className="mt-3 text-sm">Don't have an account? <Link to="/auth/signup" className="text-blue-600">Sign Up</Link></p>
     </div>
   );
