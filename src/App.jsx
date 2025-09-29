@@ -7,6 +7,13 @@ import CoursePage from "./pages/CoursePage";
 import WhatsAppChat from "./components/WhatsAppChat.jsx";
 import ScrollToTop from "./components/ScrollToTop";
 import Footer from "./components/Footer.jsx";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import SignIn from "./pages/SignIn.jsx";
+import SignUp from "./pages/SignUp.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import HomeCourses from "./pages/HomeCourses.jsx";
+import CourseContent from "./pages/CourseContent.jsx";
 
 // 404 Not Found Component
 const NotFound = () => (
@@ -25,17 +32,45 @@ const NotFound = () => (
 const App = () => {
   return (
     <Router>
-      <ScrollToTop />
-      <Header />
+      <AuthProvider>
+        <ScrollToTop />
+        <Header />
 
-      <Routes>
-        <Route path="/" element={<Website />} />
-        <Route path="/course-registration" element={<RegisterForm />} />
-        <Route path="/course/:courseId" element={<CoursePage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Footer />
-      <WhatsAppChat />
+        <Routes>
+          <Route path="/" element={<Website />} />
+          <Route path="/course-registration" element={<RegisterForm />} />
+          <Route path="/course/:courseId" element={<CoursePage />} />
+
+          {/* Auth */}
+          <Route path="/auth/signin" element={<SignIn />} />
+          <Route path="/auth/signup" element={<SignUp />} />
+
+          {/* Catalog and learning */}
+          <Route path="/courses" element={<HomeCourses />} />
+          <Route
+            path="/learn/:courseId"
+            element={
+              <ProtectedRoute>
+                <CourseContent />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+        <WhatsAppChat />
+      </AuthProvider>
     </Router>
   );
 };
