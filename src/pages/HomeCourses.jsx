@@ -10,7 +10,7 @@ const CourseCard = ({ course, isEnrolled, onEnroll }) => (
     <p className="mt-2 text-sm">{course.description}</p>
     <p className="font-bold text-green-700 mt-2">Price: ₹{Number(course.price).toFixed(2)}</p>
     {isEnrolled === true ? (
-      <Link to={`/course/${course.id}`} className="mt-3 inline-block bg-green-600 text-white px-3 py-2 rounded">Access Course</Link>
+      <Link to={`/learn/${course.id}`} className="mt-3 inline-block bg-green-600 text-white px-3 py-2 rounded">Access Course</Link>
     ) : isEnrolled === false ? (
       <button onClick={() => onEnroll(course)} className="mt-3 w-full bg-yellow-400 text-black px-3 py-2 rounded">Pay ₹{Number(course.price).toFixed(2)} & Enroll</button>
     ) : (
@@ -23,12 +23,22 @@ const HomeCourses = () => {
   const { currentUser, isAuthenticated } = useAuth();
   const [courses, setCourses] = useState([]);
   const [enrollmentStatus, setEnrollmentStatus] = useState({});
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const snapshot = await getDocs(collection(db, 'courses'));
-      const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setCourses(list);
+      try {
+        setError('');
+        const snapshot = await getDocs(collection(db, 'courses'));
+        const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setCourses(list);
+      } catch (e) {
+        setError('Failed to load courses. Please try again later.');
+        console.error('Fetch courses error', e);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchCourses();
   }, []);
@@ -50,8 +60,13 @@ const HomeCourses = () => {
       where('courseId', '==', courseId),
       where('status', '==', 'SUCCESS')
     );
-    const snap = await getDocs(qEnroll);
-    setEnrollmentStatus((p) => ({ ...p, [courseId]: !snap.empty }));
+    try {
+      const snap = await getDocs(qEnroll);
+      setEnrollmentStatus((p) => ({ ...p, [courseId]: !snap.empty }));
+    } catch (e) {
+      console.error('Check enrollment error', e);
+      setEnrollmentStatus((p) => ({ ...p, [courseId]: false }));
+    }
   };
 
   const handleEnroll = (course) => {
@@ -59,7 +74,16 @@ const HomeCourses = () => {
       alert('Please sign in to enroll in a course.');
       return;
     }
-    const amountInPaise = Number(course.price) * 100;
+    const priceNumber = Number(course.price);
+    if (!Number.isFinite(priceNumber) || priceNumber <= 0) {
+      alert('Invalid course price. Please contact support.');
+      return;
+    }
+    if (typeof window === 'undefined' || !window.Razorpay) {
+      alert('Payment system not loaded yet. Please try again in a moment.');
+      return;
+    }
+    const amountInPaise = Math.round(priceNumber * 100);
     const razorpayOptions = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_xxx',
       amount: amountInPaise,
@@ -74,7 +98,7 @@ const HomeCourses = () => {
             courseTitle: course.title,
             status: 'SUCCESS',
             paymentId: response.razorpay_payment_id,
-            amount: Number(course.price),
+            amount: priceNumber,
             enrolledAt: new Date()
           });
           alert(`Enrollment successful! Payment ID: ${response.razorpay_payment_id}`);
@@ -105,9 +129,11 @@ const HomeCourses = () => {
       <p className="text-sm text-gray-700 mt-2">
         {isAuthenticated && currentUser ? `Welcome, ${currentUser.email}!` : 'Sign in to enroll and get instant access.'}
       </p>
+      {loading && <p className="mt-4">Loading courses...</p>}
+      {error && <p className="mt-4 text-red-600">{error}</p>}
       <div className="course-list mt-6 flex flex-wrap gap-5 justify-center">
         {courses.length === 0 ? (
-          <p>No courses currently available. Check back soon!</p>
+           <p>No courses currently available. Check back soon!</p>
         ) : (
           courses.map((c) => (
             <CourseCard key={c.id} course={c} isEnrolled={enrollmentStatus[c.id]} onEnroll={handleEnroll} />

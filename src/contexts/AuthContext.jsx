@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const AuthContext = createContext(undefined);
@@ -29,6 +30,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signin = (email, password) => signInWithEmailAndPassword(auth, email, password);
+  const signinWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    const profileRef = doc(db, 'users', user.uid);
+    const profileSnap = await getDoc(profileRef);
+    if (!profileSnap.exists()) {
+      await setDoc(profileRef, {
+        uid: user.uid,
+        email: user.email,
+        isAdmin: false,
+        createdAt: new Date()
+      });
+    }
+    return result;
+  };
   const logout = () => signOut(auth);
 
   useEffect(() => {
@@ -57,6 +74,7 @@ export const AuthProvider = ({ children }) => {
     userProfile,
     signup,
     signin,
+    signinWithGoogle,
     logout,
     isAuthenticated: Boolean(currentUser),
     isAdmin: Boolean(userProfile?.isAdmin),

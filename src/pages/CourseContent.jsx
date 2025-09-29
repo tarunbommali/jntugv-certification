@@ -10,6 +10,7 @@ const CourseContent = () => {
   const [courseDetails, setCourseDetails] = useState(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated || !currentUser) {
@@ -18,20 +19,29 @@ const CourseContent = () => {
     }
     const run = async () => {
       try {
+        setError('');
+        if (!courseId) throw new Error('Invalid course identifier');
         const qCourse = query(collection(db, 'courses'), where('__name__', '==', courseId));
         const courseSnapshot = await getDocs(qCourse);
-        if (!courseSnapshot.empty) {
-          const docData = courseSnapshot.docs[0].data();
-          setCourseDetails({ id: courseSnapshot.docs[0].id, ...docData });
-          const qEnrollment = query(
-            collection(db, 'enrollments'),
-            where('userId', '==', currentUser.uid),
-            where('courseId', '==', courseSnapshot.docs[0].id),
-            where('status', '==', 'SUCCESS')
-          );
-          const enrollmentSnapshot = await getDocs(qEnrollment);
-          setIsAuthorized(!enrollmentSnapshot.empty);
+        if (courseSnapshot.empty) {
+          setError('Course not found.');
+          setIsAuthorized(false);
+          return;
         }
+        const docData = courseSnapshot.docs[0].data();
+        setCourseDetails({ id: courseSnapshot.docs[0].id, ...docData });
+        const qEnrollment = query(
+          collection(db, 'enrollments'),
+          where('userId', '==', currentUser.uid),
+          where('courseId', '==', courseSnapshot.docs[0].id),
+          where('status', '==', 'SUCCESS')
+        );
+        const enrollmentSnapshot = await getDocs(qEnrollment);
+        setIsAuthorized(!enrollmentSnapshot.empty);
+      } catch (e) {
+        console.error('CourseContent error', e);
+        setError('Failed to load course. Please try again later.');
+        setIsAuthorized(false);
       } finally {
         setLoading(false);
       }
@@ -40,12 +50,20 @@ const CourseContent = () => {
   }, [isAuthenticated, currentUser, courseId]);
 
   if (loading) return <div className="page-container p-6">Loading course access...</div>;
+  if (error)
+    return (
+      <div className="page-container p-6">
+        <h1 className="text-2xl font-semibold">Error</h1>
+        <p className="mt-2 text-red-600">{error}</p>
+        <Link to="/courses" className="text-blue-600 underline mt-3 inline-block">Browse Courses</Link>
+      </div>
+    );
   if (!isAuthorized)
     return (
       <div className="page-container p-6">
         <h1 className="text-2xl font-semibold">Access Denied 🔒</h1>
         <p className="mt-2">You must successfully complete the payment and enrollment process to access this course content.</p>
-        <Link to="/" className="text-blue-600 underline mt-3 inline-block">Browse Courses</Link>
+        <Link to="/courses" className="text-blue-600 underline mt-3 inline-block">Browse Courses</Link>
       </div>
     );
 

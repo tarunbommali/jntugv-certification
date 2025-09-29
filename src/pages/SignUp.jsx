@@ -7,7 +7,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup, currentUser } = useAuth();
+  const { signup, signinWithGoogle, currentUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +18,17 @@ const SignUp = () => {
       alert('Account created successfully!');
     } catch (err) {
       setError('Failed to create an account: ' + (err?.message || String(err)));
+    }
+    setLoading(false);
+  };
+
+  const handleGoogle = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await signinWithGoogle();
+    } catch (err) {
+      setError('Google sign-in failed: ' + (err?.message || String(err)));
     }
     setLoading(false);
   };
@@ -35,6 +46,9 @@ const SignUp = () => {
           {loading ? 'Creating...' : 'Sign Up'}
         </button>
       </form>
+      <button onClick={handleGoogle} disabled={loading} className="w-full mt-3 bg-white border text-gray-800 py-2 rounded">
+        Continue with Google
+      </button>
       <p className="mt-3 text-sm">Already have an account? <Link to="/auth/signin" className="text-blue-600">Sign In</Link></p>
     </div>
   );

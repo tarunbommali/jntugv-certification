@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpg";
 import { website } from "../utils/constants";
 import useCountdownTimer from "../hooks/useCountdownTimer";
 import ContactModal from "./ContactModal";
 import OfferModal from "./OfferModal";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated, currentUser, logout } = useAuth();
 
   const formattedTime = useCountdownTimer(9 * 3600 + 17 * 60 + 10);
 
@@ -81,14 +84,26 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:flex">
-            <Link
-              to="/course-registration"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:opacity-90 transition-shadow shadow-md"
-            >
-              Register Now
-            </Link>
+          {/* Auth Toggle */}
+          <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm text-gray-600">{currentUser?.email}</span>
+                <button
+                  onClick={async () => { await logout(); navigate('/'); }}
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:opacity-90 transition-shadow shadow-md"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate('/auth/signin')}
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:opacity-90 transition-shadow shadow-md"
+              >
+                Login
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -144,9 +159,21 @@ const Header = () => {
                     </a>
                   ))}
 
-                  <button className="w-full h-12 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium hover:opacity-90 transition-shadow shadow-md">
-                    Register Now
-                  </button>
+                  {isAuthenticated ? (
+                    <button
+                      className="w-full h-12 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium hover:opacity-90 transition-shadow shadow-md"
+                      onClick={async () => { await logout(); setIsMenuOpen(false); navigate('/'); }}
+                    >
+                      Logout
+                    </button>
+                  ) : (
+                    <button
+                      className="w-full h-12 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium hover:opacity-90 transition-shadow shadow-md"
+                      onClick={() => { setIsMenuOpen(false); navigate('/auth/signin'); }}
+                    >
+                      Login
+                    </button>
+                  )}
                 </nav>
               </div>
             </div>
