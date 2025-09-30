@@ -1,55 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { useCourse } from '../contexts/CourseContext.jsx';
+import { useUser } from '../contexts/UserContext.jsx';
 
 const CourseContent = () => {
   const { courseId } = useParams();
   const { currentUser, isAuthenticated } = useAuth();
+  const { getCourseById, refreshCourses, loading: loadingCourses } = useCourse();
+  const { enrollments, loadingEnrollments } = useUser();
   const [courseDetails, setCourseDetails] = useState(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated || !currentUser) {
-      setLoading(false);
-      return;
-    }
     const run = async () => {
-      try {
-        setError('');
-        if (!courseId) throw new Error('Invalid course identifier');
-        const qCourse = query(collection(db, 'courses'), where('__name__', '==', courseId));
-        const courseSnapshot = await getDocs(qCourse);
-        if (courseSnapshot.empty) {
-          setError('Course not found.');
-          setIsAuthorized(false);
-          return;
-        }
-        const docData = courseSnapshot.docs[0].data();
-        setCourseDetails({ id: courseSnapshot.docs[0].id, ...docData });
-        const qEnrollment = query(
-          collection(db, 'enrollments'),
-          where('userId', '==', currentUser.uid),
-          where('courseId', '==', courseSnapshot.docs[0].id),
-          where('status', '==', 'SUCCESS')
-        );
-        const enrollmentSnapshot = await getDocs(qEnrollment);
-        setIsAuthorized(!enrollmentSnapshot.empty);
-      } catch (e) {
-        console.error('CourseContent error', e);
-        setError('Failed to load course. Please try again later.');
-        setIsAuthorized(false);
-      } finally {
+      if (!courseId) {
+        setError('Invalid course identifier');
         setLoading(false);
+        return;
       }
+      if (!isAuthenticated || !currentUser) {
+        setLoading(false);
+        return;
+      }
+      setError('');
+      await refreshCourses();
+      const course = getCourseById(courseId);
+      if (!course) {
+        setError('Course not found.');
+        setIsAuthorized(false);
+        setLoading(false);
+        return;
+      }
+      setCourseDetails(course);
+      const authorized = enrollments.some((e) => String(e.courseId) === String(course.id));
+      setIsAuthorized(authorized);
+      setLoading(false);
     };
     run();
-  }, [isAuthenticated, currentUser, courseId]);
+  }, [isAuthenticated, currentUser, courseId, getCourseById, refreshCourses, enrollments]);
 
-  if (loading) return <div className="page-container p-6">Loading course access...</div>;
+  if (loading || loadingCourses || loadingEnrollments) return <div className="page-container p-6">Loading course access...</div>;
   if (error)
     return (
       <div className="page-container p-6">
