@@ -18,5 +18,12 @@ export const auth = getAuth(app);
 initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
 export const db = getFirestore(app);
 
+
+
+
+// Read and export the Razorpay Key ID
+export const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID; 
+
+
 export default app;
 
