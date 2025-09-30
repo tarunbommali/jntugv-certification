@@ -3,13 +3,21 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { doc, getDoc, addDoc, collection } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../firebase"; // Ensure this path is correct
 import { Lock, DollarSign, CheckCircle, GraduationCap, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import useRazorpay from "../hooks/useRazorpay"; // ✅ The custom hook is now correctly imported
+import useRazorpay from "../hooks/useRazorpay";
 import { global_classnames } from "../utils/classnames.js";
 
-// --- Placeholder Data & Constants ---
+// --- Local Fallback Data (Used if Firebase data fails) ---
+const FALLBACK_COURSE_DATA = {
+  id: "ai-ml-cert",
+  title: "Advanced AI & Machine Learning Certification (Local Demo)",
+  price: 5499, // Course Amount (₹5499)
+  originalPrice: 6599, // For display
+  platformDiscount: 1100,
+  taxRate: 0.18, // 18% GST/Tax
+};
 
 // Define core colors based on established style
 const PRIMARY_BLUE = "#004080";
@@ -19,9 +27,8 @@ const ACCENT_GREEN = "#28a745";
 const CheckoutPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useAuth(); // Get real user from context
+  const { currentUser } = useAuth(); // --- State Management ---
 
-  // --- State Management ---
   const [course, setCourse] = useState(null);
   const [billingInfo, setBillingInfo] = useState({
     name: currentUser?.name || "",
@@ -31,52 +38,62 @@ const CheckoutPage = () => {
     college: "",
     agreeTerms: false,
   });
-  const [loading, setLoading] = useState(true); // Initial fetch loading state
-  const [paymentError, setPaymentError] = useState(null); // --- Payment Integration --- // Callback executed upon successful payment (called by useRazorpay hook)
+  const [loading, setLoading] = useState(true);
+  const [paymentError, setPaymentError] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponMessage, setCouponMessage] = useState("");
-  const [useTestPayment, setUseTestPayment] = useState(false);
+  const [useTestPayment, setUseTestPayment] = useState(false); // --- Payment Integration ---
 
   const handlePaymentSuccess = useCallback(
     (enrollmentId, courseId) => {
-      // Optionally show a success toast/notification here
-      alert("Enrollment successful! Redirecting to course content."); // Redirect to the learning area
+      alert("Enrollment successful! Redirecting to course content.");
       navigate(`/learn/${courseId}`);
     },
     [navigate]
-  ); // Initialize the Razorpay hook
+  );
 
   const {
     initializePayment,
-    isLoading: isPaymentGatewayLoading, // Rename hook loading state
-    error: paymentGatewayError, // Rename hook error state
-  } = useRazorpay(currentUser, handlePaymentSuccess); // Placeholder: Fetch Course Data and Initialize Billing Info
+    isLoading: isPaymentGatewayLoading,
+    error: paymentGatewayError,
+  } = useRazorpay(currentUser, handlePaymentSuccess); // --- Course Data Loading Logic (Resilient) ---
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
         setPaymentError(null);
+        // 1. Attempt to fetch data from Firestore
         const ref = doc(db, "courses", courseId);
         const snap = await getDoc(ref);
         if (snap.exists()) {
           setCourse({ id: snap.id, ...snap.data() });
         } else {
-          setCourse(null);
-          setPaymentError("Course not found. Please start from the courses page.");
+          // 2. Fallback if document doesn't exist (e.g., URL typo)
+          setCourse(FALLBACK_COURSE_DATA);
+          setPaymentError("Course not found in database. Using demo data.");
         }
+      } catch (e) {
+        // 3. Fallback if the database connection fails (e.g., Firestore Listen error)
+        console.error(
+          "Failed to load course from Firebase. Using local demo data.",
+          e
+        );
+        setCourse(FALLBACK_COURSE_DATA);
+        setPaymentError(
+          "Connection error. Using local demo data. Payments will use test mode."
+        );
+        setUseTestPayment(true); // Force test payment if connection fails
+      } finally {
+        // Initialize billing info AFTER fetching course data (or setting fallback)
         if (currentUser) {
           setBillingInfo((prev) => ({
             ...prev,
             email: currentUser.email,
-            name: currentUser.displayName || currentUser.name || prev.name || "",
+            name: currentUser.displayName || prev.name || "",
           }));
         }
-      } catch (e) {
-        console.error("Failed to load course", e);
-        setPaymentError("Failed to load course details.");
-      } finally {
         setLoading(false);
       }
     };
@@ -86,7 +103,7 @@ const CheckoutPage = () => {
   if (!course || loading)
     return (
       <div className="p-10 text-center text-xl font-medium">
-                Loading course details...      
+                        Loading course details...            
       </div>
     ); // --- Calculation Logic ---
 
@@ -95,13 +112,16 @@ const CheckoutPage = () => {
   const subtotal = courseAmount - platformDiscount;
   const taxRate = Number(course.taxRate || 0.18);
   const tax = subtotal * taxRate;
-  const couponDiscount = appliedCoupon?.type === "percent"
-    ? Math.min(subtotal, subtotal * (appliedCoupon.value / 100))
-    : appliedCoupon?.type === "flat"
-    ? Math.min(subtotal, appliedCoupon.value)
-    : 0;
+
+  const couponDiscount =
+    appliedCoupon?.type === "percent"
+      ? Math.min(subtotal, subtotal * (appliedCoupon.value / 100))
+      : appliedCoupon?.type === "flat"
+      ? Math.min(subtotal, appliedCoupon.value)
+      : 0;
+
   const totalAmount = Math.max(0, subtotal - couponDiscount + tax);
-  const totalSaved = (Number(course.originalPrice || 0)) - totalAmount; // --- Handlers ---
+  const totalSaved = Number(course.originalPrice || 0) - totalAmount; // --- Handlers ---
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -110,6 +130,38 @@ const CheckoutPage = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
     setPaymentError(null); // Clear form-level errors on input
+  };
+
+  const handleApplyCoupon = (e) => {
+    e.preventDefault(); // Prevents form submission
+    const trimmed = couponCode.trim().toUpperCase();
+    if (!trimmed) return;
+
+    // Hardcoded Coupon data (Ideally fetched from Firestore)
+    const coupons = {
+      WELCOME10: {
+        code: "WELCOME10",
+        type: "percent",
+        value: 10,
+        label: "10% OFF",
+      },
+      FLAT500: { code: "FLAT500", type: "flat", value: 500, label: "₹500 OFF" },
+      COLLEGE50: {
+        code: "COLLEGE50",
+        type: "percent",
+        value: 50,
+        label: "50% OFF (special)",
+      },
+    };
+
+    const found = coupons[trimmed];
+    if (!found) {
+      setAppliedCoupon(null);
+      setCouponMessage("Invalid coupon code.");
+    } else {
+      setAppliedCoupon(found);
+      setCouponMessage(`Coupon applied: ${found.label}`);
+    }
   };
 
   const handleConfirmAndPay = async (e) => {
@@ -127,7 +179,12 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Test payment path
+    // Ensure course object is available before payment
+    if (!course) {
+      setPaymentError("Course data is missing. Cannot initiate payment.");
+      return;
+    } // 1. Test payment path
+
     if (useTestPayment) {
       try {
         const enrollmentDoc = await addDoc(collection(db, "enrollments"), {
@@ -136,8 +193,6 @@ const CheckoutPage = () => {
           courseTitle: course.title,
           status: "SUCCESS",
           paymentId: "TEST_PAYMENT_" + Math.random().toString(36).slice(2),
-          orderId: "TEST_ORDER",
-          signature: "TEST_SIGNATURE",
           amount: totalAmount,
           coupon: appliedCoupon?.code || null,
           couponDiscount,
@@ -149,12 +204,10 @@ const CheckoutPage = () => {
         return;
       } catch (err) {
         console.error("Test payment enrollment error", err);
-        setPaymentError("Failed to record test enrollment.");
+        setPaymentError("Failed to record test enrollment in database.");
         return;
       }
-    }
-
-    // 🚀 EXECUTE RAZORPAY PAYMENT 🚀 // We don't set local 'loading' true here, as the hook handles payment loading
+    } // 2. 🚀 EXECUTE RAZORPAY PAYMENT 🚀
 
     const success = await initializePayment({
       amount: totalAmount,
@@ -163,13 +216,14 @@ const CheckoutPage = () => {
       billingInfo: billingInfo,
       coupon: appliedCoupon?.code || null,
       couponDiscount,
-    }); // If initializePayment fails *before* launching the modal (e.g., key missing)
+    }); // If initializePayment fails *before* launching the modal
     if (!success && paymentGatewayError) {
       setPaymentError(paymentGatewayError);
-    } // Note: If the payment modal opens successfully, the hook handles the rest.
+    }
   }; // Determine the final error message to display
 
   const finalError = paymentError || paymentGatewayError; // --- Helper Component for Readability ---
+
   const PriceRow = ({
     label,
     value,
@@ -192,7 +246,7 @@ const CheckoutPage = () => {
             : "text-gray-700"
         }`}
       >
-                {label}     
+                {label}           
       </span>
            
       <span
@@ -200,7 +254,7 @@ const CheckoutPage = () => {
           isDiscount ? "text-red-500" : isTotal ? "text-2xl" : "text-gray-900"
         } font-semibold`}
       >
-                {isDiscount ? "- " : ""}₹{Math.abs(value).toFixed(2)}     
+                {isDiscount ? "- " : ""}₹{Math.abs(value).toFixed(2)}           
       </span>
          
     </div>
@@ -210,48 +264,44 @@ const CheckoutPage = () => {
     "w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600 transition";
 
   return (
-    <section className="py-16 bg-gray-50 min-h-screen">
+    <section className="py-4 bg-gray-50 min-h-screen">
            
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-               
-        <h1
-          className={`text-4xl font-extrabold mb-12 text-center`}
-          style={{ color: PRIMARY_BLUE }}
-        >
-                    Secure Enrollment Checkout 🔒        
-        </h1>
-               
+                         
         <form
           onSubmit={handleConfirmAndPay}
           className="grid grid-cols-1 lg:grid-cols-3 gap-10"
         >
-                    {/* LEFT COLUMN: Billing Information Form (2/3 width) */}   
-               
+                             
+          {/* LEFT COLUMN: Billing Information Form (2/3 width) */}             
           <div className="lg:col-span-2 space-y-8 p-8 bg-white rounded-2xl shadow-xl border border-blue-100">
                        
             <h2 className="text-2xl font-bold border-b-2 border-yellow-500 pb-3 text-gray-800 flex items-center gap-3">
-                           
+                                                       
               <GraduationCap
                 className="w-6 h-6"
                 style={{ color: PRIMARY_BLUE }}
               />
-                           1. Your Billing Details            
+              Enrollment Checkout           
             </h2>
-                       {/* Course Title Reminder */}           
+                                   {/* Course Title Reminder */}               
+                   
             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
                            
               <p className="font-semibold text-blue-800 text-lg">
-                               Enrolling in: {course.title}             
+                                               Enrolling in: {course.title}     
+                                     
               </p>
                          
             </div>
-                       
+                                               
             <div className="grid sm:grid-cols-2 gap-6">
-                           
+                                                       
               <div>
                                
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    Full Name                
+                                                      Full Name                
+                                 
                 </label>
                                
                 <input
@@ -265,11 +315,12 @@ const CheckoutPage = () => {
                 />
                              
               </div>
-                           
+                                                       
               <div>
                                
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    Email Address (Non-editable)                
+                                                      Email Address
+                  (Non-editable)                                
                 </label>
                                
                 <input
@@ -282,11 +333,12 @@ const CheckoutPage = () => {
                 />
                              
               </div>
-                           
+                                                       
               <div>
                                
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    Phone Number                
+                                                      Phone Number              
+                                   
                 </label>
                                
                 <input
@@ -300,11 +352,11 @@ const CheckoutPage = () => {
                 />
                              
               </div>
-                           
+                                                       
               <div>
                                
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  College / Institution
+                                    College / Institution                
                 </label>
                                
                 <input
@@ -317,52 +369,12 @@ const CheckoutPage = () => {
                 />
                              
               </div>
-                                        
+                         
             </div>
-            {/* Terms and Conditions + Coupon + Test Payment */}
+                        {/* Terms and Conditions  + Test Payment */}           
             <div className="pt-6 border-t border-gray-200">
-                           
-              {/* Coupon entry */}
-              <div className="grid sm:grid-cols-3 gap-4 items-end mb-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Have a coupon?</label>
-                  <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    placeholder="Enter coupon code (e.g., WELCOME10, FLAT500)"
-                    className={baseInputClasses}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const trimmed = couponCode.trim().toUpperCase();
-                    if (!trimmed) return;
-                    const coupons = {
-                      WELCOME10: { code: "WELCOME10", type: "percent", value: 10, label: "10% OFF" },
-                      FLAT500: { code: "FLAT500", type: "flat", value: 500, label: "₹500 OFF" },
-                      COLLEGE50: { code: "COLLEGE50", type: "percent", value: 50, label: "50% OFF (special)" },
-                    };
-                    const found = coupons[trimmed];
-                    if (!found) {
-                      setAppliedCoupon(null);
-                      setCouponMessage("Invalid coupon code.");
-                    } else {
-                      setAppliedCoupon(found);
-                      setCouponMessage(`Coupon applied: ${found.label}`);
-                    }
-                  }}
-                  className="h-12 bg-blue-600 text-white rounded-lg font-semibold"
-                >
-                  Apply
-                </button>
-              </div>
-              {couponMessage && (
-                <p className={`text-sm ${appliedCoupon ? "text-green-700" : "text-red-600"}`}>{couponMessage}</p>
-              )}
-
-              {/* Terms */}
+                                                                     
+              {/* Terms */}             
               <label className="flex items-center space-x-3 cursor-pointer mt-4">
                                
                 <input
@@ -375,7 +387,7 @@ const CheckoutPage = () => {
                 />
                                
                 <span className="text-sm text-gray-700">
-                                    I agree to the                  
+                                    I agree to the                   
                   <Link
                     to="/terms"
                     target="_blank"
@@ -383,7 +395,7 @@ const CheckoutPage = () => {
                   >
                                         Terms                  
                   </Link>
-                                    and                  
+                                    and                   
                   <Link
                     to="/policies"
                     target="_blank"
@@ -395,16 +407,16 @@ const CheckoutPage = () => {
                 </span>
                              
               </label>
-
+                           
               {finalError && (
                 <p className="text-red-600 text-sm mt-3 font-medium flex items-center gap-1">
-                                    <X className="w-4 h-4" />                 
-                  {finalError}             
+                                    <X className="w-4 h-4" />                   
+                                  {finalError}                             
                 </p>
               )}
-
-              {/* Test payment toggle */}
+                            {/* Test payment toggle */}             
               <div className="mt-4 flex items-center gap-3">
+                               
                 <input
                   id="useTestPayment"
                   type="checkbox"
@@ -412,20 +424,31 @@ const CheckoutPage = () => {
                   onChange={(e) => setUseTestPayment(e.target.checked)}
                   className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-600"
                 />
-                <label htmlFor="useTestPayment" className="text-sm text-gray-700">Use Test Payment (no real charge)</label>
+                               
+                <label
+                  htmlFor="useTestPayment"
+                  className="text-sm text-gray-700"
+                >
+                  Use Test Payment (No real charge)
+                </label>
+                             
               </div>
+                         
             </div>
-                  
+                     
           </div>
-                    {/* RIGHT COLUMN: Order Summary (1/3 width) */}         
+                              {/* RIGHT COLUMN: Order Summary (1/3 width) */}   
+                         
           <div className="lg:col-span-1 space-y-6">
-                        {/* Course Summary Card */}           
+                                    {/* Course Summary Card */}                 
+                 
             <div className="bg-white p-6 rounded-2xl shadow-xl border border-blue-100 sticky top-28">
-                           
+                                                       
               <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
-                                2. Payment Details              
+                Payment Details                            
               </h2>
-                          {/* Detailed Pricing */}             
+                                        {/* Detailed Pricing */}               
+                         
               <div className="space-y-1">
                                
                 <PriceRow label="Course Amount" value={courseAmount} />
@@ -435,6 +458,47 @@ const CheckoutPage = () => {
                   value={platformDiscount}
                   isDiscount={true}
                 />
+                {/* Coupon entry */}             
+                <div className="grid sm:grid-cols-3 gap-4 items-end mb-4">
+                                 
+                  <div className="sm:col-span-2">
+                                     
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Have a coupon?
+                    </label>
+                                     
+                    <input
+                      type="text"
+                      value={couponCode}
+
+                      onChange={(e) =>
+                        setCouponCode(e.target.value.toUpperCase())
+                      }
+                      placeholder="Enter coupon code (e.g., WELCOME10)"
+                      className={`${baseInputClasses} outline-none`}
+                    />
+                                   
+                  </div>
+                                 
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    className="h-12 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                  >
+                                      Apply                
+                  </button>
+                               
+                </div>
+                             
+                {couponMessage && (
+                  <p
+                    className={`text-sm ${
+                      appliedCoupon ? "text-green-700" : "text-red-600"
+                    }`}
+                  >
+                    {couponMessage}
+                  </p>
+                )}
                                
                 <PriceRow label="Total (Pre-Tax)" value={subtotal} />
                                
@@ -443,7 +507,7 @@ const CheckoutPage = () => {
                   value={tax}
                   isTax={true}
                 />
-                            
+                               
                 {couponDiscount > 0 && (
                   <PriceRow
                     label={`Coupon Discount (${appliedCoupon?.code})`}
@@ -451,61 +515,56 @@ const CheckoutPage = () => {
                     isDiscount={true}
                   />
                 )}
+                             
               </div>
-                          {/* Total Final Price */}
-                          
+                                        {/* Total Final Price */}
+                           
               <PriceRow
                 label="Total Amount Payable"
                 value={totalAmount}
                 isTotal={true}
               />
-                          {/* Total Savings */}           
+                                        {/* Total Savings */}                   
+                   
               <div className="bg-green-50 border border-green-300 p-4 mt-4 rounded-lg flex justify-between items-center text-green-700 font-bold shadow-inner">
                                
                 <span className="flex items-center gap-2">
-                                    <DollarSign className="w-5 h-5" />         
-                        Total Saved            
+                                      Total Saved                
                 </span>
                                
                 <span className="text-xl">₹{totalSaved.toFixed(2)}</span>       
-                     
+                             
               </div>
+                                      {/* Confirm and Pay Button */}           
                          
+              <button
+                type="submit"
+                disabled={isPaymentGatewayLoading || !billingInfo.agreeTerms}
+                className={`w-full h-14 rounded-xl text-lg font-bold text-white transition-all shadow-xl ${
+                  billingInfo.agreeTerms
+                    ? "bg-green-600 hover:bg-green-700 transform hover:scale-[1.01]"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
+              >
+                             
+                {isPaymentGatewayLoading ? (
+                  "Initiating Secure Payment..."
+                ) : (
+                  <>
+                                      <Lock className="w-5 h-5 inline mr-2" /> 
+                                        Confirm and Pay ₹
+                    {totalAmount.toFixed(2)}                       
+                  </>
+                )}
+                           
+              </button>
+                                 
             </div>
-                        {/* Confirm and Pay Button */}           
-            <button
-              type="submit"
-              disabled={isPaymentGatewayLoading || !billingInfo.agreeTerms}
-              className={`w-full h-14 rounded-xl text-lg font-bold text-white transition-all shadow-xl ${
-                billingInfo.agreeTerms
-                  ? "bg-green-600 hover:bg-green-700 transform hover:scale-[1.01]"
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
-            >
-                          
-              {isPaymentGatewayLoading ? (
-                "Initiating Secure Payment..."
-              ) : (
-                <>
-                                    <Lock className="w-5 h-5 inline mr-2" />   
-                              Confirm and Pay ₹{totalAmount.toFixed(2)}       
-                        
-                </>
-              )}
-                         
-            </button>
-                        {/* Security Assurance */}           
-            <div className="text-center text-sm text-gray-500 flex items-center justify-center gap-2">
-                           <CheckCircle className="w-4 h-4 text-green-500" />
-                         
-              <span>Payments powered by Razorpay. 100% Secure & Verified.</span>
-                         
-            </div>
-                 
+                     
           </div>
                  
         </form>
-              
+             
       </div>
          
     </section>

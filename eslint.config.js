@@ -1,11 +1,5 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
-
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'node_modules', 'build', '.eslintrc.js']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -15,7 +9,11 @@ export default defineConfig([
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        ...globals.es2020,
+        ...globals.node
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -23,7 +21,12 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': 'error',
+      'no-irregular-whitespace': 'error',
+      'no-console': 'error',
+      'no-debugger': 'error',
+      'prefer-const': 'error',
+      'react-hooks/exhaustive-deps': 'error',
     },
   },
 ])
