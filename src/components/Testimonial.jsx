@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { testimonials } from "../utils/constants";
+import { global_classnames } from "../utils/classnames.js";
 
 const Testimonial = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,7 +21,7 @@ const Testimonial = () => {
   const { name, image, text } = testimonials[currentIndex];
 
   return (
-    <section className="max-w-7xl mx-auto p-2 py-8 md:p-6 text-center">
+    <div className={`${global_classnames.width.container} mx-auto p-2 py-8 md:p-6 text-center`}>
       <h2 className="text-2xl font-bold mb-6 text-[#004080]">
         What Our Students Say
       </h2>
@@ -58,7 +59,7 @@ const Testimonial = () => {
           </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

@@ -1,12 +1,14 @@
 import React from "react";
 import { FaLanguage, FaStar, FaClock } from "react-icons/fa";
 import ModulesSection from "../components/ModulesSection";
+import { global_classnames } from "../utils/classnames.js";
+import { Link } from "react-router-dom";
 
 const CourseDetails = ({ course, formattedTime }) => {
   const modules = course.modules || [];
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 bg-white rounded-lg">
+    <div className={`${global_classnames.width.container} mx-auto p-4 sm:p-6 lg:p-8 bg-white rounded-lg`}>
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
 
         {/* Preview + Pricing (Right Column on large screens, Top on small screens) */}
@@ -54,9 +56,9 @@ const CourseDetails = ({ course, formattedTime }) => {
             <div className="bg-gray-100 text-center font-mono p-2 rounded text-sm">
               ⏱ {formattedTime}
             </div>
-            <button className="w-full bg-primary text-white bg-green-700 px-4 py-2 rounded hover:bg-primary/90 transition">
+            <Link to={`/checkout/${course.id}`} className="w-full bg-primary text-white bg-green-700 px-4 py-2 rounded hover:bg-primary/90 transition">
               Enroll Now
-            </button>
+            </Link>
           </div>
         </div>
 

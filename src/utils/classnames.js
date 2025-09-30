@@ -1,4 +1,7 @@
 export const global_classnames = {
+  width: {
+    container: "lg:max-w-7xl xl:max-w-8xl",
+  },
   container: {
     border: "#d1d9e0",
   },

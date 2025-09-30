@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Website from "./pages/Website.jsx";
-import RegisterForm from "./pages/RegisterForm.jsx";
 import Header from "./components/Header.jsx";
 import CoursePage from "./pages/CoursePage";
 import WhatsAppChat from "./components/WhatsAppChat.jsx";
@@ -14,6 +13,8 @@ import SignUp from "./pages/SignUp.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import HomeCourses from "./pages/HomeCourses.jsx";
 import CourseContent from "./pages/CourseContent.jsx";
+
+import CheckoutPage from "./pages/CheckoutPage.jsx";
 
 // 404 Not Found Component
 const NotFound = () => (
@@ -38,8 +39,7 @@ const App = () => {
 
         <Routes>
           <Route path="/" element={<Website />} />
-          <Route path="/course-registration" element={<RegisterForm />} />
-          <Route path="/course/:courseId" element={<CoursePage />} />
+           <Route path="/course/:courseId" element={<CoursePage />} />
 
           {/* Auth */}
           <Route path="/auth/signin" element={<SignIn />} />
@@ -52,6 +52,15 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <CourseContent />
+              </ProtectedRoute>
+            }
+          />
+
+              <Route
+            path="/checkout/:courseId"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
               </ProtectedRoute>
             }
           />

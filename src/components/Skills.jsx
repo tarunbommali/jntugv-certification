@@ -30,7 +30,7 @@ const Skills = () => {
       className="py-16 lg:py-20"
       style={{ backgroundColor: global_classnames.background?.secondary || "#f3f4f6" }}
     >
-      <div className="max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={`${global_classnames.width.container} md:mx-auto px-4 sm:px-6 lg:px-8`}>
         {/* Heading */}
         <div className="md:text-center mb-12">
           <motion.h2
