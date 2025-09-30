@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext.jsx";
+import { useCourse } from "../contexts/CourseContext.jsx";
+import { useUser } from "../contexts/UserContext.jsx";
 import { global_classnames } from "../utils/classnames.js";
 
 const CourseCard = ({ course, isEnrolled, onEnroll }) => (
@@ -39,53 +41,28 @@ const CourseCard = ({ course, isEnrolled, onEnroll }) => (
 
 const HomeCourses = () => {
   const { currentUser, isAuthenticated } = useAuth();
-  const [courses, setCourses] = useState([]);
+  const { courses, loading, error, refreshCourses } = useCourse();
+  const { enrollments } = useUser();
   const [enrollmentStatus, setEnrollmentStatus] = useState({});
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setError("");
-        const snapshot = await getDocs(collection(db, "courses"));
-        const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setCourses(list);
-      } catch (e) {
-        setError("Failed to load courses. Please try again later.");
-        console.error("Fetch courses error", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourses();
+    refreshCourses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated && currentUser) {
-      courses.forEach((c) => checkEnrollmentStatus(c.id));
-    } else {
+    if (!isAuthenticated || !currentUser) {
       setEnrollmentStatus({});
+      return;
     }
-  }, [courses, isAuthenticated, currentUser]);
+    const status = courses.reduce((acc, c) => {
+      acc[c.id] = enrollments.some((e) => String(e.courseId) === String(c.id));
+      return acc;
+    }, {});
+    setEnrollmentStatus(status);
+  }, [courses, enrollments, isAuthenticated, currentUser]);
 
-  const checkEnrollmentStatus = async (courseId) => {
-    if (!currentUser) return;
-    setEnrollmentStatus((p) => ({ ...p, [courseId]: null }));
-    const qEnroll = query(
-      collection(db, "enrollments"),
-      where("userId", "==", currentUser.uid),
-      where("courseId", "==", courseId),
-      where("status", "==", "SUCCESS")
-    );
-    try {
-      const snap = await getDocs(qEnroll);
-      setEnrollmentStatus((p) => ({ ...p, [courseId]: !snap.empty }));
-    } catch (e) {
-      console.error("Check enrollment error", e);
-      setEnrollmentStatus((p) => ({ ...p, [courseId]: false }));
-    }
-  };
+  // Removed per-context de-duplication; enrollment comes from UserContext
 
   const handleEnroll = (course) => {
     if (!currentUser) {

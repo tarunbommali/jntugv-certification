@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Briefcase, School, Mail, Phone, BookOpen, Edit, Shield, TrendingUp, UserCircle, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { collection, query, where, getDocs, doc } from 'firebase/firestore';
-import { db } from '../firebase'; 
+import { useUser } from '../contexts/UserContext.jsx';
+import { useCourse } from '../contexts/CourseContext.jsx';
 import { global_classnames } from "../utils/classnames.js";
 
 const PRIMARY_BLUE = "#004080";
@@ -21,6 +21,8 @@ const getInitials = (name) => {
 
 const ProfilePage = () => {
     const { currentUser, userProfile, logout, isAuthenticated, loading: authLoading } = useAuth();
+    const { enrollments, loadingEnrollments } = useUser();
+    const { getCourseById, refreshCourses } = useCourse();
     const navigate = useNavigate();
 
     // Local State for Enrolled Courses and Data Fetching
@@ -30,48 +32,30 @@ const ProfilePage = () => {
 
     // Placeholder: Fetch Enrolled and Recommended Courses
     useEffect(() => {
-        if (!isAuthenticated || !currentUser) {
-            setDataLoading(false);
-            return;
-        }
-
-        const fetchProfileData = async () => {
-            try {
-                setDataLoading(true);
-
-                // 1. Fetch Enrolled Courses
-                // Queries the 'enrollments' collection for SUCCESS status enrollments belonging to the user
-                const enrollmentQuery = query(
-                    collection(db, 'enrollments'),
-                    where('userId', '==', currentUser.uid),
-                    where('status', '==', 'SUCCESS')
-                );
-                const enrollmentSnap = await getDocs(enrollmentQuery);
-                const enrolled = enrollmentSnap.docs.map(doc => ({ 
-                    id: doc.id, 
-                    ...doc.data(), 
-                    // Simulate fetching course details to display title
-                    courseTitle: doc.data().courseTitle || "Emerging Technologies" 
-                }));
-                setEnrolledCourses(enrolled);
-
-                // 2. Simulate Recommended Courses
-                setRecommendedCourses([
-                    { id: 'sec-cert', title: 'Advanced Cybersecurity', difficulty: 'Expert', icon: Shield },
-                    { id: 'quantum-intro', title: 'Introduction to Quantum Computing', difficulty: 'Beginner', icon: TrendingUp },
-                ]);
-
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                // Fallback to empty state
-                setEnrolledCourses([]);
-            } finally {
+        const load = async () => {
+            if (!isAuthenticated || !currentUser) {
                 setDataLoading(false);
+                return;
             }
+            setDataLoading(true);
+            await refreshCourses();
+            const mapped = enrollments.map((e) => {
+                const course = getCourseById(e.courseId);
+                return {
+                    id: e.id || `${e.userId}-${e.courseId}`,
+                    courseId: e.courseId,
+                    courseTitle: course?.title || 'Course',
+                };
+            });
+            setEnrolledCourses(mapped);
+            setRecommendedCourses([
+                { id: 'sec-cert', title: 'Advanced Cybersecurity', difficulty: 'Expert', icon: Shield },
+                { id: 'quantum-intro', title: 'Introduction to Quantum Computing', difficulty: 'Beginner', icon: TrendingUp },
+            ]);
+            setDataLoading(false);
         };
-
-        fetchProfileData();
-    }, [isAuthenticated, currentUser]);
+        load();
+    }, [isAuthenticated, currentUser, enrollments, getCourseById, refreshCourses]);
 
 
     // Placeholder for profile details
@@ -87,7 +71,7 @@ const ProfilePage = () => {
     };
     
     // Show loading or redirect if not authenticated
-    if (authLoading || dataLoading) {
+    if (authLoading || dataLoading || loadingEnrollments) {
         return <div className="p-10 text-center text-xl font-medium">Loading user dashboard...</div>;
     }
 
