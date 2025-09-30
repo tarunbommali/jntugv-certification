@@ -14,8 +14,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-// Improve compatibility with corporate networks/ad-blockers by forcing long polling
-initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
+// Improve compatibility with restrictive networks by auto-detecting long polling
+initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+  experimentalForceLongPolling: false,
+  useFetchStreams: false
+});
 export const db = getFirestore(app);
 
 

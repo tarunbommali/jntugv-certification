@@ -76,6 +76,22 @@ const CourseContent = () => {
           Go to Course Material Link
         </a>
       )}
+      {Array.isArray(courseDetails?.modules) && courseDetails.modules.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">Module Links</h2>
+          <ul className="list-disc ml-5 space-y-2">
+            {courseDetails.modules.map((m) => (
+              <li key={m.id}>
+                {m.title || m.id}: {m.url ? (
+                  <a href={m.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">Open</a>
+                ) : (
+                  <span className="text-gray-500">No link</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
