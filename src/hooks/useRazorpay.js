@@ -2,8 +2,7 @@
 import { useState, useCallback } from "react";
 import { collection, addDoc } from "firebase/firestore";
 
-import RAZORPAY_KEY_ID from '../firebase'
-import db from "../firebase";
+import { RAZORPAY_KEY_ID, db } from "../firebase";
 /**
  * Custom hook to manage the Razorpay checkout process.
  * It loads the Razorpay SDK script and provides a payment initiation function.
@@ -102,7 +101,7 @@ const useRazorpay = (currentUser, onPaymentSuccess) => {
         },
 
         theme: {
-          color: PRIMARY_BLUE,
+        color: "#004080",
         },
       };
 
