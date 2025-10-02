@@ -50,9 +50,10 @@ export default function CourseCard({ course }) {
         {/* View Details Button */}
         <Link
           to={`/course/${course.id}`}
+          state={{ course }}
           className="w-full bg-primary text-white bg-[#004080]  rounded-4xl text-center px-4 py-2 mt-3 hover:bg-primary/90 transition font-medium text-sm"
         >
-          View Course
+          {course.isEnrolled ? "View Course" : "Enroll Now"}
         </Link>
       </div>
     </div>

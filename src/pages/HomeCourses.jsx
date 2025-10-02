@@ -4,38 +4,9 @@ import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { global_classnames } from "../utils/classnames.js";
-
-const CourseCard = ({ course, isEnrolled, onEnroll }) => (
-  <div className="course-card border rounded p-4 w-80">
-    <h3 className="text-lg font-semibold text-blue-700">{course.title}</h3>
-    <p className="mt-2 text-sm">{course.description}</p>
-    <p className="font-bold text-green-700 mt-2">
-      Price: ₹{Number(course.price).toFixed(2)}
-    </p>
-    {isEnrolled === true ? (
-      <Link
-        to={`/learn/${course.id}`}
-        className="mt-3 inline-block bg-green-600 text-white px-3 py-2 rounded"
-      >
-        Access Course
-      </Link>
-    ) : isEnrolled === false ? (
-      <button
-        onClick={() => onEnroll(course)}
-        className="mt-3 w-full bg-yellow-400 text-black px-3 py-2 rounded"
-      >
-        Pay ₹{Number(course.price).toFixed(2)} & Enroll
-      </button>
-    ) : (
-      <button
-        disabled
-        className="mt-3 w-full bg-gray-200 text-gray-600 px-3 py-2 rounded"
-      >
-        Checking Status...
-      </button>
-    )}
-  </div>
-);
+import { courses as coursesData } from "../utils/fallbackData";
+import CourseCard from "../components/CourseCard.jsx";
+import CourseList from '../components/CourseList.jsx';
 
 const HomeCourses = () => {
   const { currentUser, isAuthenticated } = useAuth();
@@ -147,19 +118,14 @@ const HomeCourses = () => {
 
   return (
     <div
-      className={`${global_classnames.width.container} page-container  mx-auto p-6`}
+      className={`${global_classnames.width.container} page-container   p-6`}
     >
-      <h1 className="text-3xl font-bold">Available Certification Courses</h1>
-      <p className="text-sm text-gray-700 mt-2">
-        {isAuthenticated && currentUser
-          ? `Welcome, ${currentUser.email}!`
-          : "Sign in to enroll and get instant access."}
-      </p>
+      <h1 className="text-3xl font-bold">Courses</h1>
       {loading && <p className="mt-4">Loading courses...</p>}
       {error && <p className="mt-4 text-red-600">{error}</p>}
       <div className="course-list mt-6 flex flex-wrap gap-5 justify-center">
         {courses.length === 0 ? (
-          <p>No courses currently available. Check back soon!</p>
+          <CourseList /> 
         ) : (
           courses.map((c) => (
             <CourseCard

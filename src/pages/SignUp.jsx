@@ -48,17 +48,15 @@ const SignUp = () => {
           <Link to="/" className="inline-flex items-center justify-center space-x-2">
             <img src={logo} alt="JNTU-GV Logo" className="w-16 h-16" />
             <span className="text-2xl font-extrabold text-[#004080]">
-              NxtGen Certificationf
+              NxtGen Certification
             </span>
           </Link>
         </div>
 
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-6">
+        <h2 className="text-3xl font-bold  text-gray-900 mb-6">
           Create Your Account
         </h2>
-        <p className="text-center text-gray-600 mb-6">
-            Start your professional certification journey today.
-        </p>
+        
 
         {/* Error Message */}
         {error && (

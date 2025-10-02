@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase'; // Assuming 'db' is exported from '../firebase'
+// src/contexts/CourseContext.jsx
+
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { getAllCourses } from '../firebase/services';
+import { courses as fallbackCourses } from '../utils/fallbackData';
 
 const CourseContext = createContext(undefined);
 
-export const useCourse = () => {
+export const useCourseContext = () => {
     const ctx = useContext(CourseContext);
-    if (!ctx) throw new Error('useCourse must be used within CourseProvider');
+    if (!ctx) throw new Error('useCourseContext must be used within CourseProvider');
     return ctx;
 };
 
@@ -15,41 +17,39 @@ export const CourseProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Function to fetch all courses from Firestore
-    const fetchCourses = async () => {
-        try {
+    useEffect(() => {
+        let isMounted = true;
+        const load = async () => {
             setLoading(true);
             setError(null);
-            
-            const snapshot = await getDocs(collection(db, 'courses'));
-            const courseList = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            
-            setCourses(courseList);
-        } catch (err) {
-            console.error('Failed to fetch courses:', err);
-            setError('Failed to load courses. Please try again.');
-            setCourses([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Fetch courses once on mount
-    useEffect(() => {
-        fetchCourses();
+            try {
+                const result = await getAllCourses(50);
+                if (isMounted) {
+                    if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+                        setCourses(result.data);
+                    } else {
+                        setCourses(fallbackCourses);
+                        if (!result.success) setError(result.error || 'Failed to fetch courses. Using fallback.');
+                    }
+                }
+            } catch (e) {
+                if (isMounted) {
+                    setCourses(fallbackCourses);
+                    setError('Unable to reach database. Showing demo courses.');
+                }
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+        load();
+        return () => { isMounted = false; };
     }, []);
 
-    const value = useMemo(() => ({
-        courses,
-        loading,
+    const value = useMemo(() => ({ 
+        courses, 
+        loading, 
         error,
-        // Allow components to manually refresh the list
-        refreshCourses: fetchCourses,
-        // Helper to quickly find a course by ID
-        getCourseById: (id) => courses.find(c => c.id === id),
+        getCourseById: (courseId) => courses.find(c => String(c.id) === String(courseId)) || null
     }), [courses, loading, error]);
 
     return (

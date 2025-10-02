@@ -91,148 +91,143 @@ const Header = () => {
 
   return (
     <>
-            {/* Modals */}     
+      {/* Modals */}
       {isContactModalOpen && (
         <ContactModal onClose={() => setIsContactModalOpen(false)} />
       )}
-           
+
       {isOfferModalOpen && (
         <OfferModal onClose={() => setIsOfferModalOpen(false)} />
       )}
-            {/* Top Offer Bar - Fixed height, highly visible */}     
+      {/* Top Offer Bar - Fixed height, highly visible */}
       <div className="w-full bg-[#004080] text-white py-2 shadow-inner z-50">
-               
+
         <div
           className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-center md:justify-between items-center text-center text-sm font-semibold`}
         >
-                              {/* Contact Link (Hidden on small screens) */}   
-               
+          {/* Contact Link (Hidden on small screens) */}
+
           <button
             className="hidden md:flex items-center gap-1 text-gray-300 hover:text-white transition-colors"
             onClick={() => setIsContactModalOpen(true)}
           >
-                        New Course Enquiry: India - +91 7780351078          
+            New Course Enquiry: India - +91 7780351078
           </button>
-                    {/* Offer Countdown Button */}         
+          {/* Offer Countdown Button */}
           <button
             className="flex items-center gap-2 cursor-pointer rounded-full bg-yellow-500 text-[#004080] px-4 py-1.5 font-extrabold hover:bg-yellow-400 transition-all text-xs sm:text-sm shadow-lg"
             onClick={() => setIsOfferModalOpen(true)}
           >
-                        Career Level Up Offer! Ends in: {formattedTime}
-            <ArrowRight className="w-4 h-4" />         
+            Career Level Up Offer! Ends in: {formattedTime}
+            <ArrowRight className="w-4 h-4" />
           </button>
-                 
+
         </div>
-             
+
       </div>
-            {/* Main Header (Sticky for desktop) */}     
+      {/* Main Header (Sticky for desktop) */}
       <header className="sticky top-0 bg-white border-b border-[#d1d9e0] z-40 shadow-sm">
-               
+
         <div
           className={`${global_classnames.width.container}  mx-auto px-4 sm:px-6 lg:px-8`}
         >
-                   
+
           <div className="flex h-20 items-center justify-between">
-                                    {/* Logo and Branding */}           
+            {/* Logo and Branding */}
             <Link to="/" className="flex items-center space-x-2">
-                           
+
               <img
                 src={logo}
                 alt="JNTU-GV Logo"
                 className="w-12 h-12 mr-2 md:w-14 md:h-14"
               />
-                           
+
               <div className="flex flex-col leading-tight">
-                               
+
                 <span className="text-xl md:text-2xl font-bold text-[#004080]">
-                                    NxtGen Certification                
+                  NxtGen Certification
                 </span>
-                               
+
                 <span className="text-xs md:text-sm text-gray-500 hidden sm:flex">
-                                    Powered by JNTU-GV State University        
-                         
+                  <span className="font-semibold  italic">Powered by JNTU GV </span>
+
                 </span>
-                             
+
               </div>
-                         
+
             </Link>
-                        {/* Desktop Navigation */}                       {" "}
-            {/* Auth Toggle (Desktop) */}           
+            {/* Desktop Navigation */}                       {" "}
+            {/* Auth Toggle (Desktop) */}
             <div className="hidden md:flex items-center gap-4">
               <Link
                 to="/courses"
                 className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors"
               >
-                                Courses                
+                Courses
               </Link>
-                           
+
               {isAuthenticated ? (
                 <>
-                                   
-                  {/* User Avatar component with Profile link */}               
-                   
+
+                  {/* User Avatar component with Profile link */}
+
                   <UserAvatar
                     currentUser={currentUser}
                     userProfile={userProfile}
                     navigate={navigate}
                   />
-                                   
-                  <button
-                    onClick={handleLogout}
-                    className="rounded-full text-sm font-medium h-10 px-5 bg-red-600 text-white hover:bg-red-700 transition-colors shadow-md"
-                  >
-                                        Logout                  
-                  </button>
-                                 
+
+
+
                 </>
               ) : (
                 <button
                   onClick={() => navigate("/auth/signin")}
                   className="rounded-full text-sm font-medium h-10 px-5 bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:opacity-90 transition-shadow shadow-md"
                 >
-                                    Login                
+                  Login
                 </button>
               )}
-                         
+
             </div>
-                        {/* Mobile Menu Button */}           
+            {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 text-[#004080] hover:text-blue-600 transition-colors"
               onClick={() => setIsMenuOpen(true)}
             >
-                            <Menu className="h-7 w-7" />           
+              <Menu className="h-7 w-7" />
             </button>
-                     
+
           </div>
-                 
+
         </div>
-                {/* Mobile Navigation Drawer (Slide-in from right) */}       
+        {/* Mobile Navigation Drawer (Slide-in from right) */}
         {isMenuOpen && (
           <>
-                        {/* Backdrop */}           
+            {/* Backdrop */}
             <div
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
               onClick={() => setIsMenuOpen(false)}
             />
-                                    {/* Drawer Content */}           
+            {/* Drawer Content */}
             {/* NOTE: Ensure you have the 'animate-slide-in-right' keyframes in your CSS! */}
-                       
+
             <div className="fixed top-0 right-0 w-64 xs:w-72 sm:w-80 h-full bg-white p-6 shadow-2xl z-50 transition-transform transform translate-x-0 ease-in-out duration-300 animate-slide-in-right">
-                                          {/* Drawer Header (Close Button) */} 
-                         
+              {/* Drawer Header (Close Button) */}
+
               <div className="flex justify-end mb-8">
-                               
+
                 <button
                   className="p-2 text-[#004080] hover:text-red-500"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                                    <X className="h-6 w-6" />               
+                  <X className="h-6 w-6" />
                 </button>
-                             
+
               </div>
-                            {/* Navigation Links */}             
+              {/* Navigation Links */}
               <nav className="flex flex-col space-y-4 border-b border-gray-200 pb-6">
-                                {/* Added Profile Link */}               
+                {/* Added Profile Link */}
                 {isAuthenticated && (
                   <button
                     onClick={() => {
@@ -241,20 +236,20 @@ const Header = () => {
                     }}
                     className="text-xl font-semibold text-blue-600 hover:text-blue-800 transition-colors py-2 border-b border-gray-100 text-left flex items-center gap-2"
                   >
-                                            <UserCircle className="w-6 h-6" />
-                    Profile                    
+                    <UserCircle className="w-6 h-6" />
+                    Profile
                   </button>
                 )}
-                               
+
                 <Link
                   to="/courses"
                   onClick={() => handleMobileLinkClick("/courses")}
                   className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors py-2 border-b border-gray-100 text-left"
                 >
-                                      Courses                
+                  Courses
                 </Link>
-                                                {/* Mobile Contact Button */}   
-                           
+                {/* Mobile Contact Button */}
+
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
@@ -262,31 +257,31 @@ const Header = () => {
                   }}
                   className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors py-2 border-b border-gray-100 text-left"
                 >
-                                      Contact                
+                  Contact
                 </button>
-                             
+
               </nav>
-                            {/* Mobile Auth/User Status */}             
+              {/* Mobile Auth/User Status */}
               <div className="mt-8">
-                               
+
                 {isAuthenticated ? (
                   <div className="flex flex-col items-start space-y-3">
-                                       
+
                     <p className="text-base text-gray-700 font-medium">
-                                            Signed in as: <br />
+                      Signed in as: <br />
                       <strong className="text-blue-600 break-all">
                         {currentUser?.email}
                       </strong>
-                                         
+
                     </p>
-                                       
+
                     <button
                       onClick={handleLogout}
                       className="w-full h-12 rounded-md bg-red-600 text-white text-base font-medium hover:bg-red-700 transition-colors shadow-md"
                     >
-                                            Logout                    
+                      Logout
                     </button>
-                                     
+
                   </div>
                 ) : (
                   <button
@@ -296,19 +291,19 @@ const Header = () => {
                     }}
                     className="w-full h-12 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-base font-medium hover:opacity-90 transition-shadow shadow-md"
                   >
-                                        Login to Enroll                  
+                    Login to Enroll
                   </button>
                 )}
-                             
+
               </div>
-                         
+
             </div>
-                     
+
           </>
         )}
-             
+
       </header>
-         
+
     </>
   );
 };

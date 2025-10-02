@@ -1,15 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Briefcase, School, Mail, Phone, BookOpen, Edit, Shield, TrendingUp, UserCircle, LogOut } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { Briefcase, School, Mail, Phone, LogOut, BookOpen, Shield, TrendingUp, UserCircle, PencilLine, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { collection, query, where, getDocs, doc } from 'firebase/firestore';
-import { db } from '../firebase'; 
+import { useUser } from '../contexts/UserContext.jsx'; // Context providing enrollments
 import { global_classnames } from "../utils/classnames.js";
 
 const PRIMARY_BLUE = "#004080";
 const ACCENT_YELLOW = "#ffc107";
 
-// Helper function to get initials for placeholder avatar (copied from Header)
+// ----------------------------------------------------------------------
+// Shimmer Loading Component (Kept the same)
+// ----------------------------------------------------------------------
+
+// Helper Shimmer component for a skeleton effect
+const Shimmer = () => (
+    <div className="animate-pulse space-y-8 py-16">
+        <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
+            {/* Header Shimmer */}
+            <div className="bg-white p-8 rounded-2xl shadow-xl flex items-center gap-6">
+                <div className="w-24 h-24 rounded-full bg-gray-200"></div>
+                <div className="flex-1 space-y-3">
+                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/5"></div>
+                </div>
+                <div className="h-10 w-32 bg-gray-300 rounded-full"></div>
+            </div>
+
+            {/* Content Shimmer */}
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column Shimmer (Skills) */}
+                <div className="space-y-6">
+                    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+                        <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                        <div className="flex flex-wrap gap-2">
+                            <div className="h-8 w-16 bg-blue-100 rounded-full"></div>
+                            <div className="h-8 w-24 bg-blue-100 rounded-full"></div>
+                            <div className="h-8 w-16 bg-blue-100 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column Shimmer (Courses) */}
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Enrolled Courses Shimmer */}
+                    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+                        <div className="h-6 bg-gray-200 rounded w-2/5"></div>
+                        <div className="h-16 bg-gray-100 border rounded-lg"></div>
+                        <div className="h-16 bg-gray-100 border rounded-lg"></div>
+                    </div>
+                    {/* Recommended Courses Shimmer */}
+                    <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+                        <div className="h-6 bg-gray-200 rounded w-2/5"></div>
+                        <div className="h-16 bg-yellow-50 border rounded-lg"></div>
+                        <div className="h-16 bg-yellow-50 border rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+
+// ----------------------------------------------------------------------
+// Main Profile Component
+// ----------------------------------------------------------------------
+
+// Helper function to get initials for placeholder avatar
 const getInitials = (name) => {
     if (!name) return 'U';
     const parts = name.split(' ');
@@ -20,59 +77,40 @@ const getInitials = (name) => {
 };
 
 const ProfilePage = () => {
+    // Destructure `logout` function from useAuth
     const { currentUser, userProfile, logout, isAuthenticated, loading: authLoading } = useAuth();
     const navigate = useNavigate();
+    // Access enrollment data from useUser context
+    const { enrollments, loadingEnrollments, enrollmentsError } = useUser();
 
-    // Local State for Enrolled Courses and Data Fetching
-    const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [recommendedCourses, setRecommendedCourses] = useState([]);
-    const [dataLoading, setDataLoading] = useState(true);
+    // Using loadingEnrollments as the primary data loading state
+    const [dataError] = useState(null);
 
-    // Placeholder: Fetch Enrolled and Recommended Courses
-    useEffect(() => {
-        if (!isAuthenticated || !currentUser) {
-            setDataLoading(false);
-            return;
+    // ✅ Define editProfile function
+    const editProfile = useCallback(() => {
+        navigate('/profile/edit');
+    }, [navigate]);
+
+    // 🚨 FIX: Define handleLogout function 🚨
+    const handleLogout = useCallback(async () => {
+        try {
+            await logout();
+            navigate('/auth/signin', { replace: true });
+        } catch (error) {
+            console.error("Logout failed:", error);
+            alert("Logout failed. Please try again.");
         }
+    }, [logout, navigate]);
 
-        const fetchProfileData = async () => {
-            try {
-                setDataLoading(true);
-
-                // 1. Fetch Enrolled Courses
-                // Queries the 'enrollments' collection for SUCCESS status enrollments belonging to the user
-                const enrollmentQuery = query(
-                    collection(db, 'enrollments'),
-                    where('userId', '==', currentUser.uid),
-                    where('status', '==', 'SUCCESS')
-                );
-                const enrollmentSnap = await getDocs(enrollmentQuery);
-                const enrolled = enrollmentSnap.docs.map(doc => ({ 
-                    id: doc.id, 
-                    ...doc.data(), 
-                    // Simulate fetching course details to display title
-                    courseTitle: doc.data().courseTitle || "Emerging Technologies" 
-                }));
-                setEnrolledCourses(enrolled);
-
-                // 2. Simulate Recommended Courses
-                setRecommendedCourses([
-                    { id: 'sec-cert', title: 'Advanced Cybersecurity', difficulty: 'Expert', icon: Shield },
-                    { id: 'quantum-intro', title: 'Introduction to Quantum Computing', difficulty: 'Beginner', icon: TrendingUp },
-                ]);
-
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                // Fallback to empty state
-                setEnrolledCourses([]);
-            } finally {
-                setDataLoading(false);
-            }
-        };
-
-        fetchProfileData();
-    }, [isAuthenticated, currentUser]);
-
+    // Recommended (static/local) to avoid extra calls
+    const initRecommended = useCallback(() => {
+        setRecommendedCourses([
+            { id: 'sec-cert', title: 'Advanced Cybersecurity', difficulty: 'Expert', icon: Shield },
+            { id: 'quantum-intro', title: 'Introduction to Quantum Computing', difficulty: 'Beginner', icon: TrendingUp },
+        ]);
+    }, []);
+    React.useEffect(() => { initRecommended(); }, [initRecommended]);
 
     // Placeholder for profile details
     const profileData = {
@@ -81,28 +119,40 @@ const ProfilePage = () => {
         phone: userProfile?.phone || 'N/A',
         college: userProfile?.college || 'JNTU-GV Student',
         gender: userProfile?.gender || 'Not Specified',
-        skills: userProfile?.skills || ['AI', 'ML Basics', 'Python'],
+        skills: userProfile?.skills && Array.isArray(userProfile.skills) ? userProfile.skills : ['AI', 'ML Basics', 'Python'],
         photoUrl: currentUser?.photoURL,
         initials: getInitials(userProfile?.name || currentUser?.displayName),
     };
-    
-    // Show loading or redirect if not authenticated
-    if (authLoading || dataLoading) {
-        return <div className="p-10 text-center text-xl font-medium">Loading user dashboard...</div>;
-    }
 
-    if (!isAuthenticated) {
+    // Show loading or redirect if not authenticated
+    if (!isAuthenticated && !authLoading) {
         return <Navigate to="/auth/signin" replace />;
     }
+
+    // Use Shimmer when authentication state or enrollment data is loading
+    if (authLoading || loadingEnrollments) {
+        return <Shimmer />;
+    }
+
+    // Combine any data errors
+    const combinedError = dataError || enrollmentsError;
 
     return (
         <div className="min-h-screen bg-gray-50 py-16">
             <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
-                
+
+                {/* Error Message Banner */}
+                {combinedError && (
+                    <div className="p-4 mb-8 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg flex items-center gap-3" role="alert">
+                        <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                        <p className="font-medium">{combinedError}</p>
+                    </div>
+                )}
+
                 {/* Header & Avatar Section */}
                 <div className="bg-white p-8 rounded-2xl shadow-xl border-t-4" style={{ borderColor: PRIMARY_BLUE }}>
                     <div className="flex flex-col md:flex-row items-center gap-6">
-                        
+
                         {/* Profile Picture */}
                         {profileData.photoUrl ? (
                             <img
@@ -115,7 +165,7 @@ const ProfilePage = () => {
                                 {profileData.initials}
                             </div>
                         )}
-                        
+
                         {/* Title and Summary */}
                         <div className="text-center md:text-left flex-1">
                             <h1 className="text-3xl font-extrabold text-gray-900">{profileData.fullName}</h1>
@@ -125,30 +175,42 @@ const ProfilePage = () => {
                             </p>
                         </div>
 
-                        {/* Logout Button */}
-                        <button
-                            onClick={logout}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-950 text-white rounded-full font-medium hover:bg-red-700 transition"
-                        >
-                            <Edit className="w-5 h-5" /> Edit
-                        </button>
+                        {/* Action Buttons Container */}
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            {/* Profile Edit button */}
+                            <button
+                                onClick={editProfile}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-full font-medium hover:bg-gray-600 transition"
+
+                            >
+                                <PencilLine className="w-5 h-5" /> Edit Profile
+                            </button>
+                            {/* Logout button */}
+                            <button
+                                onClick={handleLogout}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition"
+
+                            >
+                                <LogOut className="w-5 h-5" /> Logout
+                            </button>
+
+
+                        </div>
                     </div>
                 </div>
 
                 {/* Main Content: Details & Courses */}
                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
+
                     {/* LEFT COLUMN: User Details and Skills */}
                     <div className="lg:col-span-1 space-y-6">
-                        
-
                         {/* Skills Section */}
                         <div className="bg-white p-6 rounded-xl shadow-md">
                             <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">Current Skills</h2>
                             <div className="flex flex-wrap gap-2">
                                 {profileData.skills.map((skill, index) => (
-                                    <span 
-                                        key={index} 
+                                    <span
+                                        key={index}
                                         className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
                                     >
                                         {skill}
@@ -160,19 +222,19 @@ const ProfilePage = () => {
 
                     {/* RIGHT COLUMN: Enrolled & Recommended Courses */}
                     <div className="lg:col-span-2 space-y-8">
-                        
+
                         {/* Enrolled Courses */}
                         <div className="bg-white p-6 rounded-xl shadow-md">
                             <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4 flex items-center gap-2">
-                                <BookOpen className="w-6 h-6" style={{ color: PRIMARY_BLUE }} /> 
-                                Enrolled Courses ({enrolledCourses.length})
+                                <BookOpen className="w-6 h-6" style={{ color: PRIMARY_BLUE }} />
+                                Enrolled Courses ({enrollments.length})
                             </h2>
 
-                            {enrolledCourses.length > 0 ? (
+                            {enrollments.length > 0 ? (
                                 <ul className="space-y-4">
-                                    {enrolledCourses.map((course, index) => (
-                                        <li 
-                                            key={index} 
+                                    {enrollments.map((course, index) => (
+                                        <li
+                                            key={index}
                                             className="p-4 border rounded-lg bg-gray-50 flex justify-between items-center"
                                         >
                                             <span className="font-semibold text-lg">{course.courseTitle}</span>
@@ -188,7 +250,7 @@ const ProfilePage = () => {
                             ) : (
                                 <div className="text-center py-6 border-2 border-dashed border-gray-300 rounded-lg">
                                     <p className="text-gray-600">You are not currently enrolled in any courses. Time to start learning!</p>
-                                    <button 
+                                    <button
                                         onClick={() => navigate('/courses')}
                                         className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 transition"
                                     >
@@ -197,7 +259,7 @@ const ProfilePage = () => {
                                 </div>
                             )}
                         </div>
-                        
+
                         {/* Recommended Courses */}
                         <div className="bg-white p-6 rounded-xl shadow-md">
                             <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Recommended Courses</h2>
@@ -207,7 +269,7 @@ const ProfilePage = () => {
                                     return (
                                         <li key={index} className="p-4 border rounded-lg bg-yellow-50 flex justify-between items-center">
                                             <div className="flex items-center gap-3">
-                                                <Icon className="w-5 h-5 text-yellow-700" />
+                                                {Icon && <Icon className="w-5 h-5 text-yellow-700" />}
                                                 <span className="font-medium text-gray-800">{course.title}</span>
                                             </div>
                                             <span className="text-sm text-yellow-800 font-medium">{course.difficulty}</span>

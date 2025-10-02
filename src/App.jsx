@@ -12,13 +12,16 @@ import Footer from "./components/Footer.jsx";
 // Import Context Providers
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { CourseProvider } from "./contexts/CourseContext.jsx"; 
-import { UserProvider } from "./contexts/UserContext.jsx";     
+import { UserProvider } from "./contexts/UserContext.jsx";
+import { PaymentProvider } from "./contexts/PaymentContext.jsx";
+import { CourseContentProvider } from "./contexts/CourseContentContext.jsx";     
 
 // Import Page Components
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import AdminCouponDashboard from "./pages/AdminCouponDashboard.jsx";
 import HomeCourses from "./pages/HomeCourses.jsx";
 import CourseContent from "./pages/CourseContent.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
@@ -69,58 +72,66 @@ const MainLayout = ({ children }) => {
 const App = () => {
   return (
     <Router>
-      {/* Start of Nested Providers */}
-      <AuthProvider>
-        <UserProvider>
-          <CourseProvider>
-            
-            <ScrollToTop />
-            
-            {/* The MainLayout wraps the visible parts of the application */}
-            <MainLayout>
-              <Routes>
-                <Route path="/" element={<Website />} />
-                <Route path="/course/:courseId" element={<CourseView />} />
-              
-                {/* PROFILE ROUTE (Requires Auth) */}
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-              
-                {/* Auth Routes (No Header/Footer) */}
-                <Route path="/auth/signin" element={<SignIn />} />
-                <Route path="/auth/signup" element={<SignUp />} />
+      {/* Start of Nested Providers */}
+      <AuthProvider>
+        <UserProvider>
+          <CourseProvider>
+            <PaymentProvider>
+              <CourseContentProvider>
+                
+                <ScrollToTop />
+                
+                {/* The MainLayout wraps the visible parts of the application */}
+                <MainLayout>
+                  <Routes>
+                    <Route path="/" element={<Website />} />
+                    <Route path="/course/:courseId" element={<CourseView />} />
+                 
+                    {/* PROFILE ROUTE (Requires Auth) */}
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute>
+                          <ProfilePage />
+                        </ProtectedRoute>
+                      }
+                    />
+                 
+                    {/* Auth Routes (No Header/Footer) */}
+                    <Route path="/auth/signin" element={<SignIn />} />
+                    <Route path="/auth/signup" element={<SignUp />} />
 
-                {/* Catalog and learning */}
-                <Route path="/courses" element={<HomeCourses />} />
-                <Route
-                  path="/learn/:courseId"
-                  element={<ProtectedRoute><CourseContent /></ProtectedRoute>}
-                />
+                    {/* Catalog and learning */}
+                    <Route path="/courses" element={<HomeCourses />} />
+                    <Route
+                      path="/learn/:courseId"
+                      element={<ProtectedRoute><CourseContent /></ProtectedRoute>}
+                    />
 
-                <Route
-                  path="/checkout/:courseId"
-                  element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>}
-                />
+                    <Route
+                      path="/checkout/:courseId"
+                      element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>}
+                    />
 
-                {/* Admin (Requires Auth and Admin Role) */}
-                <Route
-                  path="/admin"
-                  element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>}
-                />
+                    {/* Admin (Requires Auth and Admin Role) */}
+                    <Route
+                      path="/admin"
+                      element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>}
+                    />
+                    <Route
+                      path="/admin/coupons"
+                      element={<ProtectedRoute requiredRole="admin"><AdminCouponDashboard /></ProtectedRoute>}
+                    />
 
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </MainLayout>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </MainLayout>
 
-          </CourseProvider>
-        </UserProvider>
-      </AuthProvider>
+              </CourseContentProvider>
+            </PaymentProvider>
+          </CourseProvider>
+        </UserProvider>
+      </AuthProvider>
       {/* End of Nested Providers */}
     </Router>
   );

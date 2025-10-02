@@ -51,12 +51,10 @@ const SignIn = () => {
           </Link>
         </div>
 
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-2">
-          Welcome Back
+        <h2 className="text-3xl font-bold  text-gray-900 mb-6">
+          Signin 
         </h2>
-        <p className="text-center text-gray-600 mb-6">
-            Sign in to resume your learning and access your dashboard.
-        </p>
+        
 
         {/* Error Message */}
         {error && (

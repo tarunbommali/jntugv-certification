@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import { getUserEnrollments } from '../firebase/services';
 import { useAuth } from './AuthContext'; // Import the primary Auth context
 
 const UserContext = createContext(undefined);
@@ -24,24 +23,19 @@ export const UserProvider = ({ children }) => {
             setLoadingEnrollments(true);
             setEnrollmentsError(null);
 
-            // Query Firestore for enrollments belonging to the current user
-            const q = query(
-                collection(db, 'enrollments'),
-                where('userId', '==', uid),
-                where('status', '==', 'SUCCESS') // Only fetching successful enrollments
-            );
-            
-            const snapshot = await getDocs(q);
-            const enrollmentList = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data() 
-            }));
-            
-            setEnrollments(enrollmentList);
+            const result = await getUserEnrollments(uid);
+            if (result.success) {
+                setEnrollments(result.data);
+            } else {
+                // Offline-safe fallback: assume no enrollments but do not break UI
+                setEnrollmentsError(result.error);
+                setEnrollments([]);
+            }
 
         } catch (err) {
             console.error('Failed to fetch user enrollments:', err);
-            setEnrollmentsError('Failed to load your enrollment history.');
+            // Offline-safe fallback: empty enrollments with friendly message
+            setEnrollmentsError('Unable to reach database. Showing empty enrollments.');
             setEnrollments([]);
         } finally {
             setLoadingEnrollments(false);
