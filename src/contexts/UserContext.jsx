@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { getUserEnrollments } from '../firebase/services';
+=======
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
+>>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
 import { useAuth } from './AuthContext'; // Import the primary Auth context
+import { EnrollmentSchema, safeParseArray, DummyEnrollment } from '../utils/schemas.js';
 
 const UserContext = createContext(undefined);
 
@@ -15,8 +22,10 @@ export const UserProvider = ({ children }) => {
     const [enrollments, setEnrollments] = useState([]);
     const [loadingEnrollments, setLoadingEnrollments] = useState(false);
     const [enrollmentsError, setEnrollmentsError] = useState(null);
+    const fetchPromiseRef = useRef(null);
 
     const fetchUserEnrollments = async (uid) => {
+<<<<<<< HEAD
         if (!uid) return setEnrollments([]);
 
         try {
@@ -36,10 +45,48 @@ export const UserProvider = ({ children }) => {
             console.error('Failed to fetch user enrollments:', err);
             // Offline-safe fallback: empty enrollments with friendly message
             setEnrollmentsError('Unable to reach database. Showing empty enrollments.');
+=======
+        if (!uid) {
+>>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
             setEnrollments([]);
-        } finally {
-            setLoadingEnrollments(false);
+            return [];
         }
+        if (fetchPromiseRef.current) {
+            return fetchPromiseRef.current;
+        }
+        const run = (async () => {
+            try {
+                setLoadingEnrollments(true);
+                setEnrollmentsError(null);
+                const qRef = query(
+                    collection(db, 'enrollments'),
+                    where('userId', '==', uid),
+                    where('status', '==', 'SUCCESS')
+                );
+                const snapshot = await getDocs(qRef);
+                const enrollmentList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const validated = safeParseArray(EnrollmentSchema, enrollmentList);
+                // If Firestore has no data, seed with a single dummy enrollment to allow demo content
+                if (validated.length === 0) {
+                    const demo = [DummyEnrollment(uid, '1')];
+                    setEnrollments(demo);
+                    return demo;
+                }
+                setEnrollments(validated);
+                return validated;
+            } catch (err) {
+                console.error('Failed to fetch user enrollments:', err);
+                setEnrollmentsError('Failed to load your enrollment history. Showing demo data.');
+                const demo = [DummyEnrollment(uid, '1')];
+                setEnrollments(demo);
+                return demo;
+            } finally {
+                setLoadingEnrollments(false);
+                fetchPromiseRef.current = null;
+            }
+        })();
+        fetchPromiseRef.current = run;
+        return run;
     };
 
     // Effect to run when user authentication state changes

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/pages/CourseContent.jsx
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -95,6 +96,54 @@ const CourseContent = () => {
 
     // --- Main Content Display ---
     
+=======
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import { useCourse } from '../contexts/CourseContext.jsx';
+import { useUser } from '../contexts/UserContext.jsx';
+
+const CourseContent = () => {
+  const { courseId } = useParams();
+  const { currentUser, isAuthenticated } = useAuth();
+  const { getCourseById, refreshCourses, loading: loadingCourses } = useCourse();
+  const { enrollments, loadingEnrollments } = useUser();
+  const [courseDetails, setCourseDetails] = useState(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const run = async () => {
+      if (!courseId) {
+        setError('Invalid course identifier');
+        setLoading(false);
+        return;
+      }
+      if (!isAuthenticated || !currentUser) {
+        setLoading(false);
+        return;
+      }
+      setError('');
+      await refreshCourses();
+      const course = getCourseById(courseId);
+      if (!course) {
+        setError('Course not found.');
+        setIsAuthorized(false);
+        setLoading(false);
+        return;
+      }
+      setCourseDetails(course);
+      const authorized = enrollments.some((e) => String(e.courseId) === String(course.id));
+      setIsAuthorized(authorized);
+      setLoading(false);
+    };
+    run();
+  }, [isAuthenticated, currentUser, courseId, getCourseById, refreshCourses, enrollments]);
+
+  if (loading || loadingCourses || loadingEnrollments) return <div className="page-container p-6">Loading course access...</div>;
+  if (error)
+>>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
     return (
         <section className="min-h-screen bg-gray-100 py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

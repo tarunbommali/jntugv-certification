@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { Briefcase, School, Mail, Phone, LogOut, BookOpen, Shield, TrendingUp, UserCircle, PencilLine, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useUser } from '../contexts/UserContext.jsx'; // Context providing enrollments
+=======
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { Briefcase, School, Mail, Phone, BookOpen, Edit, Shield, TrendingUp, UserCircle, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import { useUser } from '../contexts/UserContext.jsx';
+import { useCourse } from '../contexts/CourseContext.jsx';
+>>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
 import { global_classnames } from "../utils/classnames.js";
 
 const PRIMARY_BLUE = "#004080";
@@ -79,6 +88,8 @@ const getInitials = (name) => {
 const ProfilePage = () => {
     // Destructure `logout` function from useAuth
     const { currentUser, userProfile, logout, isAuthenticated, loading: authLoading } = useAuth();
+    const { enrollments, loadingEnrollments } = useUser();
+    const { getCourseById, refreshCourses } = useCourse();
     const navigate = useNavigate();
     // Access enrollment data from useUser context
     const { enrollments, loadingEnrollments, enrollmentsError } = useUser();
@@ -87,6 +98,7 @@ const ProfilePage = () => {
     // Using loadingEnrollments as the primary data loading state
     const [dataError] = useState(null);
 
+<<<<<<< HEAD
     // ✅ Define editProfile function
     const editProfile = useCallback(() => {
         navigate('/profile/edit');
@@ -111,6 +123,35 @@ const ProfilePage = () => {
         ]);
     }, []);
     React.useEffect(() => { initRecommended(); }, [initRecommended]);
+=======
+    // Placeholder: Fetch Enrolled and Recommended Courses
+    useEffect(() => {
+        const load = async () => {
+            if (!isAuthenticated || !currentUser) {
+                setDataLoading(false);
+                return;
+            }
+            setDataLoading(true);
+            await refreshCourses();
+            const mapped = enrollments.map((e) => {
+                const course = getCourseById(e.courseId);
+                return {
+                    id: e.id || `${e.userId}-${e.courseId}`,
+                    courseId: e.courseId,
+                    courseTitle: course?.title || 'Course',
+                };
+            });
+            setEnrolledCourses(mapped);
+            setRecommendedCourses([
+                { id: 'sec-cert', title: 'Advanced Cybersecurity', difficulty: 'Expert', icon: Shield },
+                { id: 'quantum-intro', title: 'Introduction to Quantum Computing', difficulty: 'Beginner', icon: TrendingUp },
+            ]);
+            setDataLoading(false);
+        };
+        load();
+    }, [isAuthenticated, currentUser, enrollments, getCourseById, refreshCourses]);
+
+>>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
 
     // Placeholder for profile details
     const profileData = {
@@ -123,6 +164,14 @@ const ProfilePage = () => {
         photoUrl: currentUser?.photoURL,
         initials: getInitials(userProfile?.name || currentUser?.displayName),
     };
+<<<<<<< HEAD
+=======
+    
+    // Show loading or redirect if not authenticated
+    if (authLoading || dataLoading || loadingEnrollments) {
+        return <div className="p-10 text-center text-xl font-medium">Loading user dashboard...</div>;
+    }
+>>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
 
     // Show loading or redirect if not authenticated
     if (!isAuthenticated && !authLoading) {
