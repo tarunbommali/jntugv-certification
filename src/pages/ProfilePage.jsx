@@ -1,17 +1,8 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { Briefcase, School, Mail, Phone, LogOut, BookOpen, Shield, TrendingUp, UserCircle, PencilLine, AlertTriangle } from 'lucide-react';
+import { Briefcase, School, Mail, Phone, LogOut, BookOpen, Shield, TrendingUp, UserCircle, PencilLine, AlertTriangle } from 'lucide-react'; 
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useUser } from '../contexts/UserContext.jsx'; // Context providing enrollments
-=======
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { Briefcase, School, Mail, Phone, BookOpen, Edit, Shield, TrendingUp, UserCircle, LogOut } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import { useUser } from '../contexts/UserContext.jsx';
-import { useCourse } from '../contexts/CourseContext.jsx';
->>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
 import { global_classnames } from "../utils/classnames.js";
 
 const PRIMARY_BLUE = "#004080";
@@ -88,17 +79,14 @@ const getInitials = (name) => {
 const ProfilePage = () => {
     // Destructure `logout` function from useAuth
     const { currentUser, userProfile, logout, isAuthenticated, loading: authLoading } = useAuth();
-    const { enrollments, loadingEnrollments } = useUser();
-    const { getCourseById, refreshCourses } = useCourse();
     const navigate = useNavigate();
     // Access enrollment data from useUser context
-    const { enrollments, loadingEnrollments, enrollmentsError } = useUser();
-
+    const { enrollments, loadingEnrollments, enrollmentsError } = useUser(); 
+    
     const [recommendedCourses, setRecommendedCourses] = useState([]);
     // Using loadingEnrollments as the primary data loading state
-    const [dataError] = useState(null);
+    const [dataError] = useState(null); 
 
-<<<<<<< HEAD
     // ✅ Define editProfile function
     const editProfile = useCallback(() => {
         navigate('/profile/edit');
@@ -123,35 +111,6 @@ const ProfilePage = () => {
         ]);
     }, []);
     React.useEffect(() => { initRecommended(); }, [initRecommended]);
-=======
-    // Placeholder: Fetch Enrolled and Recommended Courses
-    useEffect(() => {
-        const load = async () => {
-            if (!isAuthenticated || !currentUser) {
-                setDataLoading(false);
-                return;
-            }
-            setDataLoading(true);
-            await refreshCourses();
-            const mapped = enrollments.map((e) => {
-                const course = getCourseById(e.courseId);
-                return {
-                    id: e.id || `${e.userId}-${e.courseId}`,
-                    courseId: e.courseId,
-                    courseTitle: course?.title || 'Course',
-                };
-            });
-            setEnrolledCourses(mapped);
-            setRecommendedCourses([
-                { id: 'sec-cert', title: 'Advanced Cybersecurity', difficulty: 'Expert', icon: Shield },
-                { id: 'quantum-intro', title: 'Introduction to Quantum Computing', difficulty: 'Beginner', icon: TrendingUp },
-            ]);
-            setDataLoading(false);
-        };
-        load();
-    }, [isAuthenticated, currentUser, enrollments, getCourseById, refreshCourses]);
-
->>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
 
     // Placeholder for profile details
     const profileData = {
@@ -164,14 +123,6 @@ const ProfilePage = () => {
         photoUrl: currentUser?.photoURL,
         initials: getInitials(userProfile?.name || currentUser?.displayName),
     };
-<<<<<<< HEAD
-=======
-    
-    // Show loading or redirect if not authenticated
-    if (authLoading || dataLoading || loadingEnrollments) {
-        return <div className="p-10 text-center text-xl font-medium">Loading user dashboard...</div>;
-    }
->>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
 
     // Show loading or redirect if not authenticated
     if (!isAuthenticated && !authLoading) {
@@ -189,7 +140,7 @@ const ProfilePage = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-16">
             <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
-
+                
                 {/* Error Message Banner */}
                 {combinedError && (
                     <div className="p-4 mb-8 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg flex items-center gap-3" role="alert">
@@ -226,24 +177,22 @@ const ProfilePage = () => {
 
                         {/* Action Buttons Container */}
                         <div className="flex flex-col sm:flex-row gap-3">
-                            {/* Profile Edit button */}
-                            <button
-                                onClick={editProfile}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-full font-medium hover:bg-gray-600 transition"
-
-                            >
-                                <PencilLine className="w-5 h-5" /> Edit Profile
-                            </button>
+                            
                             {/* Logout button */}
                             <button
                                 onClick={handleLogout}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition"
-
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-full font-medium hover:bg-gray-600 transition"
                             >
                                 <LogOut className="w-5 h-5" /> Logout
                             </button>
 
-
+                            {/* Profile Edit button */}
+                            <button
+                                onClick={editProfile}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition"
+                            >
+                                <PencilLine className="w-5 h-5" /> Edit Profile
+                            </button>
                         </div>
                     </div>
                 </div>

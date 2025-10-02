@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 // Import your components
-import Website from "./pages/Website.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 import Header from "./components/Header.jsx";
 import CourseView from "./pages/CourseView.jsx";
 import WhatsAppChat from "./components/WhatsAppChat.jsx";
@@ -22,7 +22,7 @@ import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import AdminCouponDashboard from "./pages/AdminCouponDashboard.jsx";
-import HomeCourses from "./pages/HomeCourses.jsx";
+import CoursePage from "./pages/CoursePage.jsx";
 import CourseContent from "./pages/CourseContent.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx"; 
@@ -84,7 +84,7 @@ const App = () => {
                 {/* The MainLayout wraps the visible parts of the application */}
                 <MainLayout>
                   <Routes>
-                    <Route path="/" element={<Website />} />
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/course/:courseId" element={<CourseView />} />
                  
                     {/* PROFILE ROUTE (Requires Auth) */}
@@ -102,7 +102,7 @@ const App = () => {
                     <Route path="/auth/signup" element={<SignUp />} />
 
                     {/* Catalog and learning */}
-                    <Route path="/courses" element={<HomeCourses />} />
+                    <Route path="/courses" element={<CoursePage />} />
                     <Route
                       path="/learn/:courseId"
                       element={<ProtectedRoute><CourseContent /></ProtectedRoute>}

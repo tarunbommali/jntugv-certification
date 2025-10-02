@@ -8,7 +8,7 @@ import Testimonial from "../components/Testimonial.jsx";
 
 import "../App.css";
 
-const Website = () => {
+const LandingPage = () => {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <Hero />
@@ -31,4 +31,4 @@ const Website = () => {
   );
 };
 
-export default Website;
+export default LandingPage;

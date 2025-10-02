@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // src/pages/CourseContent.jsx
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -6,8 +5,8 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useCourseContent } from '../contexts/CourseContentContext.jsx';
 import VideoPlayer from '../components/VideoPlayer.jsx';
-import CourseContentShimmer from '../components/CourseContentShimmer.jsx'; // 🚨 NEW IMPORT 🚨
-import { Shield, BookOpen, PlayCircle, List, ArrowRight, Clock, CheckCircle, Lock } from 'lucide-react';
+import CourseContentShimmer from '../components/CourseContentShimmer.jsx';
+import { Shield, BookOpen, PlayCircle, List, ArrowRight, Clock, CheckCircle, Lock, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
 
 const PRIMARY_BLUE = "#004080";
 
@@ -19,7 +18,7 @@ const CourseContent = () => {
         currentModule,
         enrollmentStatus,
         loadingContent,
-        contentError,
+        contentError, // Used for showing the notification banner
         fetchCourseContent,
         setCurrentModule,
         markVideoWatched,
@@ -30,14 +29,14 @@ const CourseContent = () => {
         timeSpent
     } = useCourseContent();
 
-    // Initialize course content and enrollment check
+    // 1. Initialize course content and enrollment check
     useEffect(() => {
         if (isAuthenticated && currentUser && courseId) {
             fetchCourseContent(courseId);
         }
     }, [isAuthenticated, currentUser, courseId, fetchCourseContent]);
 
-    // Memoize active video data for the player
+    // Memoize active video data for the player (Assumes the first video in the list)
     const activeVideoData = currentModule?.videos?.[0] || null;
 
     // Handle video progress updates
@@ -63,90 +62,31 @@ const CourseContent = () => {
 
     // --- Conditional Rendering Guards ---
     if (loadingContent) {
-        // 🚨 RENDER SHIMMER LOADING UI 🚨
+        // RENDER SHIMMER LOADING UI
         return <CourseContentShimmer />;
     }
     
-    if (contentError && courseContent.length === 0) {
-        return (
-            <div className="min-h-[50vh] p-10 max-w-2xl mx-auto mt-10 text-center border-2 border-red-300 bg-red-50 rounded-lg">
-                <h1 className="text-2xl font-bold text-red-700">Error Loading Course</h1>
-                <p className="mt-2 text-red-600">{contentError}</p>
-                <Link to="/courses" className="text-blue-600 underline mt-4 inline-block">Browse All Courses</Link>
-            </div>
-        );
+    // Access Gate: If not enrolled, block access and redirect to the sales page
+    if (!enrollmentStatus.isEnrolled) {
+        // Redirect to the public course view or checkout page
+        return <Navigate to={`/course/${courseId}`} replace />;
     }
     
-    // Access Gate: If not enrolled, block access 
-    if (!enrollmentStatus.isEnrolled) {
-        return (
-            <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 bg-white shadow-xl max-w-lg mx-auto mt-20 rounded-xl border border-red-400">
-                <Shield className="w-12 h-12 text-red-600 mb-4" />
-                <h1 className="text-2xl font-bold text-gray-800">Access Denied 🔒</h1>
-                <p className="text-gray-600 mt-2 text-center">You must have a successful enrollment to view this content.</p>
-                <Link 
-                    to={`/checkout/${courseId}`} 
-                    className="mt-4 px-6 py-2 bg-yellow-500 text-gray-900 rounded-full font-semibold hover:bg-yellow-600 transition shadow-md"
-                >
-                    Complete Enrollment Now
-                </Link>
-            </div>
-        );
-    }
-
     // --- Main Content Display ---
     
-=======
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import { useCourse } from '../contexts/CourseContext.jsx';
-import { useUser } from '../contexts/UserContext.jsx';
-
-const CourseContent = () => {
-  const { courseId } = useParams();
-  const { currentUser, isAuthenticated } = useAuth();
-  const { getCourseById, refreshCourses, loading: loadingCourses } = useCourse();
-  const { enrollments, loadingEnrollments } = useUser();
-  const [courseDetails, setCourseDetails] = useState(null);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const run = async () => {
-      if (!courseId) {
-        setError('Invalid course identifier');
-        setLoading(false);
-        return;
-      }
-      if (!isAuthenticated || !currentUser) {
-        setLoading(false);
-        return;
-      }
-      setError('');
-      await refreshCourses();
-      const course = getCourseById(courseId);
-      if (!course) {
-        setError('Course not found.');
-        setIsAuthorized(false);
-        setLoading(false);
-        return;
-      }
-      setCourseDetails(course);
-      const authorized = enrollments.some((e) => String(e.courseId) === String(course.id));
-      setIsAuthorized(authorized);
-      setLoading(false);
-    };
-    run();
-  }, [isAuthenticated, currentUser, courseId, getCourseById, refreshCourses, enrollments]);
-
-  if (loading || loadingCourses || loadingEnrollments) return <div className="page-container p-6">Loading course access...</div>;
-  if (error)
->>>>>>> 73526b557d3535439700f97bb42ab30a62c0095d
     return (
         <section className="min-h-screen bg-gray-100 py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                {/* 🚨 NEW: Fallback/Error Banner (Shown when contentError is set by context) 🚨 */}
+                {contentError && (
+                    <div className="p-4 mb-8 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-lg flex items-center gap-3" role="alert">
+                        <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                        <p className="font-medium">
+                            **Warning:** {contentError}
+                        </p>
+                    </div>
+                )}
                 
                 {/* Course Header with Progress */}
                 <div className="mb-8">
