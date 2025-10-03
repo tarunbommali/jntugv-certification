@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase.js";
+import { createEnrollmentWithPayment } from "../firebase/services";
 import { useAuth } from "../contexts/AuthContext.jsx";
-// 🚨 FIX 1: Change import name from `useCourse` to `useCourseContext`
 import { useCourseContext } from "../contexts/CourseContext.jsx"; 
 import { useUser } from "../contexts/UserContext.jsx";
 import { global_classnames } from "../utils/classnames.js";
-// We don't need coursesData from fallbackData.js here since we use the context, but keep if other parts use it
-import { courses as coursesData } from "../utils/fallbackData.js"; 
-import CourseCard from "../components/CourseCard.jsx";
-import CourseList from '../components/CourseList.jsx'; // Assuming this is your dynamic list component
+import CourseCard from "../components/Course/CourseCard.jsx";
+import { AlertTriangle, UserCircle } from "lucide-react"; // Import icons for status messages
+import Breadcrumbs from "../components/ui/breadcrumbs.jsx/Breadcrumbs.jsx";
+
+const PRIMARY_BLUE = "#0056D2";
 
 const CoursePage = () => {
     const { currentUser, isAuthenticated } = useAuth();
-    // 🚨 FIX 2: Use the correct hook name when destructuring
     const { courses, loading, error, refreshCourses } = useCourseContext(); 
     const { enrollments } = useUser();
     const [enrollmentStatus, setEnrollmentStatus] = useState({});
+
+    const breadcrumbItems = [
+        { label: "Courses", link: "/courses" },
+        
+      ];
+    
 
     useEffect(() => {
         // Refresh courses when the component mounts
@@ -30,16 +36,15 @@ const CoursePage = () => {
             setEnrollmentStatus({});
             return;
         }
-        // Calculate enrollment status based on the central lists from CourseContext and UserContext
+        // Calculate enrollment status
         const status = courses.reduce((acc, c) => {
-            // Note: course.id might be a number, enrollment.courseId might be a string, so use String()
             acc[c.id] = enrollments.some((e) => String(e.courseId) === String(c.id));
             return acc;
         }, {});
         setEnrollmentStatus(status);
     }, [courses, enrollments, isAuthenticated, currentUser]);
 
-    // Handle enrollment payment logic
+    // Handle enrollment payment logic (Kept the same)
     const handleEnroll = (course) => {
         if (!currentUser) {
             alert("Please sign in to enroll in a course.");
@@ -58,34 +63,42 @@ const CoursePage = () => {
         }
         const amountInPaise = Math.round(priceNumber * 100);
         const razorpayOptions = {
-            key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_xxx",
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID,
             amount: amountInPaise,
             currency: "INR",
             name: "Certification Platform",
             description: `Enrollment for ${course.title}`,
             handler: async function (response) {
                 try {
-                    await addDoc(collection(db, "enrollments"), {
-                        userId: currentUser.uid,
-                        courseId: course.id,
-                        courseTitle: course.title,
-                        status: "SUCCESS",
-                        paymentId: response.razorpay_payment_id,
-                        amount: priceNumber,
-                        enrolledAt: new Date(),
-                    });
-                    alert(
-                        `Enrollment successful! Payment ID: ${response.razorpay_payment_id}`
+                    // Create enrollment + payment record in Firestore
+                    await createEnrollmentWithPayment(
+                        {
+                            userId: currentUser.uid,
+                            courseId: course.id,
+                            courseTitle: course.title,
+                            status: "SUCCESS",
+                            paymentData: {
+                                paymentId: response.razorpay_payment_id,
+                                amount: priceNumber,
+                            },
+                        },
+                        {
+                            userId: currentUser.uid,
+                            courseId: course.id,
+                            courseTitle: course.title,
+                            amount: priceNumber,
+                            currency: "INR",
+                            status: "captured",
+                            razorpayData: {
+                                paymentId: response.razorpay_payment_id,
+                            },
+                        }
                     );
-                    // Force a refresh of the enrollment status after successful payment
-                    // NOTE: You may need to call refreshEnrollments from useUser() here too
-                    // if that context doesn't auto-update.
+                    alert(`Enrollment successful! Payment ID: ${response.razorpay_payment_id}`);
                     setEnrollmentStatus(prev => ({...prev, [course.id]: true}));
                 } catch (err) {
                     console.error("Error saving enrollment to Firestore:", err);
-                    alert(
-                        "Payment successful but failed to record enrollment. Please contact support."
-                    );
+                    alert("Payment successful but failed to record enrollment. Please contact support.");
                 }
             },
             prefill: {
@@ -105,34 +118,46 @@ const CoursePage = () => {
 
     return (
         <div
-            className={`${global_classnames.width.container} page-container p-6`}
+            className={`${global_classnames.width.container}   min-h-screen`}
         >
-            <h1 className="text-3xl font-bold">Courses</h1>
-            <p className="text-sm text-gray-700 mt-2">
-                {isAuthenticated && currentUser
-                    ? `Welcome, ${currentUser.email}!`
-                    : "Sign in to enroll and get instant access."}
-            </p>
+            <Breadcrumbs items={breadcrumbItems} />
+
             
-            {loading && <p className="mt-4">Loading courses...</p>}
-            {error && <p className="mt-4 text-red-600">{error}</p>}
             
-            <div className="course-list mt-6 flex flex-wrap gap-5 justify-center">
-                {/* 🚨 FIX: Only render CourseCard list if courses are available */}
+            
+            {/* Loading/Error Messages */}
+            {(loading || error) && (
+                <div className="mt-4 p-4 rounded-lg flex items-center gap-3" style={{ backgroundColor: error ? '#fee2e2' : '#eff6ff' }}>
+                    {loading && <p className="text-gray-600">Loading available courses...</p>}
+                    {error && (
+                        <>
+                            <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                            <p className="text-red-700 font-medium">{error}</p>
+                        </>
+                    )}
+                </div>
+            )}
+            
+            <div className="flex flex-wrap mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                
                 {courses.length > 0 ? (
                     courses.map((c) => (
                         <CourseCard
                             key={c.id}
                             course={c}
-                            isEnrolled={enrollmentStatus[c.id]}
+                            isEnrolled={!enrollmentStatus[c.id]}
                             onEnroll={handleEnroll}
                         />
                     ))
                 ) : (
-                    // 🚨 FIX: Render CourseList (or a message) when courses are empty 🚨
-                    <div className="w-full text-center p-10 bg-gray-50 rounded-lg">
-                         <p className="text-lg text-gray-600">No courses available. Check back soon!</p>
-                    </div>
+                    // Display message when courses list is empty (and not currently loading)
+                    !loading && (
+                        <div className="lg:col-span-4 w-full text-center p-12 bg-gray-50 border border-gray-200 rounded-xl shadow-inner">
+                             <p className="text-xl text-gray-600 font-medium">
+                                No courses are currently available. Check back soon!
+                            </p>
+                        </div>
+                    )
                 )}
             </div>
         </div>

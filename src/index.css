@@ -1,3 +1,113 @@
 @import "tailwindcss";
 
 
+:root {
+  /* Theme tokens (light default) */
+  --color-bg: #ffffff;
+  --color-text: #111827;
+  --color-muted: #6b7280;
+  --color-primary: #0056D2;
+  --color-primary-contrast: #ffffff;
+  --color-success: #00B551;
+  --color-border: #e5e7eb;
+  --color-card: #ffffff;
+}
+
+/* Dark theme override */
+[data-theme="dark"] {
+  --color-bg: #0b0f1a;
+  --color-text: #e5e7eb;
+  --color-muted: #9ca3af;
+  --color-primary: #60a5fa;
+  --color-primary-contrast: #0b0f1a;
+  --color-success: #34d399;
+  --color-border: #1f2937;
+  --color-card: #111827;
+}
+
+html, body, #root {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Utility classes mapping to tokens */
+.bg-app { background: var(--color-bg); }
+.text-app { color: var(--color-text); }
+.text-muted { color: var(--color-muted); }
+.btn-primary { background: var(--color-primary); color: var(--color-primary-contrast); }
+.btn-success { background: var(--color-success); color: #fff; }
+.card { background: var(--color-card); border: 1px solid var(--color-border); }
+
+/* Overrides to adapt common utility classes to theme tokens */
+.bg-white { background: var(--color-card) !important; }
+.bg-gray-50 { background: var(--color-card) !important; }
+.text-gray-800 { color: var(--color-text) !important; }
+.text-gray-700 { color: var(--color-text) !important; }
+.text-gray-600 { color: var(--color-muted) !important; }
+.text-gray-500 { color: var(--color-muted) !important; }
+.border-gray-100 { border-color: var(--color-border) !important; }
+.border-gray-200 { border-color: var(--color-border) !important; }
+.border-gray-300 { border-color: var(--color-border) !important; }
+.text-blue-600 { color: var(--color-primary) !important; }
+.hover\:text-blue-600:hover { color: var(--color-primary) !important; }
+.from-blue-600 { --tw-gradient-from: var(--color-primary) !important; }
+.to-blue-500 { --tw-gradient-to: var(--color-primary) !important; }
+@import "tailwindcss";
+
+/* Light Theme (default) */
+:root {
+  --color-bg: #ffffff;
+  --color-text: #1e293b;       /* slate-800 for strong text */
+  --color-muted: #64748b;      /* slate-500 for muted */
+  --color-primary: #004080;    /* your main tile/navy blue */
+  --color-primary-contrast: #ffffff;
+  --color-success: #00b551;    /* fresh green */
+  --color-border: #e2e8f0;     /* light border */
+  --color-card: #f9fafb;       /* soft light gray cards */
+}
+
+/* Dark Theme Override */
+[data-theme="dark"] {
+  --color-bg: #0f172a;         /* slate-900 */
+  --color-text: #f1f5f9;       /* slate-100 */
+  --color-muted: #94a3b8;      /* slate-400 */
+  --color-primary: #60a5fa;    /* bright blue for dark bg */
+  --color-primary-contrast: #0f172a;
+  --color-success: #34d399;    /* emerald-400 */
+  --color-border: #1e293b;     /* slate-800 */
+  --color-card: #1e293b;       /* dark card */
+}
+
+/* Base App Styling */
+html, body, #root {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Utilities */
+.bg-app { background: var(--color-bg); }
+.text-app { color: var(--color-text); }
+.text-muted { color: var(--color-muted); }
+
+.btn-primary { 
+  background: var(--color-primary); 
+  color: var(--color-primary-contrast); 
+  font-weight: 600; 
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.btn-success { 
+  background: var(--color-success); 
+  color: #fff; 
+  font-weight: 600; 
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.card { 
+  background: var(--color-card); 
+  border: 1px solid var(--color-border); 
+  border-radius: 0.75rem; 
+  padding: 1rem; 
+}

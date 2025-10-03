@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { motion } from "framer-motion";
-import { global_classnames } from "../utils/classnames";
+import { global_classnames } from "../../utils/classnames";
 
 const skillsData = [
   { category: "Artificial Intelligence", skills: ["Intelligent Systems", "Search Techniques", "NLP", "Chatbots"] },

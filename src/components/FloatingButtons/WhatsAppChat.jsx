@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { X, Send, MessageSquare } from "lucide-react";
 // Assuming global_classnames provides primary colors for branding consistency
-import { global_classnames } from "../utils/classnames"; 
+import { global_classnames } from "../../utils/classnames"; 
 import { FaWhatsapp } from "react-icons/fa";
 
 // Utility function to merge classes

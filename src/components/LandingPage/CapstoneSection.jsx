@@ -1,7 +1,7 @@
 import React from "react";
-import { global_classnames } from "../utils/classnames";
-import { capstoneProjects } from "../utils/constants";
-import InfiniteMovingCards from "./ui/InfiniteMovingCards";
+import { global_classnames } from "../../utils/classnames";
+import { capstoneProjects } from "../../utils/constants";
+import InfiniteMovingCards from "../ui/InfiniteMovingCards";
 import bg from './vector_white_bg.png'
 
 

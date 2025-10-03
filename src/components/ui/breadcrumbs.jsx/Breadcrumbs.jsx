@@ -2,11 +2,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
-import { global_classnames } from "../utils/classnames"; 
+import { global_classnames } from "../../../utils/classnames"; 
 
 const Breadcrumbs = ({ items }) => {
   return (
-    <nav className={`${global_classnames.width.container} mx-auto px-4 bg-white  flex items-center text-gray-600 my-2`}>
+    <nav className={`flex items-center text-gray-600 py-6  `}>
       {items.map((item, idx) => (
         <span key={idx} className="flex items-center">
           {item.link ? (
@@ -16,7 +16,7 @@ const Breadcrumbs = ({ items }) => {
           ) : (
             <span className="font-medium text-gray-800">{item.label}</span>
           )}
-          {idx < items.length - 1 && <IoIosArrowForward size={14} className="mx-2" />}
+          {idx < items.length - 1 && <IoIosArrowForward size={14} className="mr-2" />}
         </span>
       ))}
     </nav>

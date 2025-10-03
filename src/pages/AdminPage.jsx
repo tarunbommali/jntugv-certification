@@ -1,162 +1,127 @@
-/* eslint-disable no-unused-vars */
-import React, { useMemo, useState, useEffect } from 'react';
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../firebase';
+// src/pages/AdminPage.jsx
+
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { Navigate, useParams } from 'react-router-dom';
+import { Trello } from 'lucide-react';
+import {global_classnames} from '../utils/classnames.js'
 
-const AdminCourseCreator = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [contentURL, setContentURL] = useState('');
-  const [moduleLinks, setModuleLinks] = useState([{ label: 'Module 1', url: '' }]);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+import ErrorBoundary from '../components/Error/ErrorBoundary.jsx'; 
 
-  const handleAddCourse = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    if (!title || !description || !price || !contentURL) {
-      setMessage('All fields are required.');
-      setLoading(false);
-      return;
-    }
-    try {
-      await addDoc(collection(db, 'courses'), {
-        title,
-        description,
-        price: parseFloat(price),
-        contentAccessURL: contentURL,
-        modules: moduleLinks.filter(m => m.url?.trim()).map((m, idx) => ({ id: `m${idx+1}`, title: m.label || `Module ${idx+1}`, url: m.url })),
-        createdAt: new Date(),
-        isActive: true
-      });
-      setMessage(`Course "${title}" added successfully!`);
-      setTitle('');
-      setDescription('');
-      setPrice('');
-      setContentURL('');
-      setModuleLinks([{ label: 'Module 1', url: '' }]);
-    } catch (err) {
-      setMessage('Error adding course: ' + (err?.message || String(err))); 
-    }
-    setLoading(false);
-  };
+// Import Admin Components
+import AdminAnalytics from '../components/Admin/AdminAnalytics.jsx';
+import AdminUserDashboard from '../components/Admin/AdminUserDashboard.jsx';
+import AdminCourseEditor from '../components/Admin/AdminCourseEditor.jsx';
+import AdminCouponDashboard from '../components/Admin/AdminCouponDashboard.jsx';
 
-  return (
-    <div className="border rounded p-4 my-6 max-w-lg">
-      <h3 className="text-xl font-semibold mb-3">Add New Course</h3>
-      {message && (
-        <p className={message.includes('successfully') ? 'text-green-600' : 'text-red-600'}>{message}</p>
-      )}
-      <form onSubmit={handleAddCourse} className="space-y-3 mt-3">
-        <input className="w-full border p-2 rounded" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Course Title" required />
-        <textarea className="w-full border p-2 rounded" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" required />
-        <input className="w-full border p-2 rounded" type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price (INR)" required />
-        <input className="w-full border p-2 rounded" value={contentURL} onChange={(e) => setContentURL(e.target.value)} placeholder="Course Content URL (Protected)" required />
-        <div className="border rounded p-3">
-          <div className="font-semibold mb-2">Module Links</div>
-          {moduleLinks.map((m, idx) => (
-            <div key={idx} className="flex gap-2 mb-2">
-              <input className="flex-1 border p-2 rounded" value={m.label} onChange={(e) => setModuleLinks(prev => prev.map((x, i) => i === idx ? { ...x, label: e.target.value } : x))} placeholder={`Label for module ${idx+1}`} />
-              <input className="flex-[2] border p-2 rounded" value={m.url} onChange={(e) => setModuleLinks(prev => prev.map((x, i) => i === idx ? { ...x, url: e.target.value } : x))} placeholder="Video URL" />
-              <button type="button" className="px-3 bg-gray-200 rounded" onClick={() => setModuleLinks(prev => prev.filter((_, i) => i !== idx))}>Remove</button>
-            </div>
-          ))}
-          <button type="button" className="mt-2 bg-blue-100 text-blue-800 px-3 py-1 rounded" onClick={() => setModuleLinks(prev => [...prev, { label: `Module ${prev.length+1}`, url: '' }])}>Add Module</button>
-        </div>
-        <button disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded" type="submit">
-          {loading ? 'Adding Course...' : 'Add Course to Platform'}
-        </button>
-      </form>
-    </div>
-  );
-};
+const PRIMARY_BLUE = "#0056D2";
+const BORDER_COLOR = "border-blue-600";
 
-const AdminAnalytics = () => {
-  const [enrollments, setEnrollments] = useState([]);
-  const [filterCollege, setFilterCollege] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError('');
-        const snap = await getDocs(collection(db, 'enrollments'));
-        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setEnrollments(list);
-      } catch (e) {
-        setError('Failed to load analytics.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
-
-  const filtered = useMemo(() => {
-    return enrollments.filter(e => (filterCollege ? (e.billingInfo?.college || '').toLowerCase().includes(filterCollege.toLowerCase()) : true));
-  }, [enrollments, filterCollege]);
-
-  const totalRevenue = filtered.reduce((sum, e) => sum + Number(e.amount || 0), 0);
-  const totalEnrollments = filtered.length;
-  const collegeWise = filtered.reduce((acc, e) => {
-    const c = (e.billingInfo?.college || 'Unknown').trim() || 'Unknown';
-    acc[c] = (acc[c] || 0) + 1;
-    return acc;
-  }, {});
-
-  return (
-    <div className="border rounded p-4 my-6">
-      <h3 className="text-xl font-semibold mb-3">Analytics</h3>
-      {loading && <p>Loading analytics...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-      <div className="flex gap-3 items-end mb-4">
-        <div className="flex-1">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Filter by College</label>
-          <input className="w-full border p-2 rounded" value={filterCollege} onChange={(e) => setFilterCollege(e.target.value)} placeholder="Type college name..." />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-        <div className="p-4 bg-green-50 border rounded">
-          <div className="text-sm text-gray-600">Total Enrollments</div>
-          <div className="text-2xl font-bold">{totalEnrollments}</div>
-        </div>
-        <div className="p-4 bg-blue-50 border rounded">
-          <div className="text-sm text-gray-600">Total Revenue (₹)</div>
-          <div className="text-2xl font-bold">{totalRevenue.toFixed(2)}</div>
-        </div>
-        <div className="p-4 bg-yellow-50 border rounded">
-          <div className="text-sm text-gray-600">Unique Colleges</div>
-          <div className="text-2xl font-bold">{Object.keys(collegeWise).length}</div>
-        </div>
-      </div>
-      <div className="mt-3">
-        <h4 className="font-semibold mb-2">College-wise Enrollments</h4>
-        <ul className="list-disc ml-5">
-          {Object.entries(collegeWise).map(([name, count]) => (
-            <li key={name}>{name}: {count}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-};
+// Tab configuration with proper component references
+const TABS = [
+    { 
+        id: 'analytics', 
+        name: 'Analytics', 
+        icon: '📊',
+        component: AdminAnalytics
+    },
+    { 
+        id: 'users', 
+        name: 'User Management', 
+        icon: '👥',
+        component: AdminUserDashboard
+    },
+    { 
+        id: 'courses', 
+        name: 'Course Editor', 
+        icon: '📚',
+        component: AdminCourseEditor
+    },
+    { 
+        id: 'coupons', 
+        name: 'Coupon Manager', 
+        icon: '🎫',
+        component: AdminCouponDashboard
+    },
+];
 
 const AdminPage = () => {
-  const { userProfile } = useAuth();
-  return (
-    <div className="page-container max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold">Admin Panel 🛠️</h1>
-      <p className="mt-2">Welcome, {userProfile?.email}! You have administrative access.</p>
-      <AdminCourseCreator />
-      <AdminAnalytics />
-    </div>
-  );
+    const { isAdmin, userProfile } = useAuth();
+    const { tabId } = useParams();
+    
+    // Determine initial active tab
+    const defaultTabId = TABS.find(tab => tab.id === tabId) ? tabId : TABS[0].id;
+    const [activeTab, setActiveTab] = useState(defaultTabId); 
+    
+    // Get active component
+    const activeTabConfig = TABS.find(t => t.id === activeTab) || TABS[0];
+    const ActiveComponent = activeTabConfig.component;
+
+    // Sync with URL parameters
+    useEffect(() => {
+        if (tabId && tabId !== activeTab) {
+            setActiveTab(tabId);
+        }
+    }, [tabId, activeTab]);
+
+    if (!isAdmin) {
+        return <Navigate to="/" replace />;
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
+                
+                {/* Header */}
+                <div className={`mb-8 p-6 bg-white rounded-xl shadow-lg border-t-4 ${BORDER_COLOR}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3 mb-4 sm:mb-0">
+                            <Trello className="w-8 h-8" style={{ color: PRIMARY_BLUE }} />
+                            <div>
+                                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                                    Admin Dashboard
+                                </h1>
+                            </div>
+                        </div>
+                        <div className="bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                            <span className="text-sm font-medium text-blue-800">
+                                Active Tab: <span className="font-bold capitalize">{activeTab.replace('-', ' ')}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tabs Navigation */}
+                <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+                    <nav className="flex overflow-x-auto">
+                        {TABS.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`
+                                    flex items-center gap-2 px-6 py-4 border-b-2 text-sm font-medium whitespace-nowrap transition-all duration-200
+                                    ${activeTab === tab.id
+                                        ? `${BORDER_COLOR} text-blue-600 bg-blue-50`
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                    }
+                                `}
+                            >
+                                <span className="text-lg">{tab.icon}</span>
+                                <span>{tab.name}</span>
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+
+                {/* Active Tab Content */}
+                <div className="p-0">
+                    <ErrorBoundary>
+                        {ActiveComponent && <ActiveComponent />}
+                    </ErrorBoundary>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default AdminPage;
-

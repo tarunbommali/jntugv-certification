@@ -1,7 +1,7 @@
 import React from "react";
 // Replaced CheckCircle, Clock, Users, DollarSign with more specific Lucide icons
 import { Award, Code, Globe, Zap, Shield, GitBranch, Users } from "lucide-react"; 
-import { global_classnames } from "../utils/classnames";
+import { global_classnames } from "../../utils/classnames";
  
 const techFeatures = [
   { 

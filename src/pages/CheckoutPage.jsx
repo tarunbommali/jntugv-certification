@@ -333,7 +333,7 @@ const CheckoutPage = () => {
 
     return (
         <section className="py-4 bg-gray-50 min-h-screen">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className={`${global_classnames.width.container}  mx-auto px-4 sm:px-6 lg:px-8 `}>
                 <form
                     onSubmit={handleConfirmAndPay}
                     className="grid grid-cols-1 lg:grid-cols-3 gap-10"
@@ -355,27 +355,8 @@ const CheckoutPage = () => {
                             <div><label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label><input type="text" name="name" value={billingInfo.name} onChange={handleInputChange} placeholder="Your Full Name" required className={baseInputClasses}/></div>
                             <div><label className="block text-sm font-semibold text-gray-700 mb-1">Email Address (Non-editable)</label><input type="email" name="email" value={billingInfo.email} readOnly disabled className={`${baseInputClasses} bg-gray-100 cursor-not-allowed`}/></div>
                             <div><label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label><input type="tel" name="phone" value={billingInfo.phone} onChange={handleInputChange} placeholder="+91-XXXXXXXXXX" required className={baseInputClasses}/></div>
-                            <div><label className="block text-sm font-semibold text-gray-700 mb-1">College / Institution</label><input type="text" name="college" value={billingInfo.college} onChange={handleInputChange} placeholder="Your College Name" className={baseInputClasses}/></div>
-                        </div>
-                        {/* Terms and Conditions + Test Payment */}
-                        <div className="pt-6 border-t border-gray-200">
-                            {/* Terms */}
-                            <label className="flex items-center space-x-3 cursor-pointer mt-4">
-                                <input type="checkbox" name="agreeTerms" checked={billingInfo.agreeTerms} onChange={handleInputChange} className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-600" required/>
-                                <span className="text-sm text-gray-700">
-                                    I agree to the
-                                    <Link to="/terms" target="_blank" className="text-blue-600 hover:underline font-bold">&nbsp;Terms</Link>
-                                    &nbsp;and
-                                    <Link to="/policies" target="_blank" className="text-blue-600 hover:underline font-bold">&nbsp;Policies</Link>
-                                </span>
-                            </label>
-                            {finalError && (<p className="text-red-600 text-sm mt-3 font-medium flex items-center gap-1"><X className="w-4 h-4" />{finalError}</p>)}
-                            {/* Test payment toggle */}
-                            <div className="mt-4 flex items-center gap-3">
-                                <input id="useTestPayment" type="checkbox" checked={useTestPayment} onChange={(e) => setUseTestPayment(e.target.checked)} className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-600"/>
-                                <label htmlFor="useTestPayment" className="text-sm text-gray-700">Use Test Payment (No real charge)</label>
-                            </div>
-                        </div>
+                         </div>
+                        
                     </div>
 
                     {/* RIGHT COLUMN: Order Summary (1/3 width) */}

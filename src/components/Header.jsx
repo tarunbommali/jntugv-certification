@@ -1,14 +1,16 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react"; // ✅ FIX: useEffect added here for UserAvatar component
-import { Menu, X, ArrowRight, UserCircle } from "lucide-react";
+import { Menu, X, ArrowRight, UserCircle, Moon, Sun } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpg";
 // Assuming these are present in your project:
 import useCountdownTimer from "../hooks/useCountdownTimer";
-import ContactModal from "./ContactModal";
-import OfferModal from "./OfferModal";
+
+import OfferModal from "./ui/modal/OfferModal.jsx";
+import Contact from './ui/modal/Contact.jsx'
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { global_classnames } from "../utils/classnames.js";
+import { useTheme } from "../contexts/ThemeContext.jsx";
 
 // Helper function to get initials for placeholder avatar
 const getInitials = (name) => {
@@ -65,6 +67,7 @@ const UserAvatar = ({ currentUser, userProfile, navigate }) => {
 };
 
 const Header = () => {
+  const { theme, toggleTheme, isDark } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
@@ -93,14 +96,14 @@ const Header = () => {
     <>
       {/* Modals */}
       {isContactModalOpen && (
-        <ContactModal onClose={() => setIsContactModalOpen(false)} />
+        <Contact onClose={() => setIsContactModalOpen(false)} />
       )}
 
       {isOfferModalOpen && (
         <OfferModal onClose={() => setIsOfferModalOpen(false)} />
       )}
       {/* Top Offer Bar - Fixed height, highly visible */}
-      <div className="w-full bg-[#004080] text-white py-2 shadow-inner z-50">
+      <div className="w-full text-white py-2 shadow-inner z-50" style={{ background: "var(--color-primary)" }}>
 
         <div
           className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-center md:justify-between items-center text-center text-sm font-semibold`}
@@ -115,7 +118,8 @@ const Header = () => {
           </button>
           {/* Offer Countdown Button */}
           <button
-            className="flex items-center gap-2 cursor-pointer rounded-full bg-yellow-500 text-[#004080] px-4 py-1.5 font-extrabold hover:bg-yellow-400 transition-all text-xs sm:text-sm shadow-lg"
+            className="flex items-center gap-2 cursor-pointer rounded-full px-4 py-1.5 font-extrabold transition-all text-xs sm:text-sm shadow-lg"
+            style={{ background: "#f59e0b", color: "var(--color-primary)" }}
             onClick={() => setIsOfferModalOpen(true)}
           >
             Career Level Up Offer! Ends in: {formattedTime}
@@ -126,7 +130,7 @@ const Header = () => {
 
       </div>
       {/* Main Header (Sticky for desktop) */}
-      <header className="sticky top-0 bg-white border-b border-[#d1d9e0] z-40 shadow-sm">
+      <header className="sticky top-0 z-40 shadow-sm" style={{ background: "var(--color-card)", borderBottom: "1px solid var(--color-border)" }}>
 
         <div
           className={`${global_classnames.width.container}  mx-auto px-4 sm:px-6 lg:px-8`}
@@ -144,7 +148,7 @@ const Header = () => {
 
               <div className="flex flex-col leading-tight">
 
-                <span className="text-xl md:text-2xl font-bold text-[#004080]">
+                <span className="text-xl md:text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
                   NxtGen Certification
                 </span>
 
@@ -161,10 +165,21 @@ const Header = () => {
             <div className="hidden md:flex items-center gap-4">
               <Link
                 to="/courses"
-                className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors"
+                className="text-lg font-semibold transition-colors"
+                style={{ color: "var(--color-text)" }}
               >
                 Courses
               </Link>
+
+              {/* Theme toggle (desktop) */}
+              <button
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className="p-2 rounded-full hover:opacity-80 transition"
+                style={{ background: "transparent", color: "var(--color-text)", border: "1px solid var(--color-border)" }}
+              >
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
 
               {isAuthenticated ? (
                 <>
@@ -183,7 +198,8 @@ const Header = () => {
               ) : (
                 <button
                   onClick={() => navigate("/auth/signin")}
-                  className="rounded-full text-sm font-medium h-10 px-5 bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:opacity-90 transition-shadow shadow-md"
+                  className="rounded-full text-sm font-medium h-10 px-5 hover:opacity-90 transition-shadow shadow-md"
+                  style={{ background: "var(--color-primary)", color: "var(--color-primary-contrast)" }}
                 >
                   Login
                 </button>
@@ -191,12 +207,24 @@ const Header = () => {
 
             </div>
             {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 text-[#004080] hover:text-blue-600 transition-colors"
+            <div className="md:hidden flex items-center gap-2">
+              {/* Theme toggle (mobile) */}
+              <button
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className="p-2 rounded-full"
+                style={{ color: "var(--color-text)", border: "1px solid var(--color-border)" }}
+              >
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              <button
+                className="p-2 transition-colors"
+                style={{ color: "var(--color-primary)" }}
               onClick={() => setIsMenuOpen(true)}
-            >
-              <Menu className="h-7 w-7" />
-            </button>
+              >
+                <Menu className="h-7 w-7" />
+              </button>
+            </div>
 
           </div>
 
@@ -212,13 +240,14 @@ const Header = () => {
             {/* Drawer Content */}
             {/* NOTE: Ensure you have the 'animate-slide-in-right' keyframes in your CSS! */}
 
-            <div className="fixed top-0 right-0 w-64 xs:w-72 sm:w-80 h-full bg-white p-6 shadow-2xl z-50 transition-transform transform translate-x-0 ease-in-out duration-300 animate-slide-in-right">
+            <div className="fixed top-0 right-0 w-64 xs:w-72 sm:w-80 h-full p-6 shadow-2xl z-50 transition-transform transform translate-x-0 ease-in-out duration-300 animate-slide-in-right" style={{ background: "var(--color-card)" }}>
               {/* Drawer Header (Close Button) */}
 
               <div className="flex justify-end mb-8">
 
                 <button
-                  className="p-2 text-[#004080] hover:text-red-500"
+                  className="p-2"
+                  style={{ color: "var(--color-primary)" }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <X className="h-6 w-6" />
@@ -244,7 +273,8 @@ const Header = () => {
                 <Link
                   to="/courses"
                   onClick={() => handleMobileLinkClick("/courses")}
-                  className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors py-2 border-b border-gray-100 text-left"
+                  className="text-xl font-semibold transition-colors py-2 text-left"
+                  style={{ color: "var(--color-text)", borderBottom: "1px solid var(--color-border)" }}
                 >
                   Courses
                 </Link>
@@ -267,9 +297,9 @@ const Header = () => {
                 {isAuthenticated ? (
                   <div className="flex flex-col items-start space-y-3">
 
-                    <p className="text-base text-gray-700 font-medium">
+                    <p className="text-base font-medium" style={{ color: "var(--color-text)" }}>
                       Signed in as: <br />
-                      <strong className="text-blue-600 break-all">
+                      <strong className="break-all" style={{ color: "var(--color-primary)" }}>
                         {currentUser?.email}
                       </strong>
 
@@ -277,7 +307,8 @@ const Header = () => {
 
                     <button
                       onClick={handleLogout}
-                      className="w-full h-12 rounded-md bg-red-600 text-white text-base font-medium hover:bg-red-700 transition-colors shadow-md"
+                      className="w-full h-12 rounded-md text-white text-base font-medium hover:opacity-90 transition-colors shadow-md"
+                      style={{ background: "#dc2626" }}
                     >
                       Logout
                     </button>
@@ -289,7 +320,8 @@ const Header = () => {
                       setIsMenuOpen(false);
                       navigate("/auth/signin");
                     }}
-                    className="w-full h-12 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-base font-medium hover:opacity-90 transition-shadow shadow-md"
+                    className="w-full h-12 rounded-md text-white text-base font-medium hover:opacity-90 transition-shadow shadow-md"
+                    style={{ background: "var(--color-primary)" }}
                   >
                     Login to Enroll
                   </button>

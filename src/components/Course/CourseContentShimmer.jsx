@@ -1,7 +1,7 @@
 // src/components/CourseContentShimmer.jsx
 
 import React from 'react';
-import { global_classnames } from "../utils/classnames.js";
+import { global_classnames } from "../../utils/classnames.js";
 
 const CourseContentShimmer = () => {
     return (

@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext.jsx';
 import { useUser } from '../contexts/UserContext.jsx'; // Context providing enrollments
 import { global_classnames } from "../utils/classnames.js";
 
-const PRIMARY_BLUE = "#004080";
+const PRIMARY_BLUE = "var(--color-primary)";
 const ACCENT_YELLOW = "#ffc107";
 
 // ----------------------------------------------------------------------
@@ -138,7 +138,7 @@ const ProfilePage = () => {
     const combinedError = dataError || enrollmentsError;
 
     return (
-        <div className="min-h-screen bg-gray-50 py-16">
+        <div className="min-h-screen bg-app py-16">
             <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
                 
                 {/* Error Message Banner */}
@@ -150,7 +150,7 @@ const ProfilePage = () => {
                 )}
 
                 {/* Header & Avatar Section */}
-                <div className="bg-white p-8 rounded-2xl shadow-xl border-t-4" style={{ borderColor: PRIMARY_BLUE }}>
+                <div className="p-8 rounded-2xl shadow-xl border-t-4 card" style={{ borderColor: PRIMARY_BLUE }}>
                     <div className="flex flex-col md:flex-row items-center gap-6">
 
                         {/* Profile Picture */}
@@ -169,8 +169,8 @@ const ProfilePage = () => {
                         {/* Title and Summary */}
                         <div className="text-center md:text-left flex-1">
                             <h1 className="text-3xl font-extrabold text-gray-900">{profileData.fullName}</h1>
-                            <p className="text-sm text-gray-500 mt-1 flex items-center justify-center md:justify-start gap-1"><Mail className="w-4 h-4" />{profileData.email}</p>
-                            <p className="text-sm text-gray-500 mt-1 flex items-center justify-center md:justify-start gap-1">
+                            <p className="text-sm text-muted mt-1 flex items-center justify-center md:justify-start gap-1"><Mail className="w-4 h-4" />{profileData.email}</p>
+                            <p className="text-sm text-muted mt-1 flex items-center justify-center md:justify-start gap-1">
                                 <School className="w-4 h-4" /> {profileData.college}
                             </p>
                         </div>
@@ -181,7 +181,8 @@ const ProfilePage = () => {
                             {/* Logout button */}
                             <button
                                 onClick={handleLogout}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-full font-medium hover:bg-gray-600 transition"
+                                className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-full font-medium hover:opacity-90 transition"
+                                style={{ background: "#6b7280" }}
                             >
                                 <LogOut className="w-5 h-5" /> Logout
                             </button>
@@ -189,7 +190,8 @@ const ProfilePage = () => {
                             {/* Profile Edit button */}
                             <button
                                 onClick={editProfile}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition"
+                                className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-full font-medium hover:opacity-90 transition"
+                                style={{ background: "#dc2626" }}
                             >
                                 <PencilLine className="w-5 h-5" /> Edit Profile
                             </button>
@@ -203,13 +205,14 @@ const ProfilePage = () => {
                     {/* LEFT COLUMN: User Details and Skills */}
                     <div className="lg:col-span-1 space-y-6">
                         {/* Skills Section */}
-                        <div className="bg-white p-6 rounded-xl shadow-md">
+                        <div className="p-6 rounded-xl shadow-md card">
                             <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">Current Skills</h2>
                             <div className="flex flex-wrap gap-2">
                                 {profileData.skills.map((skill, index) => (
                                     <span
                                         key={index}
-                                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
+                                        className="px-3 py-1 rounded-full text-sm font-medium"
+                                        style={{ background: "#e0f2fe", color: "#0369a1" }}
                                     >
                                         {skill}
                                     </span>
@@ -222,7 +225,7 @@ const ProfilePage = () => {
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* Enrolled Courses */}
-                        <div className="bg-white p-6 rounded-xl shadow-md">
+                        <div className="p-6 rounded-xl shadow-md card">
                             <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4 flex items-center gap-2">
                                 <BookOpen className="w-6 h-6" style={{ color: PRIMARY_BLUE }} />
                                 Enrolled Courses ({enrollments.length})
@@ -233,12 +236,14 @@ const ProfilePage = () => {
                                     {enrollments.map((course, index) => (
                                         <li
                                             key={index}
-                                            className="p-4 border rounded-lg bg-gray-50 flex justify-between items-center"
+                                        className="p-4 rounded-lg flex justify-between items-center"
+                                        style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
                                         >
                                             <span className="font-semibold text-lg">{course.courseTitle}</span>
                                             <button
                                                 onClick={() => navigate(`/learn/${course.courseId}`)}
-                                                className="px-4 py-1 bg-green-600 text-white rounded-full text-sm hover:bg-green-700 transition"
+                                                className="px-4 py-1 text-white rounded-full text-sm hover:opacity-90 transition"
+                                                style={{ background: "var(--color-success)" }}
                                             >
                                                 Go to Course
                                             </button>
@@ -246,35 +251,17 @@ const ProfilePage = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <div className="text-center py-6 border-2 border-dashed border-gray-300 rounded-lg">
-                                    <p className="text-gray-600">You are not currently enrolled in any courses. Time to start learning!</p>
+                                <div className="text-center py-6 border-2 border-dashed rounded-lg" style={{ borderColor: "var(--color-border)" }}>
+                                    <p className="text-muted">You are not currently enrolled in any courses. Time to start learning!</p>
                                     <button
                                         onClick={() => navigate('/courses')}
-                                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 transition"
+                                        className="mt-3 px-4 py-2 text-white rounded-full text-sm hover:opacity-90 transition"
+                                        style={{ background: "var(--color-primary)" }}
                                     >
                                         Browse Courses
                                     </button>
                                 </div>
                             )}
-                        </div>
-
-                        {/* Recommended Courses */}
-                        <div className="bg-white p-6 rounded-xl shadow-md">
-                            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Recommended Courses</h2>
-                            <ul className="space-y-4">
-                                {recommendedCourses.map((course, index) => {
-                                    const Icon = course.icon;
-                                    return (
-                                        <li key={index} className="p-4 border rounded-lg bg-yellow-50 flex justify-between items-center">
-                                            <div className="flex items-center gap-3">
-                                                {Icon && <Icon className="w-5 h-5 text-yellow-700" />}
-                                                <span className="font-medium text-gray-800">{course.title}</span>
-                                            </div>
-                                            <span className="text-sm text-yellow-800 font-medium">{course.difficulty}</span>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
                         </div>
 
                     </div>

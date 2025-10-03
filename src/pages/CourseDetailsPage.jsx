@@ -1,18 +1,21 @@
 import React from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { courses } from "../utils/fallbackData.js";
+import { courses, fallbackCoursesV2Mapped } from "../utils/fallbackData.js";
 import { useCourseContext } from "../contexts/CourseContext.jsx";
-import Breadcrumbs from "../components/Breadcrumbs.jsx";
+import Breadcrumbs from "../components/ui/breadcrumbs.jsx/Breadcrumbs.jsx";
 import useCountdownTimer from "../hooks/useCountdownTimer.js";
-import CourseDetails from './CourseDetails.jsx'
+import CourseDetails from '../components/Course/CourseDetails.jsx'
 import { global_classnames } from "../utils/classnames.js";
 
-const CoursePage = () => {
+const CourseDetailsPage = () => {
   const { courseId } = useParams();
   const location = useLocation();
   const { getCourseById } = useCourseContext();
   const passedCourse = location.state?.course || null;
-  const rawCourse = passedCourse || getCourseById(courseId) || courses.find((c) => String(c.id) === courseId);
+  const rawCourse = passedCourse 
+    || getCourseById(courseId) 
+    || fallbackCoursesV2Mapped.find((c) => String(c.id) === courseId)
+    || courses.find((c) => String(c.id) === courseId);
   const course = rawCourse ? {
     id: rawCourse.id,
     title: rawCourse.title || 'Course',
@@ -34,6 +37,9 @@ const CoursePage = () => {
   } : null;
   const formattedTime = useCountdownTimer(9 * 3600 + 17 * 60 + 10);
 
+
+
+
   if (!course) {
     return (
       <div className={`${global_classnames.width.container} flex items-center justify-center min-h-screen text-center`}>
@@ -41,18 +47,18 @@ const CoursePage = () => {
       </div>
     );
   }
-
+  // console.debug('CourseDetails Page opened.')
   const breadcrumbItems = [
-    { label: "Home", link: "/" },
+    { label: "Courses", link: "/courses" },
     { label: course.title },
   ];
 
   return (
-    <div>
+    <div className={`${global_classnames.width.container}  `}>
       <Breadcrumbs items={breadcrumbItems} />
       <CourseDetails course={course} formattedTime={formattedTime} />
     </div>
   );
 };
 
-export default CoursePage;
+export default CourseDetailsPage;

@@ -1,123 +1,150 @@
-// src/utils/fallbackData.js
 
-// --- 🚨 Video Mapping Data 🚨 ---
-// Maps topics from your original list to structured video objects.
-const VIDEO_MAP = {
-    // AI Module (Module 1)
-    "Introduction to AI and its applications": { url: "https://www.youtube.com/embed/J_tN-pXhLAs?autoplay=0&mute=0", duration: 25 },
-    "Machine Learning algorithms and implementation": { url: "https://www.youtube.com/embed/nixF0r0y26A?autoplay=0&mute=0", duration: 35 },
-    "Deep Learning with TensorFlow and PyTorch": { url: "https://www.youtube.com/embed/6g40Q13jC8U?autoplay=0&mute=0", duration: 30 },
-    // ML Module (Module 2) - Using AI/ML placeholders since specific videos aren't given
-    "Supervised and Unsupervised Learning": { url: "https://www.youtube.com/embed/nixF0r0y26A?autoplay=0&mute=0", duration: 20 }, 
-    "Feature Engineering and Selection": { url: "https://www.youtube.com/embed/J_tN-pXhLAs?autoplay=0&mute=0", duration: 30 },
-    "Model Evaluation and Validation": { url: "https://www.youtube.com/embed/6g40Q13jC8U?autoplay=0&mute=0", duration: 30 },
-    // IoT Module (Module 3)
-    "IoT Architecture and Protocols": { url: "https://www.youtube.com/embed/g2D_f9d2Lz8?autoplay=0&mute=0", duration: 20 },
-    "Sensor Networks and Data Collection": { url: "https://www.youtube.com/embed/Q4X-3zJg9vI?autoplay=0&mute=0", duration: 25 },
-    "Arduino and Raspberry Pi Programming": { url: "https://www.youtube.com/embed/T6Ea-Kx7F9g?autoplay=0&mute=0", duration: 40 },
-    // Cybersecurity Module (Module 4)
-    "Network Security Fundamentals": { url: "https://www.youtube.com/embed/p9yP8B5s9Qc?autoplay=0&mute=0", duration: 45 },
-    "Vulnerability Assessment and Penetration Testing": { url: "https://www.youtube.com/embed/bI3YqM0Wc1E?autoplay=0&mute=0", duration: 55 },
-    // Quantum Module (Module 5)
-    "Quantum Mechanics for Computing": { url: "https://www.youtube.com/embed/p-d0mD91uN8?autoplay=0&mute=0", duration: 30 },
-    "Quantum Gates and Circuits": { url: "https://www.youtube.com/embed/example-quantum-gates?autoplay=0&mute=0", duration: 30 },
+export const FALLBACK_V2 = {
+    users: [
+        {
+            uid: "1322242424",
+            name: "Tarun Bommali",
+            email: "btaruntej143@gmail.com",
+            role: "admin",
+            university: "Jntugv",
+            skills: ["html", "react", "quantum", "AI/ML Basics"],
+            totalCoursesEnrolled: 1,
+            lastLoginAt: "2025-10-02T10:00:00Z",
+            mobileNo: "9581193026"
+        },
+        {
+            uid: "user-456789",
+            name: "Deepika Reddy",
+            email: "deepika@student.com",
+            role: "user",
+            university: "Andhra University",
+            skills: ["Python", "Data Analysis"],
+            totalCoursesEnrolled: 1,
+            lastLoginAt: "2025-10-01T15:30:00Z"
+        }
+    ],
+    courses: [
+        {
+            courseId: "emerging-tech-2025",
+            courseTitle: "Emerging Technologies",
+            courseDescription: "Comprehensive overview of AI, ML, IoT, Cybersecurity, and Quantum Computing.",
+            originalPrice: 14999.0,
+            platformDiscount: 5000.0,
+            coursePrice: 9999.0,
+            isPublished: true,
+            modules: [
+                {
+                    moduleKey: "AI_M01",
+                    moduleTitle: "Artificial Intelligence Fundamentals",
+                    moduleVideoCount: 3,
+                    videos: [
+                        { videoId: "AI_V1", title: "Introduction to AI and its applications", videoKey: "bA9dF2xS", duration_min: 25 },
+                        { videoId: "AI_V2", title: "Machine Learning algorithms overview", videoKey: "cK5yG8hW", duration_min: 35 }
+                    ]
+                },
+                {
+                    moduleKey: "CYBER_M04",
+                    moduleTitle: "Cybersecurity & Defense Strategies",
+                    moduleVideoCount: 2,
+                    videos: [
+                        { videoId: "CYB_V1", title: "Network Security Fundamentals", videoKey: "gZ3hL7pQ", duration_min: 45 }
+                    ]
+                }
+            ]
+        }
+    ],
+    enrollments: [
+        {
+            enrollmentId: "ENR-1A2B3C",
+            userId: "1322242424",
+            courseId: "emerging-tech-2025",
+            courseTitle: "Emerging Technologies",
+            status: "SUCCESS",
+            paidAmount: 9999.0,
+            enrolledAt: "2025-07-10T09:00:00Z",
+            paymentDetails: {
+                paymentId: "rzp_0987654321",
+                paymentDate: "2025-07-10T09:00:00Z",
+                paymentStatus: "Success"
+            },
+            progress: {
+                completionPercentage: 50,
+                modulesCompleted: 1,
+                lastAccessedAt: "2025-10-02T10:00:00Z"
+            }
+        }
+    ],
+    user_progress: [
+        {
+            userCourseKey: "1322242424_emerging-tech-2025",
+            userId: "1322242424",
+            courseId: "emerging-tech-2025",
+            completionPercentage: 50,
+            videosWatched: [
+                { videoId: "AI_V1", completed: true, progress: 100 },
+                { videoId: "AI_V2", completed: false, progress: 50 }
+            ],
+            lastAccessedAt: "2025-10-02T10:00:00Z"
+        }
+    ],
+    certifications: [
+        {
+            certificateId: "CERT-XYZ-999",
+            userId: "user-456789",
+            courseId: "emerging-tech-2025",
+            courseTitle: "Emerging Technologies",
+            dateGenerated: "2025-12-15T12:00:00Z",
+            isVerified: true
+        }
+    ]
 };
 
-// Function to convert topic strings to video objects
-const createVideos = (topics) => {
-    return topics
-        .filter(topic => VIDEO_MAP[topic])
-        .map((topic, index) => ({
-            id: `v${index + 1}-${topic.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10)}`,
-            title: topic,
-            url: VIDEO_MAP[topic].url,
-            duration: VIDEO_MAP[topic].duration,
-        }));
-};
+// Normalized UI-friendly courses from V2 fallback
+export const fallbackCoursesV2Mapped = FALLBACK_V2.courses.map((c) => ({
+    id: c.courseId,
+    title: c.courseTitle,
+    price: c.coursePrice,
+    originalPrice: c.originalPrice,
+    isPublished: c.isPublished,
+    modules: Array.isArray(c.modules)
+        ? c.modules.map((m, idx) => ({
+            id: m.moduleKey || `M${idx + 1}`,
+            title: m.moduleTitle || m.title || `Module ${idx + 1}`,
+            videos: Array.isArray(m.videos)
+                ? m.videos.map((v, vIdx) => ({ id: v.videoId || `V${vIdx + 1}`, title: v.title, url: v.videoKey }))
+                : []
+        }))
+        : []
+}));
 
-// --- 🚨 Original Course Structure (for conversion) 🚨 ---
-export const originalCourses = [
-    {
-        id: 1, // Note: Use string "ai-ml-cert" in routing to match FALLBACK_COURSE_ID
-        title: "Emerging Technologies",
-        modules: [
-            { id: "ai", title: "Artificial Intelligence", description: "Foundations of AI...", content: ["Introduction to AI and its applications", "Machine Learning algorithms and implementation", "Deep Learning with TensorFlow and PyTorch"] },
-            { id: "ml", title: "Machine Learning", description: "Advanced ML techniques...", content: ["Supervised and Unsupervised Learning", "Feature Engineering and Selection", "Model Evaluation and Validation"] },
-            { id: "iot", title: "Internet of Things (IoT)", description: "Connected devices, sensors...", content: ["IoT Architecture and Protocols", "Sensor Networks and Data Collection", "Arduino and Raspberry Pi Programming"] },
-            { id: "cybersecurity", title: "Cybersecurity", description: "Information security...", content: ["Network Security Fundamentals", "Vulnerability Assessment and Penetration Testing"] },
-            { id: "quantum", title: "Quantum Computing", description: "Quantum principles...", content: ["Quantum Mechanics for Computing", "Quantum Gates and Circuits"] },
-        ],
-    },
-];
+// Legacy export names used across the app
+export const courses = fallbackCoursesV2Mapped;
 
-// --- 🚨 Final Structured Fallback Data 🚨 ---
-export const EMERGING_TECH_COURSE_CONTENT = [
-    {
-        id: "ai",
-        order: 1,
-        title: "Module 1: Artificial Intelligence",
-        description: "Foundations of AI, neural networks, and intelligent systems. (Serving OFFLINE demo content.)",
-        duration: 90, 
-        videos: createVideos(originalCourses[0].modules[0].content),
-        objectives: ["Understand AI/ML basics.", "Set up a deep learning environment."],
-        unlockCondition: 'none', // Always unlocked
-    },
-    {
-        id: "ml",
-        order: 2,
-        title: "Module 2: Machine Learning",
-        description: "Advanced ML techniques, algorithms, and practical implementations.",
-        duration: 80,
-        videos: createVideos(originalCourses[0].modules[1].content),
-        objectives: ["Implement ensemble methods.", "Perform time series analysis."],
-        unlockCondition: 'complete_previous', 
-    },
-    {
-        id: "iot",
-        order: 3,
-        title: "Module 3: Internet of Things (IoT)",
-        description: "Connected devices, sensors, and IoT ecosystem development.",
-        duration: 100,
-        videos: createVideos(originalCourses[0].modules[2].content),
-        objectives: ["Design IoT architecture.", "Program sensor networks."],
-        unlockCondition: 'complete_previous', 
-    },
-    {
-        id: "cybersecurity",
-        order: 4,
-        title: "Module 4: Cybersecurity",
-        description: "Information security, threat analysis, and defense strategies.",
-        duration: 110,
-        videos: createVideos(originalCourses[0].modules[3].content),
-        objectives: ["Identify vulnerabilities.", "Execute penetration tests."],
-        unlockCondition: 'complete_previous', 
-    },
-    {
-        id: "quantum",
-        order: 5,
-        title: "Module 5: Quantum Computing",
-        description: "Quantum principles, algorithms, and future applications.",
-        duration: 60,
-        videos: createVideos(originalCourses[0].modules[4].content),
-        objectives: ["Grasp quantum mechanics basics.", "Write quantum circuits in Qiskit."],
-        unlockCondition: 'complete_previous', 
-    },
-];
+// Learn page fallback modules built from V2 data
+export const EMERGING_TECH_COURSE_CONTENT = (FALLBACK_V2.courses[0]?.modules || []).map((m, idx) => ({
+    id: m.moduleKey || `M${idx + 1}`,
+    order: idx + 1,
+    title: m.moduleTitle || m.title || `Module ${idx + 1}`,
+    description: FALLBACK_V2.courses[0]?.courseDescription || '',
+    duration: m.moduleVideoCount ? m.moduleVideoCount * 30 : undefined,
+    videos: (m.videos || []).map((v, vIdx) => ({
+        id: v.videoId || `V${vIdx + 1}`,
+        title: v.title,
+        url: v.videoKey,
+        duration: v.duration_min || undefined,
+    })),
+}));
 
-// Fallback enrollment status for the demo
+export const FALLBACK_COURSE_ID = 'emerging-tech-2025';
+
 export const FALLBACK_ENROLLMENT_STATUS = {
     isEnrolled: true,
-    enrollment: { courseTitle: "Emerging Technologies (Offline)" },
+    enrollment: {
+        courseTitle: FALLBACK_V2.courses[0]?.courseTitle || 'Course',
+        courseId: FALLBACK_COURSE_ID,
+    },
     loading: false,
-    error: null
+    error: null,
 };
 
-// Backward-compat alias (some files may import FALLBACK_ENROLLMENT)
 export const FALLBACK_ENROLLMENT = FALLBACK_ENROLLMENT_STATUS;
-
-// Fallback course ID that triggers the hardcoded content
-// Assuming 'ai-ml-cert' is the slug used in your /learn/ route
-export const FALLBACK_COURSE_ID = originalCourses[0].id;
-
-
-export const courses = originalCourses;

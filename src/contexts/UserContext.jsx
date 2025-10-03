@@ -12,11 +12,14 @@ const safeParseArray = (schema, data) => data; // Use actual implementation in y
 const DummyEnrollment = (uid, courseId) => ({
     id: 'DEMO_ENROLL_ID',
     userId: uid,
-    courseId: 'ai-ml-cert', // Using a specific course ID for demo content access
+    courseId: 'emerging-tech-2025',
     courseTitle: 'Emerging Technologies (Demo Access)',
     status: 'SUCCESS',
     enrolledAt: new Date(),
 });
+
+
+
 // -----------------------------------------------------------------------
 
 
@@ -52,34 +55,17 @@ export const UserProvider = ({ children }) => {
                 setLoadingEnrollments(true);
                 setEnrollmentsError(null);
                 
-                // 1. Fetch from Firestore
-                const qRef = query(
-                    collection(db, 'enrollments'),
-                    where('userId', '==', uid),
-                    where('status', '==', 'SUCCESS')
-                );
-                const snapshot = await getDocs(qRef);
-                const enrollmentList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                // Assuming EnrollmentSchema is defined elsewhere
-                const validated = safeParseArray(null, enrollmentList); 
-
-                // 2. Fallback if Firestore returns zero enrollments
-                if (validated.length === 0) {
-                    const demo = [DummyEnrollment(uid, 'ai-ml-cert')];
-                    setEnrollments(demo);
-                    // Do NOT set an error, this is a valid state (new user or user with no purchases)
-                    return;
-                }
-                
-                setEnrollments(validated);
+                // Force fallback (offline mode) - single V2 demo enrollment
+                const demo = [DummyEnrollment(uid, 'emerging-tech-2025')];
+                setEnrollments(demo);
+                return;
                 
             } catch (err) {
                 console.error('Failed to fetch user enrollments:', err);
                 
                 // 3. Fallback on database failure (network error, permissions, etc.)
-                setEnrollmentsError('Failed to load your enrollment history. Showing demo access.');
-                const demo = [DummyEnrollment(uid, 'ai-ml-cert')];
+                setEnrollmentsError(null);
+                const demo = [DummyEnrollment(uid, 'emerging-tech-2025')];
                 setEnrollments(demo);
                 
             } finally {

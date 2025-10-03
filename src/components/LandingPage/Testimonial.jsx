@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { testimonials } from "../utils/constants";
-import { global_classnames } from "../utils/classnames.js";
+import { testimonials } from "../../utils/constants.js";
+import { global_classnames } from "../../utils/classnames.js";
 
 const Testimonial = () => {
   const [currentIndex, setCurrentIndex] = useState(0);

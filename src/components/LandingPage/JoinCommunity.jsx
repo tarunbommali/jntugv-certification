@@ -1,5 +1,5 @@
 import React from "react";
-import { DISCORD_SERVER_URL } from "../utils/constants";
+import { DISCORD_SERVER_URL } from "../../utils/constants";
 import { FaDiscord } from "react-icons/fa";
 
 const JoinCommunity = () => {

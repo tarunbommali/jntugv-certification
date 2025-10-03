@@ -5,7 +5,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase'; // Assuming 'db' is exported from '../firebase'
 
 // 🚨 IMPORT FALLBACK DATA 🚨
-import { courses as fallbackCourses } from '../utils/fallbackData.js'; 
+import { courses as fallbackCourses, fallbackCoursesV2Mapped } from '../utils/fallbackData.js'; 
 
 // NOTE: Assuming these are correctly defined in '../utils/schemas.js'
 // import { CourseSchema, safeParseArray } from '../utils/schemas.js';
@@ -38,32 +38,10 @@ export const CourseProvider = ({ children }) => {
             try {
                 setLoading(true);
                 setError(null);
-                
-                // Fetch from Firestore
-                const snapshot = await getDocs(collection(db, 'courses'));
-                const courseList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                // Assuming CourseSchema is used for validation
-                const validated = safeParseArray(null, courseList); 
-                
-                if (validated.length > 0) {
-                    setCourses(validated);
-                    return validated;
-                }
-                
-                // Fallback if Firestore is connected but returns empty data
-                setCourses(fallbackCourses);
-                setError('Database is empty. Showing offline demo courses.');
-                return fallbackCourses;
-
-            } catch (err) {
-                console.error('Failed to fetch courses from Firestore:', err);
-                
-                // Fallback on network/database failure
-                setError('Failed to load courses. Showing offline demo data.');
-                setCourses(fallbackCourses);
-                return fallbackCourses;
-
+                // Force fallback (offline mode)
+                const fb = fallbackCoursesV2Mapped.length > 0 ? fallbackCoursesV2Mapped : fallbackCourses;
+                setCourses(fb);
+                return fb;
             } finally {
                 setLoading(false);
                 fetchPromiseRef.current = null;

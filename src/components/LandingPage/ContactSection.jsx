@@ -1,7 +1,7 @@
 import React from "react";
 import { Mail, Phone, MapPin, Globe, ArrowRight } from "lucide-react";
 // Assuming global_classnames provides primary colors for branding consistency
-import { global_classnames } from "../utils/classnames"; 
+import { global_classnames } from "../../utils/classnames"; 
 
 const ContactSection = () => {
   // Define the primary color for icons/buttons using a fallback

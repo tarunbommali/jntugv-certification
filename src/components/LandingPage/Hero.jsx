@@ -7,7 +7,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { global_classnames } from "../utils/classnames.js";
+import { global_classnames } from "../../utils/classnames.js";
 import {
   PieChart,
   Pie,

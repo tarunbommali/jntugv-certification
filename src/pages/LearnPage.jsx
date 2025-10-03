@@ -3,14 +3,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { useCourseContent } from '../contexts/CourseContentContext.jsx';
-import VideoPlayer from '../components/VideoPlayer.jsx';
-import CourseContentShimmer from '../components/CourseContentShimmer.jsx';
+import { useLearnPage } from '../contexts/LearnPageContext.jsx';
+import VideoPlayer from '../components/Course/VideoPlayer.jsx';
+import CourseContentShimmer from '../components/Course/CourseContentShimmer.jsx';
+import { global_classnames } from "../utils/classnames.js";
 import { Shield, BookOpen, PlayCircle, List, ArrowRight, Clock, CheckCircle, Lock, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
 
 const PRIMARY_BLUE = "#004080";
 
-const CourseContent = () => {
+const LearnPage = () => {
     const { courseId } = useParams();
     const { currentUser, isAuthenticated } = useAuth();
     const {
@@ -27,7 +28,7 @@ const CourseContent = () => {
         isModuleUnlocked,
         completionPercentage,
         timeSpent
-    } = useCourseContent();
+    } = useLearnPage();
 
     // 1. Initialize course content and enrollment check
     useEffect(() => {
@@ -76,7 +77,8 @@ const CourseContent = () => {
     
     return (
         <section className="min-h-screen bg-gray-100 py-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+             className={`${global_classnames.width.container}   mx-auto px-4 sm:px-6 lg:px-8`}>
                 
                 {/* 🚨 NEW: Fallback/Error Banner (Shown when contentError is set by context) 🚨 */}
                 {contentError && (
@@ -88,32 +90,6 @@ const CourseContent = () => {
                     </div>
                 )}
                 
-                {/* Course Header with Progress */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-extrabold mb-4" style={{ color: PRIMARY_BLUE }}>
-                        <BookOpen className="w-8 h-8 inline mr-3 text-yellow-500" />
-                        {enrollmentStatus.enrollment?.courseTitle || 'Course Content'}
-                    </h1>
-                    
-                    {/* Progress Bar */}
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-700">Course Progress</span>
-                            <span className="text-sm font-medium text-gray-700">{completionPercentage.toFixed(0)}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${completionPercentage}%` }}
-                            />
-                        </div>
-                        <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                            <span>Time spent: {Math.round(timeSpent / 60)} minutes</span>
-                            <span>{courseContent.length} modules</span>
-                        </div>
-                    </div>
-                </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
                     {/* LEFT COLUMN: Video Player (2/3 width) */}
@@ -121,7 +97,7 @@ const CourseContent = () => {
                         <div className="bg-white p-4 rounded-lg shadow-md">
                             <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 border-b pb-2 mb-4">
                                 <PlayCircle className="w-5 h-5 text-blue-600" />
-                                {currentModule?.title || 'Select a module to begin'}
+                                {currentModule?.title || 'Video Title'}
                             </h2>
                             
                             {activeVideoData ? (
@@ -245,4 +221,4 @@ const CourseContent = () => {
     );
 };
 
-export default CourseContent;
+export default LearnPage;

@@ -1,0 +1,86 @@
+{
+    "database_name": "JNTUGV_Learning_Platform",
+    "collections": {
+      "users": {
+        "description": "User profiles and aggregate enrollment metrics.",
+        "primary_key": "uid",
+        "fields": {
+          "uid": { "type": "string", "required": true, "unique": true, "source": "Firebase Auth" },
+          "name": { "type": "string", "required": true },
+          "email": { "type": "string", "required": true, "unique": true },
+          "role": { "type": "enum", "values": ["user", "admin"], "default": "user" },
+          "university": { "type": "string" },
+          "skills": { "type": "array", "of": "string" },
+          "totalCoursesEnrolled": { "type": "number", "default": 0, "aggregate": true },
+          "lastLoginAt": { "type": "timestamp" }
+        }
+      },
+      "courses": {
+        "description": "Course definitions, modules, and pricing.",
+        "primary_key": "courseId",
+        "fields": {
+          "courseId": { "type": "string", "required": true, "unique": true },
+          "courseTitle": { "type": "string", "required": true },
+          "courseDescription": { "type": "string" },
+          "originalPrice": { "type": "number" },
+          "coursePrice": { "type": "number", "required": true },
+          "isPublished": { "type": "boolean", "default": false },
+          "modules": {
+            "type": "array",
+            "of": {
+              "title": "string",
+              "moduleKey": "string",
+              "videos": {
+                "type": "array",
+                "of": {
+                  "videoId": "string",
+                  "videoKey": "string",
+                  "title": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "enrollments": {
+        "description": "Records successful user purchases and links to course content access.",
+        "primary_key": "enrollmentId",
+        "fields": {
+          "enrollmentId": { "type": "string", "required": true },
+          "userId": { "type": "string", "required": true, "relation": "users.uid" },
+          "courseId": { "type": "string", "required": true, "relation": "courses.courseId" },
+          "courseTitle": { "type": "string" },
+          "status": { "type": "enum", "values": ["PENDING", "SUCCESS", "FAILED"] },
+          "paidAmount": { "type": "number" },
+          "enrolledAt": { "type": "timestamp" },
+          "paymentDetails": { "type": "object", "contains": ["paymentId", "paymentDate"] }
+        }
+      },
+      "user_progress": {
+        "description": "Tracks user completion and time spent per course.",
+        "primary_key": "userCourseKey",
+        "fields": {
+          "userCourseKey": { "type": "string", "format": "userId_courseId", "unique": true },
+          "userId": { "type": "string", "relation": "users.uid" },
+          "courseId": { "type": "string", "relation": "courses.courseId" },
+          "completionPercentage": { "type": "number", "min": 0, "max": 100, "default": 0 },
+          "videosWatched": { "type": "array", "of": { "videoId": "string", "completed": "boolean", "progress": "number" } },
+          "lastAccessedAt": { "type": "timestamp" }
+        }
+      },
+      "certifications": {
+        "description": "Records generated certificates.",
+        "primary_key": "certificateId",
+        "fields": {
+          "certificateId": { "type": "string" },
+          "userId": { "type": "string", "relation": "users.uid" },
+          "courseId": { "type": "string", "relation": "courses.courseId" },
+          "dateGenerated": { "type": "timestamp" },
+          "isVerified": { "type": "boolean", "default": true }
+        }
+      }
+    },
+    "security_rule": {
+      "secure_video_access": "Access to original video URLs (stored in private storage) is granted ONLY if a request is made from the backend after validating a successful 'enrollments' record matching the 'userId' and 'courseId'."
+    }
+  }

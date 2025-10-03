@@ -1,10 +1,10 @@
 import React from "react";
 // 🚨 Context Import (Assuming this provides course list, loading, and error)
-import { useCourseContext } from "../contexts/CourseContext.jsx"; 
+import { useCourseContext } from "../../contexts/CourseContext.jsx"; 
 // 🚨 Fallback Import (Renamed to be distinct from the context courses variable)
-import { courses as fallbackCourses } from "../utils/fallbackData.js";
+import { courses as fallbackCourses } from "../../utils/fallbackData.js";
 import CourseCard from "./CourseCard.jsx";
-import { global_classnames } from "../utils/classnames.js";
+import { global_classnames } from "../../utils/classnames.js";
 
 function CourseList() {
     // 1. Access data from context
