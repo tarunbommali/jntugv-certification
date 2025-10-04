@@ -13,11 +13,11 @@ import {
     Image,
 } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
-import BasicInfoTab from '../../components/admin/BasicInfoTab.jsx';
-import PricingTab from '../../components/admin/PricingTab.jsx';
-import ContentTab from '../../components/admin/ContentTab.jsx';
-import MediaTab from '../../components/admin/MediaTab.jsx';
-import PreviewTab from '../../components/admin/PreviewTab.jsx';
+import BasicInfoTab from '../../components/Admin/BasicInfoTab.jsx.jsx';
+import PricingTab from '../../components/Admin/PricingTab.jsx';
+import ContentTab from '../../components/Admin/ContentTab.jsx';
+import MediaTab from '../../components/Admin/MediaTab.jsx';
+import PreviewTab from '../../components/Admin/PreviewTab.jsx';
 
 
 const CourseForm = () => {
