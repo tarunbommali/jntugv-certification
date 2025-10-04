@@ -54,7 +54,7 @@ const CourseDetailsPage = () => {
   ];
 
   return (
-    <div className={`${global_classnames.width.container}  `}>
+    <div className={`${global_classnames.width.container}  min-h-screen`}>
       <Breadcrumbs items={breadcrumbItems} />
       <CourseDetails course={course} formattedTime={formattedTime} />
     </div>

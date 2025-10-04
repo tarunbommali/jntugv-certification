@@ -61,11 +61,11 @@ function CourseList() {
 
     // --- Success State (Using Context Data or Fallback Data) ---
     return (
-        <section id="courses" className="py-16 bg-background">
+        <section id="courses" className="py-16 ">
             <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
                 
                 {/* Courses Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 bg-white lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-4 gap-6">
                     {finalCourses.map((course) => (
                         <CourseCard key={course.id} course={course} />
                     ))}

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { Briefcase, School, Mail, Phone, LogOut, BookOpen, Shield, TrendingUp, UserCircle, PencilLine, AlertTriangle } from 'lucide-react'; 
+import { Briefcase, School, Mail, Phone, LogOut, BookOpen, Shield, TrendingUp, UserCircle, PencilLine, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useUser } from '../contexts/UserContext.jsx'; // Context providing enrollments
 import { global_classnames } from "../utils/classnames.js";
+import Breadcrumbs from "../components/ui/breadcrumbs.jsx/Breadcrumbs.jsx";
 
 const PRIMARY_BLUE = "var(--color-primary)";
 const ACCENT_YELLOW = "#ffc107";
@@ -81,16 +82,25 @@ const ProfilePage = () => {
     const { currentUser, userProfile, logout, isAuthenticated, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     // Access enrollment data from useUser context
-    const { enrollments, loadingEnrollments, enrollmentsError } = useUser(); 
-    
+    const { enrollments, loadingEnrollments, enrollmentsError } = useUser();
+
     const [recommendedCourses, setRecommendedCourses] = useState([]);
     // Using loadingEnrollments as the primary data loading state
-    const [dataError] = useState(null); 
+    const [dataError] = useState(null);
 
     // ✅ Define editProfile function
     const editProfile = useCallback(() => {
         navigate('/profile/edit');
     }, [navigate]);
+
+
+
+    const breadcrumbItems = [
+        { label: "Home", link: "/" },
+        { label: "Profile", link: "/profile" },
+
+    ];
+
 
     // 🚨 FIX: Define handleLogout function 🚨
     const handleLogout = useCallback(async () => {
@@ -138,9 +148,9 @@ const ProfilePage = () => {
     const combinedError = dataError || enrollmentsError;
 
     return (
-        <div className="min-h-screen bg-app py-16">
-            <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
-                
+             <div className={`${global_classnames.width.container} min-h-screen mx-auto px-4 sm:px-6 lg:px-8 py-4`}>
+                <Breadcrumbs items={breadcrumbItems} />
+
                 {/* Error Message Banner */}
                 {combinedError && (
                     <div className="p-4 mb-8 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg flex items-center gap-3" role="alert">
@@ -168,7 +178,7 @@ const ProfilePage = () => {
 
                         {/* Title and Summary */}
                         <div className="text-center md:text-left flex-1">
-                            <h1 className="text-3xl font-extrabold text-gray-900">{profileData.fullName}</h1>
+                            <h1 className="text-3xl font-semibold text-gray-800">{profileData.fullName}</h1>
                             <p className="text-sm text-muted mt-1 flex items-center justify-center md:justify-start gap-1"><Mail className="w-4 h-4" />{profileData.email}</p>
                             <p className="text-sm text-muted mt-1 flex items-center justify-center md:justify-start gap-1">
                                 <School className="w-4 h-4" /> {profileData.college}
@@ -177,16 +187,9 @@ const ProfilePage = () => {
 
                         {/* Action Buttons Container */}
                         <div className="flex flex-col sm:flex-row gap-3">
-                            
-                            {/* Logout button */}
-                            <button
-                                onClick={handleLogout}
-                                className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-full font-medium hover:opacity-90 transition"
-                                style={{ background: "#6b7280" }}
-                            >
-                                <LogOut className="w-5 h-5" /> Logout
-                            </button>
 
+
+                           
                             {/* Profile Edit button */}
                             <button
                                 onClick={editProfile}
@@ -195,6 +198,17 @@ const ProfilePage = () => {
                             >
                                 <PencilLine className="w-5 h-5" /> Edit Profile
                             </button>
+
+
+                             {/* Logout button */}
+                             <button
+                                onClick={handleLogout}
+                                className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-full font-medium hover:opacity-90 transition"
+                                style={{ background: "#6b7280" }}
+                            >
+                                <LogOut className="w-5 h-5" /> Logout
+                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -236,8 +250,8 @@ const ProfilePage = () => {
                                     {enrollments.map((course, index) => (
                                         <li
                                             key={index}
-                                        className="p-4 rounded-lg flex justify-between items-center"
-                                        style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
+                                            className="p-4 rounded-lg flex justify-between items-center"
+                                            style={{ background: "var(--color-card)", border: "1px solid var(--color-border)" }}
                                         >
                                             <span className="font-semibold text-lg">{course.courseTitle}</span>
                                             <button
@@ -267,8 +281,7 @@ const ProfilePage = () => {
                     </div>
                 </div>
             </div>
-        </div>
-    );
+     );
 };
 
 export default ProfilePage;

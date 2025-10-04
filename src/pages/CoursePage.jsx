@@ -4,7 +4,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { createEnrollmentWithPayment } from "../firebase/services";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { useCourseContext } from "../contexts/CourseContext.jsx"; 
+import { useCourseContext } from "../contexts/CourseContext.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
 import { global_classnames } from "../utils/classnames.js";
 import CourseCard from "../components/Course/CourseCard.jsx";
@@ -15,15 +15,16 @@ const PRIMARY_BLUE = "#0056D2";
 
 const CoursePage = () => {
     const { currentUser, isAuthenticated } = useAuth();
-    const { courses, loading, error, refreshCourses } = useCourseContext(); 
+    const { courses, loading, error, refreshCourses } = useCourseContext();
     const { enrollments } = useUser();
     const [enrollmentStatus, setEnrollmentStatus] = useState({});
 
     const breadcrumbItems = [
+        { label: "Home", link: "/" },
         { label: "Courses", link: "/courses" },
-        
-      ];
-    
+
+    ];
+
 
     useEffect(() => {
         // Refresh courses when the component mounts
@@ -55,7 +56,7 @@ const CoursePage = () => {
             alert("Invalid course price. Please contact support.");
             return;
         }
-        
+
         // --- Razorpay Initialization ---
         if (typeof window === "undefined" || !window.Razorpay) {
             alert("Payment system not loaded yet. Please try again in a moment.");
@@ -95,7 +96,7 @@ const CoursePage = () => {
                         }
                     );
                     alert(`Enrollment successful! Payment ID: ${response.razorpay_payment_id}`);
-                    setEnrollmentStatus(prev => ({...prev, [course.id]: true}));
+                    setEnrollmentStatus(prev => ({ ...prev, [course.id]: true }));
                 } catch (err) {
                     console.error("Error saving enrollment to Firestore:", err);
                     alert("Payment successful but failed to record enrollment. Please contact support.");
@@ -122,9 +123,9 @@ const CoursePage = () => {
         >
             <Breadcrumbs items={breadcrumbItems} />
 
-            
-            
-            
+
+
+
             {/* Loading/Error Messages */}
             {(loading || error) && (
                 <div className="mt-4 p-4 rounded-lg flex items-center gap-3" style={{ backgroundColor: error ? '#fee2e2' : '#eff6ff' }}>
@@ -137,9 +138,9 @@ const CoursePage = () => {
                     )}
                 </div>
             )}
-            
-            <div className="flex flex-wrap mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                
+
+            <div className="flex flex-wrap mt-2 md:mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm-px-2 ">
+
                 {courses.length > 0 ? (
                     courses.map((c) => (
                         <CourseCard
@@ -153,7 +154,7 @@ const CoursePage = () => {
                     // Display message when courses list is empty (and not currently loading)
                     !loading && (
                         <div className="lg:col-span-4 w-full text-center p-12 bg-gray-50 border border-gray-200 rounded-xl shadow-inner">
-                             <p className="text-xl text-gray-600 font-medium">
+                            <p className="text-xl text-gray-600 font-medium">
                                 No courses are currently available. Check back soon!
                             </p>
                         </div>

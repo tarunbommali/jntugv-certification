@@ -12,7 +12,7 @@ const CourseDetails = ({ course, formattedTime, isEnrolled, enrollmentLoading })
     const PRIMARY_COLOR = "#004080"; // Based on your App.jsx color
 
     return (
-        <div className={`bg-white rounded-lg`}>
+        <div className={`rounded-lg`}>
             <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
 
                 {/* Preview + Pricing (Right Column on large screens, Top on small screens) */}
@@ -25,9 +25,9 @@ const CourseDetails = ({ course, formattedTime, isEnrolled, enrollmentLoading })
                         />
                     </div>
 
-                    <div className="flex flex-wrap gap-4 text-[#192f60] my-2">
+                    <div className="flex flex-wrap gap-4 text-gray-800 my-2">
                         {/* ... Course Stats ... */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center  gap-2">
                             <FaLanguage className="text-primary" />
                             <span className="text-sm md:text-base">{course.language}</span>
                         </div>
@@ -44,11 +44,11 @@ const CourseDetails = ({ course, formattedTime, isEnrolled, enrollmentLoading })
                     </div>
 
                     <div className="bg-white rounded-lg p-4 shadow space-y-4">
-                        <div className="text-2xl md:text-3xl font-bold" style={{ color: PRIMARY_COLOR }}>
+                        <div className="text-2xl md:text-3xl font-bold text-gray-800">
                             ₹{course.price} + GST
                         </div>
                         <div className="flex items-center space-x-2">
-                            <span className="line-through text-gray-500 text-sm md:text-base">
+                            <span className="line-through text-gray-800 text-sm md:text-base">
                                 ₹{course.originalPrice}
                             </span>
                             <span className="text-green-600 font-semibold text-sm md:text-base">
@@ -58,7 +58,7 @@ const CourseDetails = ({ course, formattedTime, isEnrolled, enrollmentLoading })
                         <div className="text-lg font-semibold text-red-600">
                             Special Discount: {course.specialDiscount}
                         </div>
-                        <div className="bg-gray-100 text-center font-mono p-2 rounded text-sm">
+                        <div className="bg-gray-100 text-gray-900 text-center font-mono p-2 rounded text-sm">
                             ⏱ {formattedTime}
                         </div>
 
@@ -96,12 +96,20 @@ const CourseDetails = ({ course, formattedTime, isEnrolled, enrollmentLoading })
                         ))}
                     </ul>
 
-                    <div className="mt-4 md:mt-8 p-4 md:bg-gray-50 rounded shadow">
-                        <h2 className="text-2xl font-semibold" style={{ color: PRIMARY_COLOR }}>Our Mission</h2>
-                        <p className="text-gray-700 mt-2">{course.mission}</p>
+                    <div className="mt-4 md:mt-8  ">
+                        <h2 className="text-2xl font-semibold" style={{ color: PRIMARY_COLOR }}>
+                            Our Mission
+                        </h2>
+                        <p className="text-gray-800 mt-2">{course.mission}</p>
                     </div>
 
-                    <ModulesSection modules={modules} />
+                    <div className="mt-4 md:mt-8   ">
+                        <h2 className="text-2xl font-semibold" style={{ color: PRIMARY_COLOR }}>
+                            Curriculum
+                        </h2>
+                        <ModulesSection modules={modules} />
+
+                    </div>
                 </div>
             </div>
         </div>

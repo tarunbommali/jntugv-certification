@@ -185,7 +185,6 @@ export const ENROLLMENT_SCHEMA = {
     name: "string",
     email: "string", 
     phone: "string",
-    college: "string",
     country: "string"
   },
   

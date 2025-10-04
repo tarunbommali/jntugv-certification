@@ -20,13 +20,18 @@ import NotFound from './components/Error/NotFound.jsx';
 import ProtectedRoute from "./components/Auth/ProtectedRoute.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
-import AdminPage from "./pages/AdminPage.jsx";
 import CoursePage from "./pages/CoursePage.jsx";
 import LearnPage from "./pages/LearnPage.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import LegalPage from "./pages/LegalPage.jsx";
 
-
+import AdminPage from "./pages/admin/AdminPage.jsx";
+import Analytics from './pages/admin/Analytics.jsx';
+import CourseForm from './pages/admin/CourseForm.jsx';
+import UsersManagement from './pages/admin/UsersManagement.jsx'
+import AdminCoupons from './pages/admin/AdminCoupons'
+import Courses from './pages/admin/Courses.jsx'
 
 
 // --- Component to handle conditional rendering ---
@@ -100,16 +105,39 @@ const App = () => {
                       element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>}
                     />
 
-                    {/* Admin (Requires Auth and Admin Role) */}
+
+                    {/* Admin Routes (Requires Auth and Admin Role) */}
                     <Route
                       path="/admin"
                       element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>}
                     />
                     <Route
-                      path="/admin/:tabId"
-                      element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>}
+                      path="/admin/analytics"
+                      element={<ProtectedRoute requiredRole="admin"><Analytics /></ProtectedRoute>}
+                    />
+                    <Route
+                      path="/admin/users"
+                      element={<ProtectedRoute requiredRole="admin"><UsersManagement /></ProtectedRoute>}
+                    />
+                    <Route
+                      path="/admin/courses"
+                      element={<ProtectedRoute requiredRole="admin"><Courses /></ProtectedRoute>}
+                    />
+                    <Route
+                      path="/admin/coupons"
+                      element={<ProtectedRoute requiredRole="admin"><AdminCoupons /></ProtectedRoute>}
+                    />
+                    <Route
+                      path="/admin/courses/edit/:courseId"
+                      element={<ProtectedRoute requiredRole="admin"><CourseForm  /></ProtectedRoute>}
+                    />
+                    <Route
+                      path="/admin/courses/create/new"
+                      element={<ProtectedRoute requiredRole="admin"><CourseForm
+                         /></ProtectedRoute>}
                     />
 
+                    <Route path="/legal/:page" element={<LegalPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </MainLayout>

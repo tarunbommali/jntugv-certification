@@ -194,7 +194,6 @@ The platform uses the following Firebase collections:
     name: "string",
     email: "string", 
     phone: "string",
-    college: "string",
     country: "string"
   },
   
