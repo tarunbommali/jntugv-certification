@@ -9,7 +9,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const CoursePage = () => {
   const { currentUser, isAuthenticated } = useAuth();
-  const { courses, coursesLoading, coursesError, enrollments, enrollmentsLoading, isEnrolled } = useRealtime();
+  const { courses, coursesLoading, coursesError, enrollments, enrollmentsLoading, isEnrolled, ErrorAlert } = useRealtime();
   const [enrollmentStatus, setEnrollmentStatus] = useState({});
 
   const breadcrumbItems = [
@@ -49,6 +49,8 @@ const CoursePage = () => {
       <Breadcrumbs items={breadcrumbItems} />
 
       {/* Error Messages */}
+      <ErrorAlert />
+      
       {coursesError && (
         <Alert variant="destructive" className="mt-4">
           <AlertIcon variant="destructive" />

@@ -4,11 +4,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // Import Layout Components
 import AppLayout from "./components/layout/AppLayout.jsx";
 import { LoadingScreen } from "./components/ui/LoadingSpinner.jsx";
+import ErrorBoundary from "./components/ui/ErrorBoundary.jsx";
 
 // Import Context Providers
 import { AuthProvider } from "./contexts/AuthContext.jsx";
-import { CourseProvider } from "./contexts/CourseContext.jsx";
-import { UserProvider } from "./contexts/UserContext.jsx";
 import { PaymentProvider } from "./contexts/PaymentContext.jsx";
 import { LearnPageProvider } from "./contexts/LearnPageContext.jsx";
 import { RealtimeProvider } from "./contexts/RealtimeContext.jsx";
@@ -39,14 +38,13 @@ const App = () => {
     <Router>
       {/* Start of Nested Providers */}
       <AuthProvider>
-        <UserProvider>
-          <CourseProvider>
-            <PaymentProvider>
-              <LearnPageProvider>
-                <RealtimeProvider>
+        <PaymentProvider>
+          <LearnPageProvider>
+            <RealtimeProvider>
                   {/* The AppLayout wraps the visible parts of the application */}
                   <AppLayout>
-                  <Routes>
+                  <ErrorBoundary>
+                    <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/courses" element={<CoursePage />} />
@@ -157,13 +155,12 @@ const App = () => {
 
                     {/* 404 Route */}
                     <Route path="*" element={<NotFound />} />
-                  </Routes>
+                    </Routes>
+                  </ErrorBoundary>
                 </AppLayout>
-                </RealtimeProvider>
-              </LearnPageProvider>
-            </PaymentProvider>
-          </CourseProvider>
-        </UserProvider>
+            </RealtimeProvider>
+          </LearnPageProvider>
+        </PaymentProvider>
       </AuthProvider>
       {/* End of Nested Providers */}
     </Router>

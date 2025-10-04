@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useMemo, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { useFirebaseErrorHandler } from '../hooks/useFirebaseErrorHandler';
+import FirebaseErrorAlert from '../components/ui/FirebaseErrorAlert';
 import {
   useRealtimeCourses,
   useRealtimeUserEnrollments,
@@ -21,6 +23,7 @@ export const useRealtime = () => {
 
 export const RealtimeProvider = ({ children }) => {
   const { currentUser, isAuthenticated, isAdmin } = useAuth();
+  const { error, handleError, clearError } = useFirebaseErrorHandler();
 
   // ============================================================================
   // REAL-TIME DATA HOOKS
@@ -211,7 +214,13 @@ export const RealtimeProvider = ({ children }) => {
 
     // Status
     isConnected: !coursesError && !enrollmentsError,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
+    
+    // Error handling
+    error,
+    handleError,
+    clearError,
+    ErrorAlert: () => <FirebaseErrorAlert error={error} />
   }), [
     courses,
     enrollments,
@@ -246,7 +255,10 @@ export const RealtimeProvider = ({ children }) => {
     updateCourse,
     createCourse,
     createEnrollment,
-    updateEnrollmentProgress
+    updateEnrollmentProgress,
+    error,
+    handleError,
+    clearError
   ]);
 
   return (

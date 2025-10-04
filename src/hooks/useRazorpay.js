@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { createEnrollmentWithPayment } from "../firebase/services";
 import { RAZORPAY_KEY_ID } from "../firebase";
+import RazorpayWrapper from "../components/ui/RazorpayWrapper";
 
 /**
  * Custom hook to manage the Razorpay checkout process.
