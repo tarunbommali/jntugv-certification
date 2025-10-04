@@ -1,58 +1,5 @@
 @import "tailwindcss";
-
-
-:root {
-  /* Theme tokens (light default) */
-  --color-bg: #ffffff;
-  --color-text: #111827;
-  --color-muted: #6b7280;
-  --color-primary: #0056D2;
-  --color-primary-contrast: #ffffff;
-  --color-success: #00B551;
-  --color-border: #e5e7eb;
-  --color-card: #ffffff;
-}
-
-/* Dark theme override */
-[data-theme="dark"] {
-  --color-bg: #0b0f1a;
-  --color-text: #e5e7eb;
-  --color-muted: #9ca3af;
-  --color-primary: #60a5fa;
-  --color-primary-contrast: #0b0f1a;
-  --color-success: #34d399;
-  --color-border: #1f2937;
-  --color-card: #111827;
-}
-
-html, body, #root {
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-
-/* Utility classes mapping to tokens */
-.bg-app { background: var(--color-bg); }
-.text-app { color: var(--color-text); }
-.text-muted { color: var(--color-muted); }
-.btn-primary { background: var(--color-primary); color: var(--color-primary-contrast); }
-.btn-success { background: var(--color-success); color: #fff; }
-.card { background: var(--color-card); border: 1px solid var(--color-border); }
-
-/* Overrides to adapt common utility classes to theme tokens */
-.bg-white { background: var(--color-card) !important; }
-.bg-gray-50 { background: var(--color-card) !important; }
-.text-gray-800 { color: var(--color-text) !important; }
-.text-gray-700 { color: var(--color-text) !important; }
-.text-gray-600 { color: var(--color-muted) !important; }
-.text-gray-500 { color: var(--color-muted) !important; }
-.border-gray-100 { border-color: var(--color-border) !important; }
-.border-gray-200 { border-color: var(--color-border) !important; }
-.border-gray-300 { border-color: var(--color-border) !important; }
-.text-blue-600 { color: var(--color-primary) !important; }
-.hover\:text-blue-600:hover { color: var(--color-primary) !important; }
-.from-blue-600 { --tw-gradient-from: var(--color-primary) !important; }
-.to-blue-500 { --tw-gradient-to: var(--color-primary) !important; }
-@import "tailwindcss";
+@import './styles/globals.css';
 
 /* Light Theme (default) */
 :root {

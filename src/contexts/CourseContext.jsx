@@ -1,75 +1,29 @@
-// src/contexts/CourseContext.jsx
-
-import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase'; // Assuming 'db' is exported from '../firebase'
-
-// 🚨 IMPORT FALLBACK DATA 🚨
-import { courses as fallbackCourses, fallbackCoursesV2Mapped } from '../utils/fallbackData.js'; 
-
-// NOTE: Assuming these are correctly defined in '../utils/schemas.js'
-// import { CourseSchema, safeParseArray } from '../utils/schemas.js';
-const safeParseArray = (schema, data) => data; // Mock for this example
-
+import React, { createContext, useContext } from 'react';
+import { useCourses } from '../hooks/useFirebase';
 
 const CourseContext = createContext(undefined);
 
 export const useCourseContext = () => {
-    const ctx = useContext(CourseContext);
-    if (!ctx) throw new Error('useCourseContext must be used within CourseProvider');
-    return ctx;
+  const ctx = useContext(CourseContext);
+  if (!ctx) throw new Error('useCourseContext must be used within CourseProvider');
+  return ctx;
 };
 
 export const CourseProvider = ({ children }) => {
-    const [courses, setCourses] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const fetchPromiseRef = useRef(null);
+  const { courses, loading, error, refreshCourses } = useCourses();
 
-    // Use useCallback to create a stable fetch function
-    const fetchCourses = useCallback(async () => {
-        
-        // 1. Prevent simultaneous fetches
-        if (fetchPromiseRef.current) {
-            return fetchPromiseRef.current;
-        }
+  const value = {
+    courses,
+    loading,
+    error,
+    refreshCourses,
+    // Helper to quickly find a course by ID
+    getCourseById: (id) => courses.find(c => String(c.id) === String(id)),
+  };
 
-        const run = (async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                // Force fallback (offline mode)
-                const fb = fallbackCoursesV2Mapped.length > 0 ? fallbackCoursesV2Mapped : fallbackCourses;
-                setCourses(fb);
-                return fb;
-            } finally {
-                setLoading(false);
-                fetchPromiseRef.current = null;
-            }
-        })();
-        
-        fetchPromiseRef.current = run;
-        return run;
-    }, []); // fetchCourses is stable as it has no external dependencies
-
-    // Fetch courses once on mount
-    useEffect(() => {
-        fetchCourses();
-    }, [fetchCourses]);
-
-    const value = useMemo(() => ({ 
-        courses, 
-        loading, 
-        error,
-        // Helper to manually refresh the list
-        refreshCourses: fetchCourses, 
-        // Helper to quickly find a course by ID
-        getCourseById: (id) => courses.find(c => String(c.id) === String(id)),
-    }), [courses, loading, error, fetchCourses]);
-
-    return (
-        <CourseContext.Provider value={value}>
-            {children}
-        </CourseContext.Provider>
-    );
+  return (
+    <CourseContext.Provider value={value}>
+      {children}
+    </CourseContext.Provider>
+  );
 };
