@@ -1,8 +1,7 @@
-/* eslint-disable no-undef */
 import { useState, useCallback } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import { createEnrollmentWithPayment } from "../firebase/services";
+import { RAZORPAY_KEY_ID } from "../firebase";
 
-import { RAZORPAY_KEY_ID, db } from "../firebase";
 /**
  * Custom hook to manage the Razorpay checkout process.
  * It loads the Razorpay SDK script and provides a payment initiation function.
@@ -13,7 +12,7 @@ const useRazorpay = (currentUser, onPaymentSuccess) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 1. Dynamic Script Loading Function
+  // Dynamic Script Loading Function
   const loadScript = useCallback((src) => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -24,7 +23,7 @@ const useRazorpay = (currentUser, onPaymentSuccess) => {
     });
   }, []);
 
-  // 2. Main Payment Initiation Function
+  // Main Payment Initiation Function
   const initializePayment = useCallback(
     async (paymentDetails) => {
       if (!currentUser || !RAZORPAY_KEY_ID) {
@@ -48,7 +47,7 @@ const useRazorpay = (currentUser, onPaymentSuccess) => {
         return false;
       }
 
-      const amountInPaise = Math.round(paymentDetails.amount * 100); // Razorpay requires amount in paise
+      const amountInPaise = Math.round(paymentDetails.amount * 100);
 
       const options = {
         key: RAZORPAY_KEY_ID,
@@ -56,32 +55,47 @@ const useRazorpay = (currentUser, onPaymentSuccess) => {
         currency: "INR",
         name: "JNTU-GV Certification",
         description: `Enrollment for ${paymentDetails.courseTitle}`,
-        image: "YOUR_COURSE_LOGO_URL", // Optional: Provide a logo URL
-        order_id: paymentDetails.orderId || "", // Optional: If you pre-create an order server-side
+        image: "YOUR_COURSE_LOGO_URL",
+        order_id: paymentDetails.orderId || "",
 
         handler: async (response) => {
-          // This function executes ON SUCCESSFUL PAYMENT
           try {
-            // 1. Record the SUCCESSFUL enrollment in Firestore
-            const enrollmentDoc = await addDoc(collection(db, "enrollments"), {
-              userId: currentUser.uid,
-              courseId: paymentDetails.courseId,
-              courseTitle: paymentDetails.courseTitle,
-              status: "SUCCESS",
-              paymentId: response.razorpay_payment_id,
-              orderId: response.razorpay_order_id,
-              signature: response.razorpay_signature, // Important for server-side verification
-              amount: paymentDetails.amount,
-              billingInfo: paymentDetails.billingInfo,
-              enrolledAt: new Date(),
-            });
+            // Create enrollment + payment record in Firestore using batch operation
+            const result = await createEnrollmentWithPayment(
+              {
+                userId: currentUser.uid,
+                courseId: paymentDetails.courseId,
+                courseTitle: paymentDetails.courseTitle,
+                status: "SUCCESS",
+                paymentData: {
+                  paymentId: response.razorpay_payment_id,
+                  amount: paymentDetails.amount,
+                },
+              },
+              {
+                userId: currentUser.uid,
+                courseId: paymentDetails.courseId,
+                courseTitle: paymentDetails.courseTitle,
+                amount: paymentDetails.amount,
+                currency: "INR",
+                status: "captured",
+                razorpayData: {
+                  paymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                  signature: response.razorpay_signature,
+                },
+              }
+            );
 
-            // 2. Execute the success callback provided by the component (e.g., redirect)
-            if (onPaymentSuccess) {
-              onPaymentSuccess(enrollmentDoc.id, paymentDetails.courseId);
+            if (result.success) {
+              // Execute the success callback provided by the component
+              if (onPaymentSuccess) {
+                onPaymentSuccess(result.data.enrollmentId, paymentDetails.courseId);
+              }
+            } else {
+              setError("Payment successful, but failed to record enrollment. Please contact support.");
             }
           } catch (err) {
-            // If Firestore saving fails *after* successful payment
             setError(
               "Payment successful, but failed to record enrollment. Please contact support immediately."
             );
@@ -93,15 +107,13 @@ const useRazorpay = (currentUser, onPaymentSuccess) => {
 
         // Pre-fill user details for better conversion
         prefill: {
-          name:
-            paymentDetails.billingInfo.name || currentUser.displayName || "",
-          email: paymentDetails.billingInfo.email || currentUser.email || "",
-          contact:
-            paymentDetails.billingInfo.phone || currentUser.phoneNumber || "",
+          name: paymentDetails.billingInfo?.name || currentUser.displayName || "",
+          email: paymentDetails.billingInfo?.email || currentUser.email || "",
+          contact: paymentDetails.billingInfo?.phone || currentUser.phoneNumber || "",
         },
 
         theme: {
-        color: "#004080",
+          color: "#004080",
         },
       };
 
@@ -117,7 +129,7 @@ const useRazorpay = (currentUser, onPaymentSuccess) => {
       });
 
       rzp1.open();
-      setIsLoading(false); // Set to false after opening the modal, as success/failure is handled by the handler/on event
+      setIsLoading(false);
       return true;
     },
     [currentUser, loadScript, onPaymentSuccess]
