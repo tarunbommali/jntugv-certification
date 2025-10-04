@@ -13,8 +13,6 @@ import {
     Image,
 } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
-
-// Import the modular components (create these files separately)
 import BasicInfoTab from '../../components/admin/BasicInfoTab.jsx';
 import PricingTab from '../../components/admin/PricingTab.jsx';
 import ContentTab from '../../components/admin/ContentTab.jsx';
