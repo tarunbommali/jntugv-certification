@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Navigate, Link } from 'react-router-dom';
 import { Plus, Search, BookOpen, Users, Star, Clock } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
-import CourseCard from '../../components/course/CourseCard.jsx';
+import CourseCard from '../../components/Course/CourseCard.jsx';
 
 const Courses = () => {
     const { isAdmin } = useAuth();
