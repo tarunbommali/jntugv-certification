@@ -11,6 +11,7 @@ import { CourseProvider } from "./contexts/CourseContext.jsx";
 import { UserProvider } from "./contexts/UserContext.jsx";
 import { PaymentProvider } from "./contexts/PaymentContext.jsx";
 import { LearnPageProvider } from "./contexts/LearnPageContext.jsx";
+import { RealtimeProvider } from "./contexts/RealtimeContext.jsx";
 import NotFound from './components/Error/NotFound.jsx';
 
 // Import Page Components
@@ -42,8 +43,9 @@ const App = () => {
           <CourseProvider>
             <PaymentProvider>
               <LearnPageProvider>
-                {/* The AppLayout wraps the visible parts of the application */}
-                <AppLayout>
+                <RealtimeProvider>
+                  {/* The AppLayout wraps the visible parts of the application */}
+                  <AppLayout>
                   <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
@@ -157,7 +159,7 @@ const App = () => {
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
-
+                </RealtimeProvider>
               </LearnPageProvider>
             </PaymentProvider>
           </CourseProvider>

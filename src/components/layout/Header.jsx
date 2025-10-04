@@ -3,6 +3,7 @@ import { Menu, X, ArrowRight, UserCircle, Moon, Sun, Clock, Briefcase } from 'lu
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import RealtimeNotificationCenter from '../ui/RealtimeNotificationCenter';
 import { cn } from '../../utils/cn';
 import logo from '../../assets/logo.jpg';
 import useCountdownTimer from '../../hooks/useCountdownTimer';
@@ -347,6 +348,11 @@ const Header = () => {
               >
                 {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </Button>
+
+              {/* Notifications */}
+              {isAuthenticated && (
+                <RealtimeNotificationCenter />
+              )}
 
               {/* User/Auth Status */}
               {isAuthenticated ? (
