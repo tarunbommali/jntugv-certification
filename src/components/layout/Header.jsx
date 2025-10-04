@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ArrowRight, UserCircle, Moon, Sun, Clock, Briefcase } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
+import Button from '../ui/Button';
+import Badge from '../ui/Badge';
 import RealtimeNotificationCenter from '../ui/RealtimeNotificationCenter';
 import { cn } from '../../utils/cn';
 import logo from '../../assets/logo.jpg';

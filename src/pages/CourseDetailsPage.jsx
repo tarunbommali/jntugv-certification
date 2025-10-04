@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useCourse, useEnrollmentStatus, useCreateEnrollment } from '../hooks/useFirebase';
+import { useRealtimeCourse, useRealtimeEnrollmentStatus, useRealtimeEnrollmentMutations } from '../hooks/useRealtimeFirebase';
 import useRazorpay from '../hooks/useRazorpay';
 import PageContainer from '../components/layout/PageContainer';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
@@ -17,9 +17,9 @@ const CourseDetailsPage = () => {
   const navigate = useNavigate();
   const { currentUser, isAuthenticated } = useAuth();
   
-  const { course, loading: courseLoading, error: courseError } = useCourse(courseId);
-  const { isEnrolled, enrollment, loading: enrollmentLoading } = useEnrollmentStatus(currentUser?.uid, courseId);
-  const { createEnrollment, loading: enrollmentCreating } = useCreateEnrollment();
+  const { course, loading: courseLoading, error: courseError } = useRealtimeCourse(courseId);
+  const { isEnrolled, enrollment, loading: enrollmentLoading } = useRealtimeEnrollmentStatus(currentUser?.uid, courseId);
+  const { createEnrollment, loading: enrollmentCreating } = useRealtimeEnrollmentMutations();
   
   const { initializePayment, isLoading: paymentLoading, error: paymentError } = useRazorpay(
     currentUser,

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useCourses } from '../hooks/useFirebase';
-import { useUserEnrollments } from '../hooks/useFirebase';
+import { useRealtime } from '../contexts/RealtimeContext';
 import PageContainer from '../components/layout/PageContainer';
 import CourseList from '../components/course/CourseList';
 import Breadcrumbs from '../components/ui/breadcrumbs.jsx/Breadcrumbs';
@@ -10,8 +9,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const CoursePage = () => {
   const { currentUser, isAuthenticated } = useAuth();
-  const { courses, loading: coursesLoading, error: coursesError } = useCourses();
-  const { enrollments, loading: enrollmentsLoading, isEnrolled } = useUserEnrollments(currentUser?.uid);
+  const { courses, coursesLoading, coursesError, enrollments, enrollmentsLoading, isEnrolled } = useRealtime();
   const [enrollmentStatus, setEnrollmentStatus] = useState({});
 
   const breadcrumbItems = [

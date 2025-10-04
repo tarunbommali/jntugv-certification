@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
+import Button from '../ui/Button';
+import Badge from '../ui/Badge';
+import FormField from '../ui/FormField';
 import { Alert, AlertDescription, AlertIcon } from '../ui/Alert';
 import CourseList from '../course/CourseList';
 import { useRealtime } from '../../contexts/RealtimeContext';
+import { useFormValidation, validationRules } from '../../hooks/useFormValidation';
 import { 
   Plus, 
   Edit, 
@@ -33,6 +35,37 @@ const RealtimeCourseManagement = () => {
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { values, errors, handleChange, handleBlur, validateForm, resetForm } = useFormValidation(
+    {
+      title: '',
+      instructor: '',
+      description: '',
+      price: '',
+      duration: '',
+      category: '',
+      difficulty: ''
+    },
+    {
+      title: [validationRules.required('Course title is required')],
+      instructor: [validationRules.required('Instructor name is required')],
+      description: [
+        validationRules.required('Description is required'),
+        validationRules.minLength(20, 'Description must be at least 20 characters')
+      ],
+      price: [
+        validationRules.required('Price is required'),
+        validationRules.positiveNumber('Price must be a positive number')
+      ],
+      duration: [
+        validationRules.required('Duration is required'),
+        validationRules.positiveNumber('Duration must be a positive number')
+      ],
+      category: [validationRules.required('Please select a category')],
+      difficulty: [validationRules.required('Please select difficulty level')]
+    }
+  );
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
@@ -312,114 +345,135 @@ const RealtimeCourseManagement = () => {
             <CardTitle>Create New Course</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={(e) => {
+            <form onSubmit={async (e) => {
               e.preventDefault();
-              const formData = new FormData(e.target);
+              
+              if (!validateForm()) {
+                return;
+              }
+
+              setIsSubmitting(true);
+
               const courseData = {
-                title: formData.get('title'),
-                description: formData.get('description'),
-                price: parseInt(formData.get('price')) * 100, // Convert to paise
-                instructor: formData.get('instructor'),
-                category: formData.get('category'),
-                duration: parseInt(formData.get('duration')),
-                difficulty: formData.get('difficulty')
+                title: values.title,
+                instructor: values.instructor,
+                description: values.description,
+                price: parseInt(values.price) * 100, // Convert to paise
+                category: values.category,
+                duration: parseInt(values.duration),
+                difficulty: values.difficulty
               };
 
-              createCourse(courseData).then((result) => {
+              try {
+                const result = await createCourse(courseData);
                 if (result.success) {
                   setShowCreateForm(false);
-                  e.target.reset();
+                  resetForm();
                 }
-              });
+              } catch (error) {
+                console.error('Error creating course:', error);
+              } finally {
+                setIsSubmitting(false);
+              }
             }}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Course Title</label>
-                  <input
-                    name="title"
-                    required
-                    className="w-full px-3 py-2 border border-border rounded-md"
-                    placeholder="Enter course title"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Instructor</label>
-                  <input
-                    name="instructor"
-                    required
-                    className="w-full px-3 py-2 border border-border rounded-md"
-                    placeholder="Enter instructor name"
-                  />
-                </div>
+                <FormField
+                  label="Course Title"
+                  type="text"
+                  placeholder="Enter course title"
+                  required
+                  value={values.title}
+                  onChange={(value) => handleChange('title', value)}
+                  onBlur={() => handleBlur('title')}
+                  error={errors.title}
+                />
+                <FormField
+                  label="Instructor"
+                  type="text"
+                  placeholder="Enter instructor name"
+                  required
+                  value={values.instructor}
+                  onChange={(value) => handleChange('instructor', value)}
+                  onBlur={() => handleBlur('instructor')}
+                  error={errors.instructor}
+                />
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Description</label>
-                  <textarea
-                    name="description"
+                  <FormField
+                    label="Description"
+                    type="textarea"
+                    placeholder="Enter course description"
                     required
                     rows={3}
-                    className="w-full px-3 py-2 border border-border rounded-md"
-                    placeholder="Enter course description"
+                    value={values.description}
+                    onChange={(value) => handleChange('description', value)}
+                    onBlur={() => handleBlur('description')}
+                    error={errors.description}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Price (₹)</label>
-                  <input
-                    name="price"
-                    type="number"
-                    required
-                    min="0"
-                    className="w-full px-3 py-2 border border-border rounded-md"
-                    placeholder="Enter price in rupees"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Duration (hours)</label>
-                  <input
-                    name="duration"
-                    type="number"
-                    required
-                    min="1"
-                    className="w-full px-3 py-2 border border-border rounded-md"
-                    placeholder="Enter duration in hours"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
-                  <select
-                    name="category"
-                    required
-                    className="w-full px-3 py-2 border border-border rounded-md"
-                  >
-                    <option value="">Select category</option>
-                    <option value="ai-ml">AI & Machine Learning</option>
-                    <option value="web-development">Web Development</option>
-                    <option value="cybersecurity">Cybersecurity</option>
-                    <option value="data-science">Data Science</option>
-                    <option value="mobile-development">Mobile Development</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Difficulty</label>
-                  <select
-                    name="difficulty"
-                    required
-                    className="w-full px-3 py-2 border border-border rounded-md"
-                  >
-                    <option value="">Select difficulty</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                </div>
+                <FormField
+                  label="Price (₹)"
+                  type="number"
+                  placeholder="Enter price in rupees"
+                  required
+                  min="0"
+                  value={values.price}
+                  onChange={(value) => handleChange('price', value)}
+                  onBlur={() => handleBlur('price')}
+                  error={errors.price}
+                />
+                <FormField
+                  label="Duration (hours)"
+                  type="number"
+                  placeholder="Enter duration in hours"
+                  required
+                  min="1"
+                  value={values.duration}
+                  onChange={(value) => handleChange('duration', value)}
+                  onBlur={() => handleBlur('duration')}
+                  error={errors.duration}
+                />
+                <FormField
+                  label="Category"
+                  type="select"
+                  required
+                  value={values.category}
+                  onChange={(value) => handleChange('category', value)}
+                  onBlur={() => handleBlur('category')}
+                  error={errors.category}
+                >
+                  <option value="">Select category</option>
+                  <option value="ai-ml">AI & Machine Learning</option>
+                  <option value="web-development">Web Development</option>
+                  <option value="cybersecurity">Cybersecurity</option>
+                  <option value="data-science">Data Science</option>
+                  <option value="mobile-development">Mobile Development</option>
+                </FormField>
+                <FormField
+                  label="Difficulty"
+                  type="select"
+                  required
+                  value={values.difficulty}
+                  onChange={(value) => handleChange('difficulty', value)}
+                  onBlur={() => handleBlur('difficulty')}
+                  error={errors.difficulty}
+                >
+                  <option value="">Select difficulty</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </FormField>
               </div>
               <div className="flex gap-2 mt-6">
-                <Button type="submit" disabled={courseMutationsLoading}>
-                  {courseMutationsLoading ? 'Creating...' : 'Create Course'}
+                <Button type="submit" disabled={isSubmitting || courseMutationsLoading}>
+                  {isSubmitting || courseMutationsLoading ? 'Creating...' : 'Create Course'}
                 </Button>
                 <Button 
                   type="button" 
                   variant="outline" 
-                  onClick={() => setShowCreateForm(false)}
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    resetForm();
+                  }}
                 >
                   Cancel
                 </Button>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
+import Badge from '../ui/Badge';
+import Button from '../ui/Button';
 import { Alert, AlertDescription, AlertIcon } from '../ui/Alert';
 import { useRealtime } from '../../contexts/RealtimeContext';
 import { 

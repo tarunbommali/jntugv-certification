@@ -7,10 +7,10 @@ import ContactSection from '../components/landing/ContactSection';
 import Skills from '../components/landing/Skills';
 import JoinCommunity from '../components/landing/JoinCommunity';
 import Testimonial from '../components/landing/Testimonial';
-import { useCourses } from '../hooks/useFirebase';
+import { useRealtime } from '../contexts/RealtimeContext';
 
 const LandingPage = () => {
-  const { courses, loading } = useCourses();
+  const { courses, coursesLoading } = useRealtime();
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -30,7 +30,7 @@ const LandingPage = () => {
           
           <CourseList 
             courses={courses.slice(0, 8)} // Show only first 8 courses on landing page
-            loading={loading}
+            loading={coursesLoading}
             className="mb-8"
           />
         </PageContainer>

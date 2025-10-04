@@ -11,6 +11,13 @@
   --color-success: #00b551;    /* fresh green */
   --color-border: #e2e8f0;     /* light border */
   --color-card: #f9fafb;       /* soft light gray cards */
+  
+  /* Additional theme variables */
+  --color-destructive: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
 }
 
 /* Dark Theme Override */
@@ -23,6 +30,13 @@
   --color-success: #34d399;    /* emerald-400 */
   --color-border: #1e293b;     /* slate-800 */
   --color-card: #1e293b;       /* dark card */
+  
+  /* Additional theme variables */
+  --color-destructive: #f87171;
+  --color-warning: #fbbf24;
+  --color-info: #60a5fa;
+  --color-accent: #1e293b;
+  --color-accent-foreground: #f1f5f9;
 }
 
 /* Base App Styling */

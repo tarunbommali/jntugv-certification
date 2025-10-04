@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './Card';
-import { Button } from './Button';
-import { Badge } from './Badge';
+import Button from './Button';
+import Badge from './Badge';
 import { Alert, AlertDescription, AlertIcon } from './Alert';
 import { useRealtimeNotifications, NOTIFICATION_TYPES } from '../../hooks/useRealtimeNotifications';
 import { 

@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, Globe, Star, Award, CheckCircle, Edit } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
+import Badge from '../ui/Badge';
+import Button from '../ui/Button';
 import { cn } from '../../utils/cn';
 
 const CourseCard = ({

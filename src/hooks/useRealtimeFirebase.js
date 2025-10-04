@@ -9,8 +9,7 @@ import {
   onSnapshot,
   writeBatch,
   serverTimestamp,
-  increment,
-  Unsubscribe
+  increment
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
