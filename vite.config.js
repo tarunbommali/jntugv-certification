@@ -23,7 +23,7 @@ export default defineConfig({
           ui: [
             './src/components/Header.jsx',
             './src/components/Footer.jsx',
-            './src/components/CourseCard.jsx'
+            './src/components/Course/CourseCard.jsx'
           ]
         }
       }
