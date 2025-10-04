@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 // Import your components
@@ -16,6 +16,7 @@ import { UserProvider } from "./contexts/UserContext.jsx";
 import { PaymentProvider } from "./contexts/PaymentContext.jsx";
 import { LearnPageProvider } from "./contexts/LearnPageContext.jsx";
 import NotFound from './components/Error/NotFound.jsx';
+
 // Import Page Components
 import ProtectedRoute from "./components/Auth/ProtectedRoute.jsx";
 import SignIn from "./pages/SignIn.jsx";
@@ -25,14 +26,23 @@ import LearnPage from "./pages/LearnPage.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import LegalPage from "./pages/LegalPage.jsx";
+// Lazy load admin components for code splitting
+const AdminPage = lazy(() => import("./pages/admin/AdminPage.jsx"));
+const Analytics = lazy(() => import('./pages/admin/Analytics.jsx'));
+const CourseForm = lazy(() => import('./pages/admin/CourseForm.jsx'));
+const UsersManagement = lazy(() => import('./pages/admin/UsersManagement.jsx'));
+const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons.jsx'));
+const Courses = lazy(() => import('./pages/admin/Courses.jsx'));
 
-import AdminPage from "./pages/admin/AdminPage.jsx";
-import Analytics from './pages/admin/Analytics.jsx';
-import CourseForm from './pages/admin/CourseForm.jsx';
-import UsersManagement from './pages/admin/UsersManagement.jsx'
-import AdminCoupons from './pages/admin/AdminCoupons'
-import Courses from './pages/admin/Courses.jsx'
-
+// Loading component for Suspense fallback
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <p className="text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
 
 // --- Component to handle conditional rendering ---
 const MainLayout = ({ children }) => {
@@ -76,12 +86,17 @@ const App = () => {
                 {/* The MainLayout wraps the visible parts of the application */}
                 <MainLayout>
                   <Routes>
+                    {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/courses" element={<CoursePage />} />
-
                     <Route path="/course/:courseId" element={<CourseDetailsPage />} />
+                    <Route path="/legal/:page" element={<LegalPage />} />
 
-                    {/* PROFILE ROUTE (Requires Auth) */}
+                    {/* Auth Routes (No Header/Footer) */}
+                    <Route path="/auth/signin" element={<SignIn />} />
+                    <Route path="/auth/signup" element={<SignUp />} />
+
+                    {/* Protected User Routes */}
                     <Route
                       path="/profile"
                       element={
@@ -90,54 +105,96 @@ const App = () => {
                         </ProtectedRoute>
                       }
                     />
-
-                    {/* Auth Routes (No Header/Footer) */}
-                    <Route path="/auth/signin" element={<SignIn />} />
-                    <Route path="/auth/signup" element={<SignUp />} />
-
                     <Route
                       path="/learn/:courseId"
-                      element={<ProtectedRoute><LearnPage /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute>
+                          <LearnPage />
+                        </ProtectedRoute>
+                      }
                     />
-
                     <Route
                       path="/checkout/:courseId"
-                      element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute>
+                          <CheckoutPage />
+                        </ProtectedRoute>
+                      }
                     />
 
-
-                    {/* Admin Routes (Requires Auth and Admin Role) */}
+                    {/* Admin Routes with Code Splitting */}
                     <Route
                       path="/admin"
-                      element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <AdminPage />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
                     />
                     <Route
                       path="/admin/analytics"
-                      element={<ProtectedRoute requiredRole="admin"><Analytics /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <Analytics />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
                     />
                     <Route
                       path="/admin/users"
-                      element={<ProtectedRoute requiredRole="admin"><UsersManagement /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <UsersManagement />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
                     />
                     <Route
                       path="/admin/courses"
-                      element={<ProtectedRoute requiredRole="admin"><Courses /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <Courses />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
                     />
                     <Route
                       path="/admin/coupons"
-                      element={<ProtectedRoute requiredRole="admin"><AdminCoupons /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <AdminCoupons />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
                     />
                     <Route
                       path="/admin/courses/edit/:courseId"
-                      element={<ProtectedRoute requiredRole="admin"><CourseForm  /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <CourseForm />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
                     />
                     <Route
                       path="/admin/courses/create/new"
-                      element={<ProtectedRoute requiredRole="admin"><CourseForm
-                         /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <Suspense fallback={<LoadingSpinner />}>
+                            <CourseForm />
+                          </Suspense>
+                        </ProtectedRoute>
+                      }
                     />
 
-                    <Route path="/legal/:page" element={<LegalPage />} />
+                    {/* 404 Route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </MainLayout>
