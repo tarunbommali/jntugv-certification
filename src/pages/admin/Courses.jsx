@@ -6,6 +6,7 @@ import { Navigate, Link } from 'react-router-dom';
 import { Plus, Search, BookOpen, Users, Star, Clock } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
 import CourseCard from '../../components/Course/CourseCard.jsx';
+import AdminHeader from '../../components/admin/AdminHeader.jsx';
 
 const Courses = () => {
     const { isAdmin } = useAuth();
@@ -89,12 +90,10 @@ const Courses = () => {
                 
                 {/* Header */}
                 <div className="mb-8">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div>
-                            <h1 className="text-3xl font-extrabold text-gray-900 italic">Course Management</h1>
-                            <p className="text-gray-600 mt-1">Create and manage platform courses</p>
-                        </div>
-                    </div>
+                    <AdminHeader 
+                        title="Course Management"
+                        description="Create and manage platform courses"
+                    />
 
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex-1 max-w-md">

@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Navigate } from 'react-router-dom';
 import { Search, Filter, Mail, Phone, Calendar, Shield, UserPlus,  } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
+import AdminHeader from '../../components/admin/AdminHeader.jsx';
 
 const UsersManagement = () => {
     const { isAdmin } = useAuth();
@@ -84,13 +85,10 @@ const UsersManagement = () => {
                 
                 {/* Header */}
                 <div className="mb-8">
-                    <div className="flex items-center gap-4 mb-4">
-                        
-                        <div>
-                            <h1 className="text-3xl font-extrabold italic text-gray-900">User Management</h1>
-                            <p className="text-gray-600 mt-1">Manage platform users and their permissions</p>
-                        </div>
-                    </div>
+                    <AdminHeader 
+                        title="User Management"
+                        description="Manage platform users and their permissions"
+                    />
 
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex-1 max-w-md">

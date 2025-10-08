@@ -4,6 +4,7 @@ import React from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Navigate } from 'react-router-dom';
 import { global_classnames } from '../../utils/classnames.js';
+import AdminHeader from '../../components/admin/AdminHeader.jsx';
 
 const AdminPage = () => {
     const { isAdmin, userProfile } = useAuth();
@@ -17,13 +18,7 @@ const AdminPage = () => {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
 
-            <div className="flex items-center gap-4 mb-4">
-                       
-                       <div>
-                           <h1 className="text-3xl font-extrabold text-gray-900 italic">Admin</h1>
-                           <p className="text-gray-600 mt-1">Overview</p>
-                       </div>
-                   </div>
+            <AdminHeader title="Admin" description="Overview" />
 
 
                 {/* Stats */}

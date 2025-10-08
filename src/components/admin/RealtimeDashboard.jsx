@@ -66,11 +66,20 @@ const RealtimeDashboard = () => {
     return new Date(timestamp.toDate ? timestamp.toDate() : timestamp).toLocaleDateString();
   };
 
+  const colorMap = {
+    blue: 'text-blue-600',
+    green: 'text-green-600',
+    purple: 'text-purple-600',
+    orange: 'text-orange-600',
+    indigo: 'text-indigo-600',
+    emerald: 'text-emerald-600'
+  };
+
   const StatCard = ({ title, value, icon: Icon, trend, color = 'blue' }) => (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className={cn('h-4 w-4', `text-${color}-600`)} />
+        <Icon className={cn('h-4 w-4', colorMap[color] || colorMap.blue)} />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
