@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useLearnPage } from '../contexts/LearnPageContext.jsx';
-import VideoPlayer from '../components/Course/VideoPlayer.jsx';
-import CourseContentShimmer from '../components/Course/CourseContentShimmer.jsx';
+import VideoPlayer from '../components/course/VideoPlayer.jsx';
+import CourseContentShimmer from '../components/course/CourseContentShimmer.jsx';
 import { global_classnames } from "../utils/classnames.js";
 import { Shield, BookOpen, PlayCircle, List, ArrowRight, Clock, CheckCircle, Lock, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
 

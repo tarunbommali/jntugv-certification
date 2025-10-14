@@ -13,7 +13,7 @@ import {
     Image,
 } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
-import BasicInfoTab from '../../components/Admin/BasicInfoTab.jsx.jsx';
+import BasicInfoTab from '../../components/Admin/BasicInfoTab.jsx';
 import PricingTab from '../../components/Admin/PricingTab.jsx';
 import ContentTab from '../../components/Admin/ContentTab.jsx';
 import MediaTab from '../../components/Admin/MediaTab.jsx';
