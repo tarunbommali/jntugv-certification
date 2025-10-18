@@ -88,7 +88,12 @@ const ProfilePage = () => {
     // Using loadingEnrollments as the primary data loading state
     const [dataError] = useState(null);
 
-    
+    // ✅ Define editProfile function
+    const editProfile = useCallback(() => {
+        navigate('/profile/edit');
+    }, [navigate]);
+
+
 
     const breadcrumbItems = [
         { label: "Home", link: "/" },
@@ -185,7 +190,15 @@ const ProfilePage = () => {
 
 
                            
-                         
+                            {/* Profile Edit button */}
+                            <button
+                                onClick={editProfile}
+                                className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-full font-medium hover:opacity-90 transition"
+                                style={{ background: "#dc2626" }}
+                            >
+                                <PencilLine className="w-5 h-5" /> Edit Profile
+                            </button>
+
 
                              {/* Logout button */}
                              <button
@@ -203,6 +216,26 @@ const ProfilePage = () => {
                 {/* Main Content: Details & Courses */}
                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+                    {/* LEFT COLUMN: User Details and Skills */}
+                    <div className="lg:col-span-1 space-y-6">
+                        {/* Skills Section */}
+                        <div className="p-6 rounded-xl shadow-md card">
+                            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">Current Skills</h2>
+                            <div className="flex flex-wrap gap-2">
+                                {profileData.skills.map((skill, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-3 py-1 rounded-full text-sm font-medium"
+                                        style={{ background: "#e0f2fe", color: "#0369a1" }}
+                                    >
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: Enrolled & Recommended Courses */}
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* Enrolled Courses */}
