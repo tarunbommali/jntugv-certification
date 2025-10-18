@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRealtime } from '../contexts/RealtimeContext';
 import PageContainer from '../components/layout/PageContainer';
-import CourseList from '../components/course/CourseList';
+import CourseList from '../components/Course/CourseList';
 import Breadcrumbs from '../components/ui/breadcrumbs.jsx/Breadcrumbs';
 import { Alert, AlertDescription, AlertIcon } from '../components/ui/Alert';
 import LoadingSpinner from '../components/ui/LoadingSpinner';

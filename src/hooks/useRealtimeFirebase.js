@@ -28,6 +28,14 @@ export const useRealtimeListener = (queryFn, dependencies = [], options = {}) =>
   const unsubscribeRef = useRef(null);
   const { enabled = true } = options;
 
+  const sanitizeErrorMessage = (rawMsg) => {
+    const r = String(rawMsg || '').toLowerCase();
+    if (r.includes('requires an index')) {
+      return 'Some data requires a Firestore composite index. Showing partial/fallback results where possible.';
+    }
+    return String(rawMsg || 'Unknown error');
+  };
+
   useEffect(() => {
     if (!enabled) {
       setLoading(false);
@@ -47,22 +55,66 @@ export const useRealtimeListener = (queryFn, dependencies = [], options = {}) =>
       unsubscribeRef.current = onSnapshot(
         q,
         (snapshot) => {
-          const docs = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+          const docs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
           setData(docs);
           setLoading(false);
         },
-        (err) => {
+        async (err) => {
           console.error('Real-time listener error:', err);
-          setError(err.message);
+          const raw = String(err?.message || err || '').toLowerCase();
+
+          // If Firestore requires an index, and the caller provided a fallback
+          // query factory, attempt to subscribe to the fallback and apply any
+          // client-side filtering if supplied in options.
+          if (raw.includes('requires an index') && typeof options.fallbackQueryFn === 'function') {
+            console.warn('[useRealtimeListener] Index required; attempting fallback real-time query');
+            try {
+              // unsubscribe previous listener
+              if (unsubscribeRef.current) {
+                try { unsubscribeRef.current(); } catch (e) { /* ignore */ }
+                unsubscribeRef.current = null;
+              }
+
+              const fallbackQ = options.fallbackQueryFn();
+              if (!fallbackQ) {
+                setError(sanitizeErrorMessage(err.message || err));
+                setLoading(false);
+                return;
+              }
+
+              unsubscribeRef.current = onSnapshot(
+                fallbackQ,
+                (snapshot) => {
+                  let docs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+                  if (typeof options.clientSideFilter === 'function') {
+                    docs = docs.filter(options.clientSideFilter);
+                  }
+                  setData(docs);
+                  setError(null);
+                  setLoading(false);
+                },
+                (fallbackErr) => {
+                  console.error('[useRealtimeListener] Fallback real-time listener error:', fallbackErr);
+                  setError(sanitizeErrorMessage(fallbackErr.message || fallbackErr));
+                  setLoading(false);
+                }
+              );
+              return;
+            } catch (fallbackSetupErr) {
+              console.error('[useRealtimeListener] Fallback setup failed:', fallbackSetupErr);
+              setError(fallbackSetupErr.message || String(fallbackSetupErr));
+              setLoading(false);
+              return;
+            }
+          }
+
+          setError(sanitizeErrorMessage(err.message || err));
           setLoading(false);
         }
       );
     } catch (err) {
       console.error('Query setup error:', err);
-      setError(err.message);
+      setError(err.message || String(err));
       setLoading(false);
     }
 
@@ -107,11 +159,24 @@ export const useRealtimeCourses = (options = {}) => {
 
     // Apply sorting and limit
     q = query(q, orderBy('createdAt', 'desc'), limit(limitCount));
-    
+
     return q;
   }, [limitCount, publishedOnly, featuredOnly, category]);
 
-  return useRealtimeListener(queryFn, [limitCount, publishedOnly, featuredOnly, category]);
+  // Provide a fallback real-time query (ordering only) and client-side filter
+  const fallbackQueryFn = useCallback(() => {
+    const coursesRef = collection(db, 'courses');
+    return query(coursesRef, orderBy('createdAt', 'desc'), limit(limitCount));
+  }, [limitCount]);
+
+  const clientSideFilter = useCallback((doc) => {
+    if (publishedOnly && !doc.isPublished) return false;
+    if (featuredOnly && !doc.isFeatured) return false;
+    if (category && doc.category !== category) return false;
+    return true;
+  }, [publishedOnly, featuredOnly, category]);
+
+  return useRealtimeListener(queryFn, [limitCount, publishedOnly, featuredOnly, category], { fallbackQueryFn, clientSideFilter });
 };
 
 /**
@@ -181,10 +246,18 @@ export const useRealtimeUserEnrollments = (userId, options = {}) => {
     );
   }, [userId]);
 
+  const fallbackEnrollmentsQuery = useCallback(() => {
+    if (!userId) return null;
+    const enrollmentsRef = collection(db, 'enrollments');
+    return query(enrollmentsRef, where('userId', '==', userId), limit(200));
+  }, [userId]);
+
+  const enrollmentsClientFilter = useCallback((d) => d.status === 'SUCCESS', []);
+
   const { data: enrollments, loading, error } = useRealtimeListener(
-    queryFn, 
-    [userId], 
-    { enabled: enabled && !!userId }
+    queryFn,
+    [userId],
+    { enabled: enabled && !!userId, fallbackQueryFn: fallbackEnrollmentsQuery, clientSideFilter: enrollmentsClientFilter }
   );
 
   const isEnrolled = useCallback((courseId) => {

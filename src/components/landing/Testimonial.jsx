@@ -2,6 +2,7 @@ import React from 'react';
 import PageContainer from '../layout/PageContainer';
 import { Card, CardContent } from '../ui/Card';
 import Badge from '../ui/Badge';
+import { Button } from '../ui/Button';
 import { Star, Quote } from 'lucide-react';
 
 const Testimonial = () => {

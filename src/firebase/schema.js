@@ -1,22 +1,4 @@
-/**
- * Firebase Schema Design for JNTU GV Certification Platform
- * 
- * This file defines the complete database schema structure for:
- * - User management with Google OAuth integration
- * - Course content with modules and videos
- * - Payment processing with Razorpay
- * - Coupon management system
- * - Enrollment tracking
- */
 
-// ============================================================================
-// COLLECTION SCHEMAS
-// ============================================================================
-
-/**
- * USERS COLLECTION
- * Document ID: user.uid (from Firebase Auth)
- */
 export const USER_SCHEMA = {
   // Basic Info (from Firebase Auth)
   uid: "string", // Firebase Auth UID
@@ -29,14 +11,9 @@ export const USER_SCHEMA = {
   lastName: "string", 
   phone: "string",
   college: "string",
-  gender: "string", // "male" | "female" | "other" | "prefer-not-to-say"
+  gender: "string", 
   dateOfBirth: "timestamp",
-  
-  // Skills and Interests
-  skills: ["string"], // Array of skill tags
-  interests: ["string"], // Array of interest areas
-  
-  // Account Settings
+     // Account Settings
   isAdmin: "boolean", // Admin privileges
   isActive: "boolean", // Account status
   emailVerified: "boolean",
@@ -46,12 +23,6 @@ export const USER_SCHEMA = {
   updatedAt: "timestamp",
   lastLoginAt: "timestamp",
   
-  // Preferences
-  notifications: {
-    email: "boolean",
-    sms: "boolean",
-    push: "boolean"
-  },
   
   // Learning Progress
   totalCoursesEnrolled: "number",
@@ -154,164 +125,6 @@ export const COURSE_SCHEMA = {
   createdAt: "timestamp",
   updatedAt: "timestamp",
   publishedAt: "timestamp",
-}
-
-/**
- * ENROLLMENTS COLLECTION
- * Document ID: auto-generated
- */
-export const ENROLLMENT_SCHEMA = {
-  // User and Course References
-  userId: "string", // Reference to users collection
-  courseId: "string", // Reference to courses collection
-  courseTitle: "string", // Denormalized for easier queries
-  
-  // Enrollment Details
-  status: "string", // "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED" | "REFUNDED"
-  enrolledAt: "timestamp",
-  completedAt: "timestamp", // When course was completed
-  
-  // Payment Information
-  paymentId: "string", // Razorpay payment ID
-  amount: "number", // Amount paid in paise
-  currency: "string", // "INR"
-  
-  // Coupon Information
-  couponCode: "string", // Applied coupon code
-  couponDiscount: "number", // Discount amount in paise
-  
-  // Billing Information
-  billingInfo: {
-    name: "string",
-    email: "string", 
-    phone: "string",
-    country: "string"
-  },
-  
-  // Learning Progress
-  progress: {
-    modulesCompleted: "number",
-    totalModules: "number",
-    completionPercentage: "number",
-    lastAccessedAt: "timestamp",
-    timeSpent: "number", // Total time spent in minutes
-  },
-  
-  // Module Progress Tracking
-  moduleProgress: [
-    {
-      moduleId: "string",
-      isCompleted: "boolean",
-      completedAt: "timestamp",
-      timeSpent: "number", // Time spent on this module in minutes
-      videosWatched: ["string"], // Array of video IDs watched
-      quizzesCompleted: ["string"], // Array of quiz IDs completed
-    }
-  ],
-  
-  // Certificate
-  certificateIssued: "boolean",
-  certificateUrl: "string",
-  certificateIssuedAt: "timestamp",
-}
-
-/**
- * PAYMENTS COLLECTION
- * Document ID: Razorpay payment ID or auto-generated
- */
-export const PAYMENT_SCHEMA = {
-  // Payment Identifiers
-  paymentId: "string", // Razorpay payment ID
-  orderId: "string", // Razorpay order ID
-  enrollmentId: "string", // Reference to enrollments collection
-  
-  // User and Course References
-  userId: "string",
-  courseId: "string",
-  courseTitle: "string",
-  
-  // Payment Details
-  amount: "number", // Amount in paise
-  currency: "string", // "INR"
-  status: "string", // "created" | "authorized" | "captured" | "refunded" | "failed"
-  
-  // Razorpay Response Data
-  razorpayData: {
-    paymentId: "string",
-    orderId: "string",
-    signature: "string",
-    method: "string", // Payment method used
-    bank: "string", // Bank name if applicable
-    wallet: "string", // Wallet name if applicable
-    vpa: "string", // UPI VPA if applicable
-  },
-  
-  // Coupon Information
-  couponCode: "string",
-  couponDiscount: "number",
-  
-  // Pricing Breakdown
-  pricing: {
-    courseAmount: "number",
-    platformDiscount: "number",
-    couponDiscount: "number",
-    subtotal: "number",
-    tax: "number",
-    total: "number"
-  },
-  
-  // Timestamps
-  createdAt: "timestamp",
-  capturedAt: "timestamp",
-  refundedAt: "timestamp",
-  
-  // Refund Information
-  refund: {
-    amount: "number",
-    reason: "string",
-    processedAt: "timestamp",
-    refundId: "string"
-  }
-}
-
-/**
- * COUPONS COLLECTION
- * Document ID: coupon code (uppercase)
- */
-export const COUPON_SCHEMA = {
-  // Basic Coupon Info
-  code: "string", // Coupon code (uppercase)
-  name: "string", // Display name
-  description: "string",
-  
-  // Discount Details
-  type: "string", // "percent" | "flat"
-  value: "number", // Discount value (percentage or amount in paise)
-  minOrderAmount: "number", // Minimum order amount to apply coupon
-  maxDiscountAmount: "number", // Maximum discount amount (for percentage coupons)
-  
-  // Usage Limits
-  usageLimit: "number", // Total usage limit (0 = unlimited)
-  usedCount: "number", // Number of times used
-  usageLimitPerUser: "number", // Usage limit per user (0 = unlimited)
-  
-  // Validity
-  validFrom: "timestamp",
-  validUntil: "timestamp",
-  isActive: "boolean",
-  
-  // Applicability
-  applicableCourses: ["string"], // Array of course IDs (empty = all courses)
-  applicableCategories: ["string"], // Array of course categories
-  
-  // Admin Information
-  createdBy: "string", // Admin user ID
-  createdAt: "timestamp",
-  updatedAt: "timestamp",
-  
-  // Analytics
-  totalDiscountGiven: "number", // Total discount amount given
-  totalOrders: "number", // Total orders using this coupon
 }
 
 /**
@@ -475,6 +288,77 @@ export const USER_PROGRESS_SCHEMA = {
   updatedAt: "timestamp",
 }
 
+/**
+ * ENROLLMENTS COLLECTION
+ * Document ID: auto-generated
+ */
+export const ENROLLMENT_SCHEMA = {
+  userId: "string",
+  courseId: "string",
+  courseTitle: "string",
+  status: "string", // 'PENDING' | 'SUCCESS' | 'FAILED'
+  enrolledAt: "timestamp",
+  paymentId: "string",
+  amount: "number",
+  currency: "string",
+  couponCode: "string",
+  couponDiscount: "number",
+  billingInfo: {
+    name: "string",
+    email: "string",
+    phone: "string",
+    address: "string"
+  },
+  progress: {
+    modulesCompleted: "number",
+    totalModules: "number",
+    completionPercentage: "number",
+    lastAccessedAt: "timestamp",
+    timeSpent: "number"
+  },
+  moduleProgress: [
+    {
+      moduleId: "string",
+      isCompleted: "boolean",
+      completionPercentage: "number",
+      timeSpent: "number"
+    }
+  ],
+  certificateIssued: "boolean",
+  createdAt: "timestamp",
+  updatedAt: "timestamp"
+};
+
+/**
+ * PAYMENTS COLLECTION
+ */
+export const PAYMENT_SCHEMA = {
+  paymentId: "string",
+  userId: "string",
+  courseId: "string",
+  amount: "number",
+  currency: "string",
+  gateway: "string",
+  status: "string", // 'INITIATED' | 'SUCCESS' | 'FAILED'
+  metadata: "object",
+  createdAt: "timestamp",
+  updatedAt: "timestamp"
+};
+
+/**
+ * COUPONS COLLECTION
+ */
+export const COUPON_SCHEMA = {
+  code: "string",
+  type: "string", // 'percent' | 'flat'
+  value: "number",
+  isActive: "boolean",
+  expiresAt: "timestamp",
+  usageLimit: "number",
+  createdAt: "timestamp",
+  updatedAt: "timestamp"
+};
+
 // ============================================================================
 // HELPER FUNCTIONS FOR SCHEMA VALIDATION AND UTILITIES
 // ============================================================================
@@ -553,8 +437,6 @@ export const generateDefaultUserData = (firebaseUser) => {
     phone: '',
     college: '',
     gender: '',
-    skills: [],
-    interests: [],
     isAdmin: false,
     isActive: true,
     emailVerified: firebaseUser.emailVerified,

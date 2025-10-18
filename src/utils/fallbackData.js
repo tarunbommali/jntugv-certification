@@ -12,16 +12,7 @@ export const FALLBACK_V2 = {
             lastLoginAt: "2025-10-02T10:00:00Z",
             mobileNo: "9581193026"
         },
-        {
-            uid: "user-456789",
-            name: "Deepika Reddy",
-            email: "deepika@student.com",
-            role: "user",
-            university: "Andhra University",
-            skills: ["Python", "Data Analysis"],
-            totalCoursesEnrolled: 1,
-            lastLoginAt: "2025-10-01T15:30:00Z"
-        }
+     
     ],
     courses: [
         {

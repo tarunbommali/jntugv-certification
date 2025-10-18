@@ -168,15 +168,7 @@ const CheckoutPage = () => {
                     foundCourse = ctxCourse;
                 }
 
-                // 2. Fallback to local demo list if not found
-                if (!foundCourse) {
-                    const localCourse = fallbackCourseList.find(c => String(c.id) === String(courseId));
-                    if (localCourse) {
-                        foundCourse = localCourse;
-                        setUseTestPayment(true);
-                        loadingError = "Using local demo data. Payment will be simulated.";
-                    }
-                }
+                 
 
                 // 3. Final normalization for pricing fields
                 if (foundCourse) {
