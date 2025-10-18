@@ -11,7 +11,8 @@ import {
   limit,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db, auth } from "../../firebase";
 import {
   validateUserData,
   generateDefaultUserData,
@@ -106,7 +107,6 @@ export const updateUserProfile = async (uid, updateData) => {
 export const getAllUsersData = async (limitCount = 100) => {
   try {
     const usersRef = collection(db, "users");
-    // Fetch users ordered by creation date, not filtering by anything
     const q = query(usersRef, orderBy("createdAt", "desc"), limit(limitCount));
 
     const snapshot = await getDocs(q);
@@ -115,19 +115,51 @@ export const getAllUsersData = async (limitCount = 100) => {
       ...d.data(),
     }));
 
-    // NOTE: In a real app, you would batch user and enrollment data
-    // retrieval here to minimize calls in the AdminUserDashboard.
-
     return { success: true, data: users };
   } catch (error) {
     const norm = normalizeFirestoreError(error);
     console.warn("[getAllUsersData]", norm.code, norm.message);
-    // Using PERMISSION_DENIED as a common issue for admin calls
     return {
       success: false,
       error: norm.code,
       message: `Failed to fetch user list: ${norm.message}`,
     };
+  }
+};
+
+/**
+ * Create user with credentials (Admin only)
+ */
+export const createUserWithCredentials = async ({ email, password, displayName, phone }) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: displayName || '',
+      phone: phone || '',
+      isAdmin: false,
+      totalCoursesEnrolled: 0,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    await setDoc(doc(db, "users", user.uid), userData);
+
+    return {
+      success: true,
+      data: {
+        uid: user.uid,
+        email: user.email,
+        credentials: { email, password }
+      }
+    };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error("Error creating user with credentials:", norm);
+    return { success: false, error: norm.message || norm.code };
   }
 };
 
@@ -137,4 +169,5 @@ export default {
   getUserProfile,
   updateUserProfile,
   getAllUsersData,
+  createUserWithCredentials,
 };

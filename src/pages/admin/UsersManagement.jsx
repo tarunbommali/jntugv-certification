@@ -3,58 +3,126 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Navigate } from 'react-router-dom';
-import { Search, Filter, Mail, Phone, Calendar, Shield, UserPlus,  } from 'lucide-react';
+import { Search, Filter, Mail, Phone, Calendar, Shield, UserPlus, X, BookOpen, Send } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
+import { getAllUsersData, createUserWithCredentials } from '../../firebase/services_modular/userOperations';
+import { getAllCourses } from '../../firebase/services_modular/courseOperations';
+import { createEnrollment } from '../../firebase/services_modular/enrollmentOperations';
 
 const UsersManagement = () => {
     const { isAdmin } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEnrollModal, setShowEnrollModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [courses, setCourses] = useState([]);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        password: ''
+    });
+    const [selectedCourses, setSelectedCourses] = useState([]);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     if (!isAdmin) {
         return <Navigate to="/" replace />;
     }
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setUsers([
-                {
-                    id: 1,
-                    name: 'John Doe',
-                    email: 'john@example.com',
-                    phone: '+1234567890',
-                    role: 'student',
-                    joinDate: '2024-01-15',
-                    status: 'active',
-                    coursesEnrolled: 3
-                },
-                {
-                    id: 2,
-                    name: 'Jane Smith',
-                    email: 'jane@example.com',
-                    phone: '+1234567891',
-                    role: 'instructor',
-                    joinDate: '2024-01-10',
-                    status: 'active',
-                    coursesEnrolled: 5
-                },
-                {
-                    id: 3,
-                    name: 'Bob Johnson',
-                    email: 'bob@example.com',
-                    phone: '+1234567892',
-                    role: 'student',
-                    joinDate: '2024-01-20',
-                    status: 'inactive',
-                    coursesEnrolled: 1
-                }
-            ]);
-            setLoading(false);
-        }, 1500);
-
-        return () => clearTimeout(timer);
+        fetchUsers();
+        fetchCourses();
     }, []);
+
+    const fetchUsers = async () => {
+        setLoading(true);
+        const result = await getAllUsersData(500);
+        if (result.success) {
+            setUsers(result.data);
+        }
+        setLoading(false);
+    };
+
+    const fetchCourses = async () => {
+        const result = await getAllCourses();
+        if (result.success) {
+            setCourses(result.data);
+        }
+    };
+
+    const handleCreateUser = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+        setSubmitting(true);
+
+        try {
+            const result = await createUserWithCredentials({
+                email: formData.email,
+                password: formData.password,
+                displayName: formData.name,
+                phone: formData.phone
+            });
+
+            if (result.success) {
+                setSuccess(`User created successfully! Credentials: ${formData.email} / ${formData.password}`);
+                setFormData({ name: '', email: '', phone: '', password: '' });
+                fetchUsers();
+                setTimeout(() => {
+                    setShowCreateModal(false);
+                    setSuccess('');
+                }, 3000);
+            } else {
+                setError(result.error || 'Failed to create user');
+            }
+        } catch (err) {
+            setError('An error occurred while creating the user');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleEnrollUser = async () => {
+        if (!selectedUser || selectedCourses.length === 0) {
+            setError('Please select at least one course');
+            return;
+        }
+
+        setSubmitting(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            for (const courseId of selectedCourses) {
+                const course = courses.find(c => c.courseId === courseId);
+                await createEnrollment({
+                    userId: selectedUser.uid,
+                    courseId: courseId,
+                    courseTitle: course?.title || 'Course',
+                    status: 'SUCCESS',
+                    paymentData: {
+                        amount: 0,
+                        paymentId: 'ADMIN_ENROLLMENT'
+                    }
+                });
+            }
+            setSuccess(`Successfully enrolled ${selectedUser.displayName || selectedUser.email} in ${selectedCourses.length} course(s)`);
+            setSelectedCourses([]);
+            fetchUsers();
+            setTimeout(() => {
+                setShowEnrollModal(false);
+                setSuccess('');
+            }, 2000);
+        } catch (err) {
+            setError('Failed to enroll user in courses');
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     const filteredUsers = users.filter(user =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -105,7 +173,10 @@ const UsersManagement = () => {
                                 />
                             </div>
                         </div>
-                        <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
                             <UserPlus className="w-4 h-4" />
                             <span>Add User</span>
                         </button>
@@ -146,17 +217,17 @@ const UsersManagement = () => {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {filteredUsers.map((user) => (
-                                        <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                                        <tr key={user.uid} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                                                         <span className="text-blue-600 font-semibold">
-                                                            {user.name.split(' ').map(n => n[0]).join('')}
+                                                            {(user.displayName || user.email || 'U').substring(0, 2).toUpperCase()}
                                                         </span>
                                                     </div>
                                                     <div className="ml-4">
                                                         <div className="text-sm font-medium text-gray-900">
-                                                            {user.name}
+                                                            {user.displayName || 'No Name'}
                                                         </div>
                                                         <div className="text-sm text-gray-500 flex items-center">
                                                             <Mail className="w-3 h-3 mr-1" />
@@ -166,31 +237,35 @@ const UsersManagement = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.isAdmin ? 'admin' : 'student')}`}>
                                                     <Shield className="w-3 h-3 mr-1" />
-                                                    {user.role}
+                                                    {user.isAdmin ? 'admin' : 'student'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}>
-                                                    {user.status}
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor('active')}`}>
+                                                    active
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {user.coursesEnrolled} courses
+                                                {user.totalCoursesEnrolled || 0} courses
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 <div className="flex items-center">
                                                     <Calendar className="w-3 h-3 mr-1" />
-                                                    {user.joinDate}
+                                                    {user.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button className="text-blue-600 hover:text-blue-900 mr-3">
-                                                    Edit
-                                                </button>
-                                                <button className="text-red-600 hover:text-red-900">
-                                                    Delete
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedUser(user);
+                                                        setShowEnrollModal(true);
+                                                    }}
+                                                    className="text-blue-600 hover:text-blue-900 mr-3 flex items-center gap-1"
+                                                >
+                                                    <BookOpen className="w-4 h-4" />
+                                                    Enroll
                                                 </button>
                                             </td>
                                         </tr>
@@ -221,11 +296,167 @@ const UsersManagement = () => {
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
                         <div className="text-2xl font-bold text-orange-600">
-                            {users.reduce((acc, user) => acc + user.coursesEnrolled, 0)}
+                            {users.reduce((acc, user) => acc + (user.totalCoursesEnrolled || 0), 0)}
                         </div>
                         <div className="text-sm text-gray-600">Total Enrollments</div>
                     </div>
                 </div>
+
+                {showCreateModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-xl max-w-md w-full p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-2xl font-bold text-gray-900">Create User</h2>
+                                <button onClick={() => setShowCreateModal(false)} className="text-gray-500 hover:text-gray-700">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+                                    {error}
+                                </div>
+                            )}
+
+                            {success && (
+                                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+                                    {success}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleCreateUser} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Minimum 6 characters"
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCreateModal(false)}
+                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                        disabled={submitting}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                        disabled={submitting}
+                                    >
+                                        {submitting ? 'Creating...' : 'Create User'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {showEnrollModal && selectedUser && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-xl max-w-md w-full p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-2xl font-bold text-gray-900">Enroll User</h2>
+                                <button onClick={() => setShowEnrollModal(false)} className="text-gray-500 hover:text-gray-700">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <p className="text-gray-600 mb-4">Select courses to enroll <strong>{selectedUser.displayName || selectedUser.email}</strong></p>
+
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+                                    {error}
+                                </div>
+                            )}
+
+                            {success && (
+                                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+                                    {success}
+                                </div>
+                            )}
+
+                            <div className="max-h-96 overflow-y-auto space-y-2 mb-4">
+                                {courses.map((course) => (
+                                    <label key={course.courseId} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCourses.includes(course.courseId)}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setSelectedCourses([...selectedCourses, course.courseId]);
+                                                } else {
+                                                    setSelectedCourses(selectedCourses.filter(id => id !== course.courseId));
+                                                }
+                                            }}
+                                            className="mt-1 mr-3"
+                                        />
+                                        <div className="flex-1">
+                                            <div className="font-medium text-gray-900">{course.title}</div>
+                                            <div className="text-sm text-gray-500">{course.category}</div>
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowEnrollModal(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                    disabled={submitting}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleEnrollUser}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? 'Enrolling...' : 'Enroll'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
