@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Navigate } from 'react-router-dom';
 import { BarChart3, Users, BookOpen, DollarSign, TrendingUp, Eye, Calendar, ArrowLeft } from 'lucide-react';
 import { global_classnames } from '../../utils/classnames.js';
+import AdminHeader from '../../components/admin/AdminHeader.jsx';
 
 const Analytics = () =>  {
     const { isAdmin } = useAuth();
@@ -20,26 +21,38 @@ const Analytics = () =>  {
         return () => clearTimeout(timer);
     }, []);
 
-    const StatCard = ({ icon: Icon, label, value, change, color = 'blue' }) => (
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="text-sm font-medium text-gray-600">{label}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-2">
-                        {loading ? '...' : value}
-                    </p>
-                    {change && (
-                        <p className={`text-sm mt-1 ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {change > 0 ? '↑' : '↓'} {Math.abs(change)}% from last period
+    const colorMap = {
+        blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+        green: { bg: 'bg-green-100', text: 'text-green-600' },
+        purple: { bg: 'bg-purple-100', text: 'text-purple-600' },
+        emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600' },
+        orange: { bg: 'bg-orange-100', text: 'text-orange-600' },
+        indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600' }
+    };
+
+    const StatCard = ({ icon: Icon, label, value, change, color = 'blue' }) => {
+        const cls = colorMap[color] || colorMap.blue;
+        return (
+            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-gray-600">{label}</p>
+                        <p className="text-2xl font-bold text-gray-900 mt-2">
+                            {loading ? '...' : value}
                         </p>
-                    )}
-                </div>
-                <div className={`p-3 rounded-lg bg-${color}-100`}>
-                    <Icon className={`w-6 h-6 text-${color}-600`} />
+                        {change && (
+                            <p className={`text-sm mt-1 ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {change > 0 ? '↑' : '↓'} {Math.abs(change)}% from last period
+                            </p>
+                        )}
+                    </div>
+                    <div className={`p-3 rounded-lg ${cls.bg}`}>
+                        <Icon className={`w-6 h-6 ${cls.text}`} />
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -47,13 +60,7 @@ const Analytics = () =>  {
                 
                 {/* Header */}
                 <div className="mb-8">
-                    <div className="flex items-center gap-4 mb-4">
-                       
-                        <div>
-                            <h1 className="text-3xl font-extrabold italic text-gray-900">Analytics </h1>
-                            <p className="text-gray-600 mt-1">Platform performance and insights</p>
-                        </div>
-                    </div>
+                    <AdminHeader title="Analytics" description="Platform performance and insights" />
 
                     {/* Time Range Selector */}
                     <div className="flex gap-2 mb-6">

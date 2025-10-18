@@ -18,6 +18,7 @@ import PricingTab from '../../components/Admin/PricingTab.jsx';
 import ContentTab from '../../components/Admin/ContentTab.jsx';
 import MediaTab from '../../components/Admin/MediaTab.jsx';
 import PreviewTab from '../../components/Admin/PreviewTab.jsx';
+import AdminHeader from '../../components/admin/AdminHeader.jsx';
 
 
 const CourseForm = () => {
@@ -335,17 +336,10 @@ const CourseForm = () => {
                 
                 {/* Header and Tabs */}
                 <div className="mb-8">
-                    <div className="flex items-center gap-4 mb-4">
-                       
-                        <div>
-                            <h1 className="text-3xl font-extrabold italic text-gray-900">
-                                {isNewCourse ? 'Create New Course' : `Edit Course: ${course.title}`}
-                            </h1>
-                            <p className="text-gray-600 mt-1">
-                                {isNewCourse ? 'Add a new course to the platform' : `Editing Course ID: ${course.id}`}
-                            </p>
-                        </div>
-                    </div>
+                    <AdminHeader 
+                        title={isNewCourse ? 'Create New Course' : `Edit Course: ${course.title}`}
+                        description={isNewCourse ? 'Add a new course to the platform' : `Editing Course ID: ${course.id}`}
+                    />
 
                     {/* Tabs Navigation */}
                     <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-6 overflow-x-auto">
