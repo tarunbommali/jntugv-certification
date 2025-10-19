@@ -197,17 +197,20 @@ export const updateUserRole = async (uid, newRole) => {
 /**
  * Create user with credentials (Admin only)
  */
-export const createUserWithCredentials = async ({ email, password, displayName, phone }) => {
+export const createUserWithCredentials = async ({ email, password, displayName, phone, role }) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+
+    const isAdmin = String(role || '').toLowerCase() === 'admin';
 
     const userData = {
       uid: user.uid,
       email: user.email,
       displayName: displayName || '',
       phone: phone || '',
-      isAdmin: false,
+      isAdmin: isAdmin,
+      status: 'active',
       totalCoursesEnrolled: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),

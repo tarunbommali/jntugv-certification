@@ -20,6 +20,7 @@ export const createEnrollment = enrollment.createEnrollment;
 export const getUserEnrollments = enrollment.getUserEnrollments;
 export const checkUserEnrollment = enrollment.checkUserEnrollment;
 export const updateEnrollmentProgress = enrollment.updateEnrollmentProgress;
+export const getUserEnrollmentStats = enrollment.getUserEnrollmentStats;
 
 export const getAllActiveCoupons = coupon.getAllActiveCoupons;
 export const validateCouponCode = coupon.validateCouponCode;
@@ -68,6 +69,7 @@ const defaultExport = {
   getUserEnrollments,
   checkUserEnrollment,
   updateEnrollmentProgress,
+  getUserEnrollmentStats,
 
   // Coupon
   getAllActiveCoupons,

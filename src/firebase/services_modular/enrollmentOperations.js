@@ -33,11 +33,14 @@ export const createEnrollment = async (enrollmentData) => {
       courseId: enrollmentData.courseId,
       courseTitle: enrollmentData.courseTitle,
       status: enrollmentData.status ?? "SUCCESS",
-      paidAmount: enrollmentData.paymentData?.amount,
+      paidAmount: enrollmentData.paymentData?.amount ?? enrollmentData.coursePrice ?? 0,
       enrolledAt: serverTimestamp(),
+      enrolledBy: enrollmentData.enrolledBy || "user",
       paymentDetails: {
         paymentId: enrollmentData.paymentData?.paymentId ?? "",
         paymentDate: serverTimestamp(),
+        method: enrollmentData.paymentData?.method || "online",
+        reference: enrollmentData.paymentData?.reference || "",
       },
     };
     validateEnrollmentData(enrollmentPayload);
@@ -185,10 +188,57 @@ export const updateEnrollmentProgress = async (enrollmentId, progressData) => {
   }
 };
 
+/**
+ * Get enrollment statistics for a user
+ */
+export const getUserEnrollmentStats = async (userId) => {
+  try {
+    const enrollmentsRef = collection(db, "enrollments");
+    const q = query(
+      enrollmentsRef,
+      where("userId", "==", userId),
+      where("status", "==", "SUCCESS")
+    );
+
+    const snapshot = await getDocs(q);
+    const enrollments = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+
+    const totalEnrollments = enrollments.length;
+    const offlineEnrollments = enrollments.filter(
+      (e) => e.paymentDetails?.method === "offline" || e.enrolledBy === "admin"
+    ).length;
+    const onlineEnrollments = enrollments.filter(
+      (e) => e.paymentDetails?.method === "online" && e.enrolledBy !== "admin"
+    ).length;
+    const freeEnrollments = enrollments.filter(
+      (e) => e.paymentDetails?.method === "free" || e.paidAmount === 0
+    ).length;
+
+    return {
+      success: true,
+      data: {
+        totalEnrollments,
+        offlineEnrollments,
+        onlineEnrollments,
+        freeEnrollments,
+        enrollments,
+      },
+    };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error("Error fetching enrollment stats:", norm);
+    return { success: false, error: norm.message || norm.code };
+  }
+};
+
 export default {
   // Enrollment operations
   createEnrollment,
   getUserEnrollments,
   checkUserEnrollment,
   updateEnrollmentProgress,
+  getUserEnrollmentStats,
 };

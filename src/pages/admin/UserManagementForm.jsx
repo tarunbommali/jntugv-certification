@@ -24,7 +24,7 @@ import {
   toggleUserAccountStatus,
 } from "../../firebase/services_modular/userOperations";
 import { getAllCourses } from "../../firebase/services_modular/courseOperations";
-import { createEnrollment } from "../../firebase/services_modular/enrollmentOperations";
+import { createEnrollment, getUserEnrollmentStats } from "../../firebase/services_modular/enrollmentOperations";
 import PageTitle from "../../components/ui/PageTitle.jsx";
 
 const UserManagementForm = () => {
@@ -35,6 +35,7 @@ const UserManagementForm = () => {
 
   const [user, setUser] = useState(null);
   const [courses, setCourses] = useState([]);
+  const [enrollmentStats, setEnrollmentStats] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -93,6 +94,12 @@ const UserManagementForm = () => {
               password: "", // Never pre-fill password
               role: userResult.data.isAdmin ? "admin" : "student",
             });
+
+            // Fetch enrollment stats
+            const statsResult = await getUserEnrollmentStats(userId);
+            if (statsResult.success) {
+              setEnrollmentStats(statsResult.data);
+            }
           } else {
             setError("Failed to fetch user data.");
           }
@@ -254,6 +261,12 @@ const UserManagementForm = () => {
       if (!isCreationMode) {
         const updatedUserResult = await getUserData(userId);
         if (updatedUserResult.success) setUser(updatedUserResult.data);
+
+        // Refresh enrollment stats
+        const statsResult = await getUserEnrollmentStats(userId);
+        if (statsResult.success) {
+          setEnrollmentStats(statsResult.data);
+        }
       }
 
       // Redirect after success for creation mode
@@ -503,8 +516,15 @@ const UserManagementForm = () => {
                 </p>
                 <p className="mb-2">
                   <strong className="text-gray-700">Total Courses:</strong>{" "}
-                  {user.totalCoursesEnrolled || 0}
+                  {enrollmentStats?.totalEnrollments || user.totalCoursesEnrolled || 0}
                 </p>
+                {enrollmentStats && (
+                  <div className="mb-2 pl-4 text-sm text-gray-600">
+                    <p>• Online: {enrollmentStats.onlineEnrollments}</p>
+                    <p>• Offline: {enrollmentStats.offlineEnrollments}</p>
+                    <p>• Free: {enrollmentStats.freeEnrollments}</p>
+                  </div>
+                )}
                 <p className="mb-4">
                   <strong className="text-gray-700">Account Status:</strong>
                   <span
@@ -652,8 +672,8 @@ const UserManagementForm = () => {
             )}
           </div>
 
-          {/* Payment Method Card (only for existing users) */}
-          {!isCreationMode && selectedCourses.length > 0 && (
+          {/* Payment Method Card */}
+          {selectedCourses.length > 0 && (
             <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
                 <CreditCard className="w-5 h-5 text-blue-600" />
