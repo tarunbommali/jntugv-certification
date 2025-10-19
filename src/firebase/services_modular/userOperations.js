@@ -18,6 +18,12 @@ import {
   generateDefaultUserData,
 } from "../schema";
 import { normalizeFirestoreError } from "./mappers";
+import { 
+  createUserViaAPI, 
+  toggleUserStatusViaAPI, 
+  getUsersViaAPI 
+} from "./apiOperations";
+import { createErrorResponse, validateEmail, validatePassword, validateRequired } from "../../utils/errorHandling";
 
 // ============================================================================
 // USER OPERATIONS
@@ -102,10 +108,18 @@ export const updateUserProfile = async (uid, updateData) => {
 };
 
 /**
- * 🚨 NEW FUNCTION: Get all user data for the Admin Dashboard 🚨
+ * Get all user data for the Admin Dashboard - Uses API first, falls back to client-side
  */
 export const getAllUsersData = async (limitCount = 100) => {
   try {
+    // Try API first
+    const apiResult = await getUsersViaAPI(limitCount, 0);
+    if (apiResult.success) {
+      return apiResult;
+    }
+    
+    // Fallback to client-side query
+    console.warn('API fetch failed, falling back to client-side:', apiResult.error);
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("createdAt", "desc"), limit(limitCount));
 
@@ -117,8 +131,8 @@ export const getAllUsersData = async (limitCount = 100) => {
 
     return { success: true, data: users };
   } catch (error) {
-  const norm = normalizeFirestoreError(error);
-  console.warn("[getAllUsersData]", norm.code, norm.message);
+    const norm = normalizeFirestoreError(error);
+    console.warn("[getAllUsersData]", norm.code, norm.message);
     return {
       success: false,
       error: norm.code,
@@ -128,37 +142,19 @@ export const getAllUsersData = async (limitCount = 100) => {
 };
 
 /**
- * Toggle user account status in Firestore (client-side)
- * Note: Fully disabling a Firebase Auth account requires the Admin SDK on a trusted backend.
+ * Toggle user account status - Uses API first, falls back to client-side
  */
 export const toggleUserAccountStatus = async (uid, newStatus) => {
-  // Try calling secure Cloud Function first
-  const adminApiUrl = import.meta.env.VITE_ADMIN_API_URL || '/api/admin/toggleUser';
   try {
-    const current = auth.currentUser;
-    if (current) {
-      const idToken = await current.getIdToken();
-      const resp = await fetch(adminApiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({ uid, action: newStatus === 'inactive' ? 'disable' : 'enable' })
-      });
-      const data = await resp.json();
-      if (resp.ok && data && data.success) {
-        return { success: true, via: 'function' };
-      }
-      // If function responded but with an error, continue to fallback
+    // Try API first
+    const action = newStatus === 'inactive' ? 'disable' : 'enable';
+    const apiResult = await toggleUserStatusViaAPI(uid, action);
+    if (apiResult.success) {
+      return { success: true, via: 'api' };
     }
-  } catch (err) {
-    // Network or permission issue - fall back to Firestore update
-    console.warn('Admin function call failed, falling back to Firestore update', err);
-  }
-
-  // Fallback: update the Firestore user document (client-side change only)
-  try {
+    
+    // Fallback to Firestore update only
+    console.warn('API toggle failed, falling back to Firestore update:', apiResult.error);
     const userRef = doc(db, "users", uid);
     await updateDoc(userRef, { status: newStatus, updatedAt: serverTimestamp() });
     return { success: true, via: 'firestore' };
@@ -195,10 +191,24 @@ export const updateUserRole = async (uid, newRole) => {
 };
 
 /**
- * Create user with credentials (Admin only)
+ * Create user with credentials (Admin only) - Uses API first, falls back to client-side
  */
 export const createUserWithCredentials = async ({ email, password, displayName, phone, role }) => {
   try {
+    // Validate input
+    validateRequired(email, 'Email');
+    validateRequired(password, 'Password');
+    validateEmail(email);
+    validatePassword(password);
+
+    // Try API first
+    const apiResult = await createUserViaAPI({ email, password, displayName, phone, role });
+    if (apiResult.success) {
+      return apiResult;
+    }
+    
+    // Fallback to client-side creation
+    console.warn('API creation failed, falling back to client-side:', apiResult.error);
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -227,9 +237,7 @@ export const createUserWithCredentials = async ({ email, password, displayName, 
       }
     };
   } catch (error) {
-  const norm = normalizeFirestoreError(error);
-  console.error("Error creating user with credentials:", norm);
-    return { success: false, error: norm.message || norm.code };
+    return createErrorResponse(error, 'createUserWithCredentials');
   }
 };
 

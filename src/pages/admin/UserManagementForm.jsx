@@ -24,8 +24,14 @@ import {
   toggleUserAccountStatus,
 } from "../../firebase/services_modular/userOperations";
 import { getAllCourses } from "../../firebase/services_modular/courseOperations";
-import { createEnrollment, getUserEnrollmentStats } from "../../firebase/services_modular/enrollmentOperations";
+import { 
+  createEnrollment, 
+  getUserEnrollmentStats,
+  updateEnrollment,
+  deleteEnrollment 
+} from "../../firebase/services_modular/enrollmentOperations";
 import PageTitle from "../../components/ui/PageTitle.jsx";
+import EnrollmentManagement from "../../components/admin/EnrollmentManagement.jsx";
 
 const UserManagementForm = () => {
   const { isAdmin } = useAuth();
@@ -55,6 +61,7 @@ const UserManagementForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(true);
+  const [refreshEnrollments, setRefreshEnrollments] = useState(0);
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;
@@ -96,10 +103,7 @@ const UserManagementForm = () => {
             });
 
             // Fetch enrollment stats
-            const statsResult = await getUserEnrollmentStats(userId);
-            if (statsResult.success) {
-              setEnrollmentStats(statsResult.data);
-            }
+            await fetchEnrollmentStats();
           } else {
             setError("Failed to fetch user data.");
           }
@@ -121,7 +125,7 @@ const UserManagementForm = () => {
       }
     };
     fetchData();
-  }, [userId, isCreationMode]);
+  }, [userId, isCreationMode, refreshEnrollments]);
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -139,6 +143,20 @@ const UserManagementForm = () => {
       ...offlinePaymentDetails,
       [e.target.name]: e.target.value,
     });
+  };
+
+  // Function to fetch enrollment stats
+  const fetchEnrollmentStats = async () => {
+    if (!isCreationMode && user) {
+      try {
+        const statsResult = await getUserEnrollmentStats(user.uid);
+        if (statsResult.success) {
+          setEnrollmentStats(statsResult.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch enrollment stats:", err);
+      }
+    }
   };
 
   // Calculate total amount for selected courses
@@ -554,6 +572,18 @@ const UserManagementForm = () => {
                     ? "Enable Account"
                     : "Disable Account"}
                 </button>
+              </div>
+
+              {/* Enrollment Management Card */}
+              <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <EnrollmentManagement 
+                  userId={user.uid} 
+                  onEnrollmentChange={() => {
+                    setRefreshEnrollments(prev => prev + 1);
+                    // Refresh enrollment stats
+                    fetchEnrollmentStats();
+                  }}
+                />
               </div>
             </>
           )}

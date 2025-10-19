@@ -21,6 +21,8 @@ export const getUserEnrollments = enrollment.getUserEnrollments;
 export const checkUserEnrollment = enrollment.checkUserEnrollment;
 export const updateEnrollmentProgress = enrollment.updateEnrollmentProgress;
 export const getUserEnrollmentStats = enrollment.getUserEnrollmentStats;
+export const updateEnrollment = enrollment.updateEnrollment;
+export const deleteEnrollment = enrollment.deleteEnrollment;
 
 export const getAllActiveCoupons = coupon.getAllActiveCoupons;
 export const validateCouponCode = coupon.validateCouponCode;
@@ -70,6 +72,8 @@ const defaultExport = {
   checkUserEnrollment,
   updateEnrollmentProgress,
   getUserEnrollmentStats,
+  updateEnrollment,
+  deleteEnrollment,
 
   // Coupon
   getAllActiveCoupons,
