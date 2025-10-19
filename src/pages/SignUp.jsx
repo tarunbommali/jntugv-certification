@@ -47,7 +47,7 @@ const SignUp = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center justify-center space-x-2">
             <img src={logo} alt="JNTU-GV Logo" className="w-16 h-16" />
-            <span className="text-2xl font-extrabold text-[#004080]">
+            <span className="text-2xl font-extrabold text-primary">
               NxtGen Certification
             </span>
           </Link>
@@ -68,7 +68,7 @@ const SignUp = () => {
         {/* Email and Password Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-[#004080] focus:border-[#004080] outline-none transition"
+            className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +76,7 @@ const SignUp = () => {
             required
           />
           <input
-            className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-[#004080] focus:border-[#004080] outline-none transition"
+            className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -87,7 +87,7 @@ const SignUp = () => {
             disabled={loading}
             type="submit"
             className={`w-full text-white py-3 rounded-lg font-semibold transition-colors shadow-md flex items-center justify-center gap-2 ${
-              loading ? "bg-gray-500 cursor-not-allowed" : "bg-[#004080] hover:bg-[#003366]"
+              loading ? "bg-gray-500 cursor-not-allowed" : "bg-primary hover:bg-primaryHover"
             }`}
           >
             {loading && <Loader2 className="w-5 h-5 animate-spin" />}
@@ -123,7 +123,7 @@ const SignUp = () => {
         {/* Link to Sign In */}
         <p className="mt-6 text-sm text-center text-gray-600">
           Already have an account?{" "}
-          <Link to="/auth/signin" className="text-[#004080] font-bold hover:underline">
+          <Link to="/auth/signin" className="text-primary font-bold hover:underline">
             Sign In
           </Link>
         </p>

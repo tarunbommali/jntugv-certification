@@ -62,11 +62,11 @@ const Hero = () => {
   ];
 
   const barData = [
-    { name: "Gap", value: 53, fill: "#004080" },
-    { name: "Skilled", value: 47, fill: "#3b82f6" }, // Use a different blue for contrast
+    { name: "Gap", value: 53, fill: "var(--color-primary)" },
+    { name: "Skilled", value: 47, fill: "var(--color-primaryHover)" }, // Use hover color for contrast
   ];
 
-  const PIE_COLORS = ["#004080", "#a1a1aa"]; // Dark Blue (Primary) and Gray (Secondary)
+  const PIE_COLORS = ["var(--color-primary)", "var(--color-textLow)"]; // LinkedIn Blue and Gray
 
   // Custom Recharts Tooltip for better clarity
   const CustomTooltip = ({ active, payload }) => {
@@ -74,7 +74,7 @@ const Hero = () => {
       const data = payload[0].payload;
       return (
         <div className="bg-white p-2 border border-gray-300 rounded-md shadow-lg text-sm">
-          <p className="font-semibold text-[#004080]">{data.name}</p>
+          <p className="font-semibold text-primary">{data.name}</p>
           <p>{`${data.value}%`}</p>
         </div>
       );
@@ -88,7 +88,7 @@ const Hero = () => {
       const value = payload[0].value;
       return (
         <div className="bg-white p-2 border border-gray-300 rounded-md shadow-lg text-sm">
-          <p className="font-semibold text-[#004080]">Projected Jobs</p>
+          <p className="font-semibold text-primary">Projected Jobs</p>
           <p>{`${(value * 100000).toLocaleString()} New Jobs`}</p>
         </div>
       );
@@ -108,7 +108,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-3xl md:text-5xl font-semibold  text-[#004080] mb-16 leading-tight"
+          className="text-3xl md:text-5xl font-semibold text-primary mb-16 leading-tight"
         >
           JNTU-GV State University
           <span className="text-[#0056b3]"> Certification </span> in Advanced

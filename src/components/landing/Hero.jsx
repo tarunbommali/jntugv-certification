@@ -57,11 +57,11 @@ const Hero = () => {
   ];
 
   const barData = [
-    { name: "Gap", value: 53, fill: "#004080" },
-    { name: "Skilled", value: 47, fill: "#3b82f6" },
+    { name: "Gap", value: 53, fill: "var(--color-primary)" },
+    { name: "Skilled", value: 47, fill: "var(--color-primaryHover)" },
   ];
 
-  const PIE_COLORS = ["#004080", "#a1a1aa"];
+  const PIE_COLORS = ["var(--color-primary)", "var(--color-textLow)"];
 
   // Custom Tooltips
   const CustomTooltip = ({ active, payload }) => {
@@ -187,13 +187,13 @@ const Hero = () => {
                   ]}
                 >
                   <Tooltip content={<JobsTooltip />} />
-                  <YAxis dataKey="name" type="category" stroke="#6b7280" />
+                  <YAxis dataKey="name" type="category" stroke="var(--color-textMedium)" />
                   <XAxis
                     type="number"
                     tickFormatter={(v) => `${v} Lakhs`}
-                    stroke="#6b7280"
+                    stroke="var(--color-textMedium)"
                   />
-                  <Bar dataKey="value" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="value" fill="var(--color-error)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -212,7 +212,7 @@ const Hero = () => {
                       cy="50%"
                       innerRadius={40}
                       outerRadius={60}
-                      fill="#8884d8"
+                      fill="var(--color-primary)"
                       paddingAngle={5}
                       dataKey="value"
                     >
@@ -251,7 +251,7 @@ const Hero = () => {
                     <Bar
                       dataKey="value"
                       isAnimationActive={false}
-                      label={{ position: "right", fill: "#004080" }}
+                      label={{ position: "right", fill: "var(--color-primary)" }}
                     >
                       {barData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />

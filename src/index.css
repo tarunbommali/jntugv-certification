@@ -4,24 +4,25 @@
 /* Comprehensive Theme System */
 /* Colors are dynamically set by ThemeContext, but we provide fallbacks here */
 
-/* Light Theme (default) - Fallback values */
+/* Light Theme (default) - LinkedIn-style fallback values */
 :root {
-  --color-primary: #007AFF;
-  --color-primaryHover: #0056CC;
-  --color-background: #F7F7F7;
-  --color-backgroundAlt: #FFFFFF;
-  --color-surface: #FFFFFF;
-  --color-surfaceElevated: #EFEFEF;
-  --color-textHigh: #1A1A1A;
-  --color-textMedium: #4A4A4A;
+  --color-primary: #0A66C2;
+  --color-primaryHover: #004182;
+  --color-primaryLight: #E8F3FF;
+  --color-background: #FFFFFF;
+  --color-backgroundAlt: #F3F2EF;
+  --color-surface: #F3F2EF;
+  --color-surfaceElevated: #FFFFFF;
+  --color-textHigh: #191919;
+  --color-textMedium: #666666;
   --color-textLow: #8A8A8A;
   --color-success: #38A169;
   --color-error: #D9534F;
   --color-warning: #F59E0B;
-  --color-border: #E2E8F0;
-  --color-divider: #F1F5F9;
+  --color-border: #E0E0E0;
+  --color-divider: #E0E0E0;
   --color-hover: #F8FAFC;
-  --color-active: #E2E8F0;
+  --color-active: #E8F3FF;
   --color-disabled: #CBD5E1;
   
   /* Legacy support for existing components */
@@ -36,24 +37,25 @@
   --color-accent-foreground: var(--color-textHigh);
 }
 
-/* Dark Theme Override - Fallback values */
+/* Dark Theme Override - LinkedIn-style fallback values */
 [data-theme="dark"] {
-  --color-primary: #4D9FFF;
-  --color-primaryHover: #66B3FF;
-  --color-background: #121212;
-  --color-backgroundAlt: #1E1E1E;
-  --color-surface: #2C2C2C;
-  --color-surfaceElevated: #212121;
-  --color-textHigh: #E0E0E0;
-  --color-textMedium: #AFAFAF;
+  --color-primary: #0A66C2;
+  --color-primaryHover: #378FE9;
+  --color-primaryLight: #1A1D21;
+  --color-background: #1A1D21;
+  --color-backgroundAlt: #22272B;
+  --color-surface: #22272B;
+  --color-surfaceElevated: #2E3338;
+  --color-textHigh: #F3F6F8;
+  --color-textMedium: #A3A6AA;
   --color-textLow: #757575;
   --color-success: #6EE7B7;
   --color-error: #FF6961;
   --color-warning: #FBBF24;
-  --color-border: #404040;
-  --color-divider: #2A2A2A;
+  --color-border: #2E3338;
+  --color-divider: #2E3338;
   --color-hover: #3A3A3A;
-  --color-active: #4A4A4A;
+  --color-active: #2E3338;
   --color-disabled: #555555;
   
   /* Legacy support for existing components */

@@ -15,7 +15,7 @@ const CourseDetails = ({
   enrollmentLoading,
 }) => {
   const modules = course.modules || [];
-  const PRIMARY_COLOR = "#004080"; // Based on your App.jsx color
+  const PRIMARY_COLOR = "var(--color-primary)"; // LinkedIn Blue from theme
 
   return (
     <div className={`rounded-lg`}>
