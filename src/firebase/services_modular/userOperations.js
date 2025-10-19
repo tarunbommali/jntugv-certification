@@ -23,7 +23,7 @@ import {
   toggleUserStatusViaAPI, 
   getUsersViaAPI 
 } from "./apiOperations";
-import { createErrorResponse, validateEmail, validatePassword, validateRequired } from "../errorHandling";
+import { createErrorResponse, validateEmail, validatePassword, validateRequired } from "../../utils/errorHandling";
 
 // ============================================================================
 // USER OPERATIONS

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import {
   collection,
   doc,
@@ -21,7 +23,7 @@ import {
   updateEnrollmentViaAPI, 
   deleteEnrollmentViaAPI 
 } from "./apiOperations";
-import { createErrorResponse, validateEnrollmentData as validateEnrollment } from "../errorHandling";
+import { createErrorResponse } from "../../utils/errorHandling";
 
 // ============================================================================
 // ENROLLMENT OPERATIONS
