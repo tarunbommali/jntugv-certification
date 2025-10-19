@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
 
-const Card = React.forwardRef(({ className, onEdit, onDelete, onView, ...props }, ref) => {
+const Card = React.forwardRef(({ className, onEdit, onDelete, onView, elevated = false, ...props }, ref) => {
   // Prevent unknown DOM props from being spread to native elements.
   // If consumers pass action handlers, they should be applied to button elements
   // inside Card children rather than forwarded to the root div.
@@ -9,7 +9,7 @@ const Card = React.forwardRef(({ className, onEdit, onDelete, onView, ...props }
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm',
+        elevated ? 'card-elevated' : 'card',
         className
       )}
       {...props}
@@ -45,7 +45,7 @@ CardTitle.displayName = 'CardTitle';
 const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
+    className={cn('text-sm text-medium', className)}
     {...props}
   />
 ));

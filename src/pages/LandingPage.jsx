@@ -14,7 +14,7 @@ const LandingPage = () => {
   const { courses, coursesLoading } = useRealtime();
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen bg-app text-high">
       <Hero />
       
       {/* Featured Courses Section */}
@@ -24,7 +24,7 @@ const LandingPage = () => {
             <h2 className="text-3xl sm:text-4xl font-bold text-primary mb-4">
               Explore Our Courses
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-medium max-w-2xl mx-auto">
               Discover industry-relevant certification programs designed to advance your career
             </p>
           </div>

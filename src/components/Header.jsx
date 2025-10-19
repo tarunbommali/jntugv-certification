@@ -73,8 +73,8 @@ const NavigationMenu = ({ isAdminMode, isAdminUser }) => {
                             flex items-center gap-2 px-3 py-1  text-sm font-medium whitespace-nowrap transition-all duration-200
                             ${
                               isActive
-                                ? ` text-blue-600 font-semibold`
-                                : "border-transparent text-gray-500 hover:text-gray-700"
+                                ? ` text-primary font-semibold`
+                                : "border-transparent text-medium hover:text-high"
                             }
                         `}
           >
@@ -209,9 +209,9 @@ const Header = () => {
 
       {/* Main Header (Sticky for desktop) */}
       <header
-        className="sticky top-0 z-40 shadow-sm"
+        className="sticky top-0 z-40 shadow-sm theme-transition"
         style={{
-          background: "var(--color-card)",
+          background: "var(--color-surface)",
           borderBottom: "1px solid var(--color-border)",
         }}
       >
@@ -228,12 +228,11 @@ const Header = () => {
               />
               <div className="flex flex-col leading-tight">
                 <span
-                  className="text-xl md:text-2xl font-bold"
-                  style={{ color: "var(--color-primary)" }}
+                  className="text-xl md:text-2xl font-bold text-primary"
                 >
                   NxtGen Certification
                 </span>
-                <span className="text-xs md:text-sm text-gray-500 hidden sm:flex">
+                <span className="text-xs md:text-sm text-low hidden sm:flex">
                   <span className="font-semibold italic">
                     Powered by JNTU GV{" "}
                   </span>
@@ -255,12 +254,12 @@ const Header = () => {
                   className="flex items-center gap-2 border-r pr-4 mr-2"
                   style={{ borderColor: "var(--color-border)" }}
                 >
-                  <Shield className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">Admin</span>
+                  <Shield className="w-4 h-4 text-medium" />
+                  <span className="text-sm text-medium">Admin</span>
                   <button
                     onClick={handleAdminModeToggle}
                     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                      isAdminMode ? "bg-blue-600" : "bg-gray-300"
+                      isAdminMode ? "bg-primary" : "bg-disabled"
                     }`}
                   >
                     <span
@@ -276,10 +275,10 @@ const Header = () => {
               <button
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
-                className="p-2 rounded-full hover:opacity-80 transition"
+                className="p-2 rounded-full hover:opacity-80 transition focus-ring"
                 style={{
                   background: "transparent",
-                  color: "var(--color-text)",
+                  color: "var(--color-textHigh)",
                   border: "1px solid var(--color-border)",
                 }}
               >
@@ -300,11 +299,7 @@ const Header = () => {
               ) : (
                 <button
                   onClick={() => navigate("/auth/signin")}
-                  className="rounded-full text-sm font-medium h-10 px-5 hover:opacity-90 transition-shadow shadow-md"
-                  style={{
-                    background: "var(--color-primary)",
-                    color: "var(--color-primary-contrast)",
-                  }}
+                  className="btn-primary rounded-full text-sm font-medium h-10 px-5 hover:opacity-90 transition-shadow shadow-md"
                 >
                   Login
                 </button>
@@ -317,9 +312,9 @@ const Header = () => {
               <button
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
-                className="p-2 rounded-full"
+                className="p-2 rounded-full focus-ring"
                 style={{
-                  color: "var(--color-text)",
+                  color: "var(--color-textHigh)",
                   border: "1px solid var(--color-border)",
                 }}
               >
@@ -330,7 +325,7 @@ const Header = () => {
                 )}
               </button>
               <button
-                className="p-2 transition-colors"
+                className="p-2 transition-colors focus-ring"
                 style={{ color: "var(--color-primary)" }}
                 onClick={() => setIsMenuOpen(true)}
               >

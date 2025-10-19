@@ -1,16 +1,20 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const Button = React.forwardRef(({ className, variant = 'primary', size = 'md', children, asChild = false, ...props }, ref) => {
-  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  const { colors } = useTheme();
+  
+  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium theme-transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
   const variants = {
-    primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-    outline: 'border border-input hover:bg-accent hover:text-accent-foreground',
-    ghost: 'hover:bg-accent hover:text-accent-foreground',
+    primary: 'btn-primary',
+    secondary: 'bg-surface text-textHigh hover:bg-hover border border-border',
+    outline: 'border border-primary text-primary hover:bg-primary hover:text-white',
+    ghost: 'text-textHigh hover:bg-hover',
     link: 'underline-offset-4 hover:underline text-primary',
-    destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+    destructive: 'btn-error',
+    success: 'btn-success'
   };
 
   const sizes = {
