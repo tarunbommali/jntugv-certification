@@ -15,16 +15,35 @@ import { validateEnrollmentData } from "../schema";
 import { mapEnrollmentToV2, normalizeFirestoreError } from "./mappers";
 import { v4 as uuidv4 } from "uuid";
 import { increment } from "firebase/firestore";
+import { 
+  createEnrollmentViaAPI, 
+  getUserEnrollmentsViaAPI, 
+  updateEnrollmentViaAPI, 
+  deleteEnrollmentViaAPI 
+} from "./apiOperations";
+import { createErrorResponse, validateEnrollmentData as validateEnrollment } from "../errorHandling";
 
 // ============================================================================
 // ENROLLMENT OPERATIONS
 // ============================================================================
 
 /**
- * Create enrollment record
+ * Create enrollment record - Uses API first, falls back to client-side
  */
 export const createEnrollment = async (enrollmentData) => {
   try {
+    // Validate enrollment data
+    validateEnrollment(enrollmentData);
+
+    // Try API first
+    const apiResult = await createEnrollmentViaAPI(enrollmentData);
+    if (apiResult.success) {
+      return apiResult;
+    }
+    
+    // Fallback to client-side creation
+    console.warn('API enrollment creation failed, falling back to client-side:', apiResult.error);
+    
     // Create V2 enrollment with explicit enrollmentId
     const enrollmentId = enrollmentData.enrollmentId ?? uuidv4();
     const enrollmentPayload = {
@@ -64,17 +83,24 @@ export const createEnrollment = async (enrollmentData) => {
 
     return { success: true, data: { id: docRef.id, ...enrollmentPayload } };
   } catch (error) {
-    const norm = normalizeFirestoreError(error);
-    console.error("Error creating enrollment:", norm);
-    return { success: false, error: norm.message || norm.code };
+    return createErrorResponse(error, 'createEnrollment');
   }
 };
 
 /**
- * Get user enrollments
+ * Get user enrollments - Uses API first, falls back to client-side
  */
 export const getUserEnrollments = async (userId) => {
   try {
+    // Try API first
+    const apiResult = await getUserEnrollmentsViaAPI(userId, 'SUCCESS');
+    if (apiResult.success) {
+      return apiResult;
+    }
+    
+    // Fallback to client-side query
+    console.warn('API fetch failed, falling back to client-side:', apiResult.error);
+    
     const enrollmentsRef = collection(db, "enrollments");
     const q = query(
       enrollmentsRef,
@@ -234,6 +260,85 @@ export const getUserEnrollmentStats = async (userId) => {
   }
 };
 
+/**
+ * Update enrollment record - Uses API first, falls back to client-side
+ */
+export const updateEnrollment = async (enrollmentId, updateData) => {
+  try {
+    // Try API first
+    const apiResult = await updateEnrollmentViaAPI(enrollmentId, updateData);
+    if (apiResult.success) {
+      return apiResult;
+    }
+    
+    // Fallback to client-side update
+    console.warn('API update failed, falling back to client-side:', apiResult.error);
+    
+    const enrollmentRef = doc(db, "enrollments", enrollmentId);
+    const updatePayload = {
+      ...updateData,
+      updatedAt: serverTimestamp(),
+    };
+
+    await updateDoc(enrollmentRef, updatePayload);
+    return { success: true };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error("Error updating enrollment:", norm);
+    return { success: false, error: norm.message || norm.code };
+  }
+};
+
+/**
+ * Delete enrollment record - Uses API first, falls back to client-side
+ */
+export const deleteEnrollment = async (enrollmentId) => {
+  try {
+    // Try API first
+    const apiResult = await deleteEnrollmentViaAPI(enrollmentId);
+    if (apiResult.success) {
+      return apiResult;
+    }
+    
+    // Fallback to client-side deletion
+    console.warn('API deletion failed, falling back to client-side:', apiResult.error);
+    
+    // Get enrollment data before deletion
+    const enrollmentDoc = await getDoc(doc(db, "enrollments", enrollmentId));
+    if (!enrollmentDoc.exists()) {
+      return { success: false, error: "Enrollment not found" };
+    }
+
+    const enrollmentData = enrollmentDoc.data();
+
+    // Delete enrollment
+    await updateDoc(doc(db, "enrollments", enrollmentId), {
+      status: "CANCELLED",
+      updatedAt: serverTimestamp()
+    });
+
+    // Update course enrollment count
+    const courseRef = doc(db, "courses", enrollmentData.courseId);
+    await updateDoc(courseRef, {
+      totalEnrollments: increment(-1),
+      updatedAt: serverTimestamp()
+    });
+
+    // Update user enrollment count
+    const userRef = doc(db, "users", enrollmentData.userId);
+    await updateDoc(userRef, {
+      totalCoursesEnrolled: increment(-1),
+      updatedAt: serverTimestamp()
+    });
+
+    return { success: true };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error("Error deleting enrollment:", norm);
+    return { success: false, error: norm.message || norm.code };
+  }
+};
+
 export default {
   // Enrollment operations
   createEnrollment,
@@ -241,4 +346,6 @@ export default {
   checkUserEnrollment,
   updateEnrollmentProgress,
   getUserEnrollmentStats,
+  updateEnrollment,
+  deleteEnrollment,
 };

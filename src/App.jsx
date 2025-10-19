@@ -37,6 +37,7 @@ const CourseForm = lazy(() => import("./pages/admin/CourseForm.jsx"));
 const UsersManagement = lazy(() => import("./pages/admin/UsersManagement.jsx"));
 const AdminCoupons = lazy(() => import("./pages/admin/AdminCoupons.jsx"));
 const Courses = lazy(() => import("./pages/admin/Courses.jsx"));
+const EnrollmentManagement = lazy(() => import("./pages/admin/EnrollmentManagement.jsx"));
 
 const App = () => {
   return (
@@ -165,6 +166,16 @@ const App = () => {
                           <ProtectedRoute requiredRole="admin">
                             <Suspense fallback={<LoadingScreen />}>
                               <AdminCoupons />
+                            </Suspense>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/admin/enrollments"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <Suspense fallback={<LoadingScreen />}>
+                              <EnrollmentManagement />
                             </Suspense>
                           </ProtectedRoute>
                         }
