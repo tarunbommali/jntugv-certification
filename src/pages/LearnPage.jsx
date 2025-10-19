@@ -10,7 +10,7 @@ import CourseContentShimmer from '../components/Course/CourseContentShimmer.jsx'
 import { global_classnames } from "../utils/classnames.js";
 import { Shield, BookOpen, PlayCircle, List, ArrowRight, Clock, CheckCircle, Lock, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
 
-const PRIMARY_BLUE = "#004080";
+const PRIMARY_BLUE = "var(--color-primary)"; // LinkedIn Blue from theme
 
 const LearnPage = () => {
     const { courseId } = useParams();

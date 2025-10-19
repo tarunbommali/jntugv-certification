@@ -69,6 +69,7 @@ export const getThemeStyles = (theme, styleType) => {
       secondary: theme.colors.backgroundAlt,
       surface: theme.colors.surface,
       surfaceElevated: theme.colors.surfaceElevated,
+      primaryLight: theme.colors.primaryLight,
     },
     text: {
       high: theme.colors.textHigh,
@@ -84,6 +85,13 @@ export const getThemeStyles = (theme, styleType) => {
       primary: theme.colors.primary,
       success: theme.colors.success,
       error: theme.colors.error,
+    },
+    interactive: {
+      primary: theme.colors.primary,
+      primaryHover: theme.colors.primaryHover,
+      hover: theme.colors.hover,
+      active: theme.colors.active,
+      disabled: theme.colors.disabled,
     },
   };
   

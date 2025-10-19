@@ -17,7 +17,7 @@ import {
 import * as LucideIcons from "lucide-react";
 import PageContainer from "../../components/layout/PageContainer.jsx";
 import PageTitle from "../../components/ui/PageTitle.jsx";
-const PRIMARY_COLOR = "#0056D2";
+const PRIMARY_COLOR = "var(--color-primary)"; // LinkedIn Blue from theme
 
 const items = [
   { label: "Admin", link: "/admin" },

@@ -10,7 +10,7 @@ import { AlertCircle, Percent, DollarSign, ArrowLeft } from "lucide-react";
 
 import PageTitle from "../../components/ui/PageTitle.jsx";
 
-const PRIMARY_COLOR = "#0056D2";
+const PRIMARY_COLOR = "var(--color-primary)"; // LinkedIn Blue from theme
 
 const CreateEditCouponPage = () => {
   // ... existing hook and auth logic (omitted for brevity)
