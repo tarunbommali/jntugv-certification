@@ -1,76 +1,76 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'app_theme';
 const DEFAULT_THEME = 'light';
 
-// LinkedIn-style color system for professional course website
+// App color system — use Instagram-like palette (centralized in src/index.css)
 const THEME_COLORS = {
-  light: {
-    // Primary Brand Colors (LinkedIn Blue)
-    primary: '#0A66C2', // LinkedIn Blue
-    primaryHover: '#004182', // Dark Blue for hover states
-    primaryLight: '#E8F3FF', // Light Blue for backgrounds
-    
-    // Background Colors
-    background: '#FFFFFF', // White background
-    backgroundAlt: '#F3F2EF', // Light Gray surface
-    
-    // Surface/Card Background
-    surface: '#F3F2EF', // Light Gray for cards
-    surfaceElevated: '#FFFFFF', // White for elevated surfaces
-    
-    // Text Colors
-    textHigh: '#191919', // Dark Gray for primary text
-    textMedium: '#666666', // Medium Gray for secondary text
-    textLow: '#8A8A8A', // Light Gray for hints/labels
-    
-    // Feedback Colors
-    success: '#38A169', // Green for success
-    error: '#D9534F', // Red for errors
-    warning: '#F59E0B', // Orange for warnings
-    
-    // Border and Divider
-    border: '#E0E0E0', // Light border
-    divider: '#E0E0E0', // Divider color
-    
-    // Interactive States
-    hover: '#F8FAFC', // Very light hover state
-    active: '#E8F3FF', // Light blue active state
-    disabled: '#CBD5E1', // Disabled state
-  },
-  dark: {
-    // Primary Brand Colors (LinkedIn Blue - consistent across themes)
-    primary: '#0A66C2', // LinkedIn Blue (same as light)
-    primaryHover: '#378FE9', // Light Blue for hover in dark theme
-    primaryLight: '#1A1D21', // Deep charcoal for backgrounds
-    
-    // Background Colors
-    background: '#1A1D21', // Deep Charcoal background
-    backgroundAlt: '#22272B', // Slightly lighter gray
-    
-    // Surface/Card Background
-    surface: '#22272B', // Slightly lighter gray for cards
-    surfaceElevated: '#2E3338', // Elevated dark surface
-    
-    // Text Colors
-    textHigh: '#F3F6F8', // Off-White for primary text
-    textMedium: '#A3A6AA', // Gray for secondary text
-    textLow: '#757575', // Muted gray for hints/labels
-    
-    // Feedback Colors
-    success: '#6EE7B7', // Light green for success
-    error: '#FF6961', // Light red for errors
-    warning: '#FBBF24', // Light orange for warnings
-    
-    // Border and Divider
-    border: '#2E3338', // Dark border
-    divider: '#2E3338', // Dark divider
-    
-    // Interactive States
-    hover: '#3A3A3A', // Dark hover state
-    active: '#2E3338', // Dark active state
-    disabled: '#555555', // Disabled state
-  }
+    light: {
+        // Primary Brand Colors (Instagram pink)
+        primary: '#155dfc',
+        primaryHover: '#C13584',
+        primaryLight: '#FFF0F6',
+
+        // Background Colors
+        background: '#FFFFFF',
+        backgroundAlt: '#FAFAFA',
+
+        // Surface/Card Background
+        surface: '#FFFFFF',
+        surfaceElevated: '#FFFFFF',
+
+        // Text Colors
+        textHigh: '#1C1E21',
+        textMedium: '#65676B',
+        textLow: '#A8A8A8',
+
+        // Feedback Colors
+        success: '#10B981',
+        error: '#EF4444',
+        warning: '#F59E0B',
+
+        // Border and Divider
+        border: '#E4E6EB',
+        divider: '#E4E6EB',
+
+        // Interactive States
+        hover: '#F5F5F5',
+        active: '#FFF0F6',
+        disabled: '#E0E0E0',
+    },
+    dark: {
+        // Primary Brand Colors (Instagram pink)
+        primary: '#155dfc',
+        primaryHover: '#F77737',
+        primaryLight: '#2C2C2C',
+
+        // Background Colors
+        background: '#121212',
+        backgroundAlt: '#181818',
+
+        // Surface/Card Background
+        surface: '#1F1F1F',
+        surfaceElevated: '#242424',
+
+        // Text Colors
+        textHigh: '#F5F5F5',
+        textMedium: '#B0B0B0',
+        textLow: '#6E6E6E',
+
+        // Feedback Colors
+        success: '#34D399',
+        error: '#F87171',
+        warning: '#FBBF24',
+
+        // Border and Divider
+        border: '#2E2E2E',
+        divider: '#2E2E2E',
+
+        // Interactive States
+        hover: '#2A2A2A',
+        active: '#E1306C22',
+        disabled: '#555555',
+    }
 };
 
 const ThemeContext = createContext(undefined);

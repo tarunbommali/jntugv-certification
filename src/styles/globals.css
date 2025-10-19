@@ -1,5 +1,3 @@
-@tailwind base;
-@tailwind components;
 @tailwind utilities;
 
 @layer base {
@@ -11,19 +9,21 @@
     --card-foreground: 0 0% 9.8%; /* #191919 */
     --popover: 0 0% 100%; /* #FFFFFF */
     --popover-foreground: 0 0% 9.8%; /* #191919 */
-    --primary: 210 100% 40%; /* #0A66C2 - LinkedIn Blue */
+   /* map legacy primary to canonical color variable (Instagram palette used in index.css)
+     keep HSL-format variables for components that expect hsl() tokens */
+   --primary: 329 70% 36%; /* #E1306C - Instagram-like magenta (mapped) */
     --primary-foreground: 0 0% 100%; /* #FFFFFF */
     --secondary: 0 0% 95.1%; /* #F3F2EF */
     --secondary-foreground: 0 0% 9.8%; /* #191919 */
     --muted: 0 0% 95.1%; /* #F3F2EF */
     --muted-foreground: 0 0% 40%; /* #666666 */
-    --accent: 210 100% 40%; /* #0A66C2 */
+  --accent: 329 70% 36%; /* #E1306C (mapped) */
     --accent-foreground: 0 0% 100%; /* #FFFFFF */
     --destructive: 0 84.2% 60.2%; /* #D9534F */
     --destructive-foreground: 0 0% 100%; /* #FFFFFF */
     --border: 0 0% 87.8%; /* #E0E0E0 */
     --input: 0 0% 87.8%; /* #E0E0E0 */
-    --ring: 210 100% 40%; /* #0A66C2 */
+  --ring: 329 70% 36%; /* #E1306C (mapped) */
     --radius: 0.5rem;
   }
 
@@ -35,19 +35,20 @@
     --card-foreground: 220 9% 95%; /* #F3F6F8 */
     --popover: 220 13% 10%; /* #1A1D21 */
     --popover-foreground: 220 9% 95%; /* #F3F6F8 */
-    --primary: 210 100% 40%; /* #0A66C2 - LinkedIn Blue (consistent) */
+  /* dark theme: map legacy primary to canonical color variable (Instagram palette) */
+  --primary: 329 70% 36%; /* #E1306C - Instagram-like magenta (mapped) */
     --primary-foreground: 0 0% 100%; /* #FFFFFF */
     --secondary: 220 13% 13%; /* #22272B */
     --secondary-foreground: 220 9% 95%; /* #F3F6F8 */
     --muted: 220 13% 13%; /* #22272B */
     --muted-foreground: 220 6% 65%; /* #A3A6AA */
-    --accent: 210 100% 40%; /* #0A66C2 */
+  --accent: 329 70% 36%; /* #E1306C (mapped) */
     --accent-foreground: 0 0% 100%; /* #FFFFFF */
     --destructive: 0 62.8% 30.6%; /* #D9534F */
     --destructive-foreground: 0 0% 100%; /* #FFFFFF */
     --border: 220 13% 18%; /* #2E3338 */
     --input: 220 13% 18%; /* #2E3338 */
-    --ring: 210 100% 40%; /* #0A66C2 */
+  --ring: 329 70% 36%; /* #E1306C (mapped) */
   }
 }
 

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ArrowRight, UserCircle, Moon, Sun, Clock, Briefcase } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -345,8 +347,9 @@ const Header = () => {
                 size="sm"
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
+                className={`transition-all duration-300 rounded-full border ${isDark ? 'bg-black text-white border-[var(--color-primary)] hover:bg-gray-200' : 'bg-white text-black border-[var(--color-primary)] hover:bg-[var(--color-primaryLight)]'}`}
               >
-                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                {isDark ? <Sun className="w-5 h-5 text-white" /> : <Moon className="w-5 h-5 text-[var(--color-primary)]" />}
               </Button>
 
               {/* Notifications */}
@@ -375,8 +378,9 @@ const Header = () => {
                 size="sm"
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
+                className={`transition-all duration-300 rounded-full border ${isDark ? 'bg-black text-white border-[var(--color-primary)] hover:bg-gray-200' : 'bg-white text-black border-[var(--color-primary)] hover:bg-[var(--color-primaryLight)]'}`}
               >
-                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                {isDark ? <Sun className="w-5 h-5 text-white" /> : <Moon className="w-5 h-5 text-[var(--color-primary)]" />}
               </Button>
               <Button
                 variant="ghost"

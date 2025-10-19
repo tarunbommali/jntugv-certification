@@ -26,7 +26,7 @@ const UserAvatar = ({ currentUser, userProfile, navigate }) => {
     return (
         <button
             onClick={() => navigate("/profile")}
-            className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-2 p-1 rounded-full  transition-colors"
             title={`View Profile: ${currentUser.email}`}
         >
             {photoUrl && !imageLoadError ? (

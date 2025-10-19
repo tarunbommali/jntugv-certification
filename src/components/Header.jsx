@@ -227,9 +227,7 @@ const Header = () => {
                 className="w-12 h-12 mr-2 md:w-14 md:h-14"
               />
               <div className="flex flex-col leading-tight">
-                <span
-                  className="text-xl md:text-2xl font-bold text-primary"
-                >
+                <span className="text-xl md:text-2xl font-bold text-primary">
                   NxtGen Certification
                 </span>
                 <span className="text-xs md:text-sm text-low hidden sm:flex">
@@ -251,19 +249,38 @@ const Header = () => {
               {/* Admin Mode Toggle */}
               {isAdminUser && (
                 <div
-                  className="flex items-center gap-2 border-r pr-4 mr-2"
-                  style={{ borderColor: "var(--color-border)" }}
+                  className={`flex items-center gap-2 border-r pr-4 mr-2 transition-colors duration-300 
+    ${isDark ? "border-[#2E3338]" : "border-[#E0E0E0]"}`}
                 >
-                  <Shield className="w-4 h-4 text-medium" />
-                  <span className="text-sm text-medium">Admin</span>
-                  <button
-                    onClick={handleAdminModeToggle}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                      isAdminMode ? "bg-primary" : "bg-disabled"
+                  <Shield
+                    className={`w-4 h-4 transition-colors duration-300 ${
+                      isDark ? "text-[#A3A6AA]" : "text-[#666666]"
+                    }`}
+                  />
+                  <span
+                    className={`text-sm font-medium transition-colors duration-300 ${
+                      isDark ? "text-[#F3F6F8]" : "text-[#191919]"
                     }`}
                   >
+                    Admin
+                  </span>
+
+                  {/* Admin Mode Toggle Button */}
+                  <button
+                    onClick={handleAdminModeToggle}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 
+      ${
+        isAdminMode
+          ? isDark
+            ? "bg-[#378FE9]" // Lighter blue in dark mode
+            : "bg-[#0A66C2]" // LinkedIn blue in light mode
+          : isDark
+          ? "bg-[#444B52]" // Gray background in dark mode
+          : "bg-[#D1D5DB]" // Light gray in light mode
+      }`}
+                  >
                     <span
-                      className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
                         isAdminMode ? "translate-x-5" : "translate-x-1"
                       }`}
                     />
@@ -275,12 +292,11 @@ const Header = () => {
               <button
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
-                className="p-2 rounded-full hover:opacity-80 transition focus-ring"
-                style={{
-                  background: "transparent",
-                  color: "var(--color-textHigh)",
-                  border: "1px solid var(--color-border)",
-                }}
+                className={`transition-all duration-300 rounded-full  ${
+                  isDark
+                    ? "bg-black text-white border-[var(--color-primary)] "
+                    : "bg-white text-black border-[var(--color-primary)] ]"
+                }`}
               >
                 {isDark ? (
                   <Sun className="w-5 h-5" />
