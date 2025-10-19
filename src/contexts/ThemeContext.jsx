@@ -3,15 +3,15 @@ import { createContext, useContext, useEffect, useMemo, useState, useCallback } 
 const STORAGE_KEY = 'app_theme';
 const DEFAULT_THEME = 'light';
 
-// App color system — use Instagram-like palette (centralized in src/index.css)
+// Comprehensive color system based on the provided specification
 const THEME_COLORS = {
     light: {
-        // Primary Brand Colors (Instagram pink)
-        primary: '#155dfc',
+        // Primary Accent (Instagram-like)
+        primary: '#E1306C',
         primaryHover: '#C13584',
         primaryLight: '#FFF0F6',
 
-        // Background Colors
+        // Background
         background: '#FFFFFF',
         backgroundAlt: '#FAFAFA',
 
@@ -39,34 +39,27 @@ const THEME_COLORS = {
         disabled: '#E0E0E0',
     },
     dark: {
-        // Primary Brand Colors (Instagram pink)
         primary: '#155dfc',
         primaryHover: '#F77737',
         primaryLight: '#2C2C2C',
 
-        // Background Colors
         background: '#121212',
         backgroundAlt: '#181818',
 
-        // Surface/Card Background
         surface: '#1F1F1F',
         surfaceElevated: '#242424',
 
-        // Text Colors
         textHigh: '#F5F5F5',
         textMedium: '#B0B0B0',
         textLow: '#6E6E6E',
 
-        // Feedback Colors
         success: '#34D399',
         error: '#F87171',
         warning: '#FBBF24',
 
-        // Border and Divider
         border: '#2E2E2E',
         divider: '#2E2E2E',
 
-        // Interactive States
         hover: '#2A2A2A',
         active: '#E1306C22',
         disabled: '#555555',

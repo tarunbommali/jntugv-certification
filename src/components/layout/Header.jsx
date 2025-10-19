@@ -347,7 +347,7 @@ const Header = () => {
                 size="sm"
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
-                className={`transition-all duration-300 rounded-full border ${isDark ? 'bg-black text-white border-[var(--color-primary)] hover:bg-gray-200' : 'bg-white text-black border-[var(--color-primary)] hover:bg-[var(--color-primaryLight)]'}`}
+                className={`transition-all duration-300 rounded-full border ${isDark ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)] hover:bg-[var(--color-primaryHover)]' : 'bg-white text-[var(--color-primary)] border-[var(--color-primary)] hover:bg-[var(--color-primaryLight)]'}`}
               >
                 {isDark ? <Sun className="w-5 h-5 text-white" /> : <Moon className="w-5 h-5 text-[var(--color-primary)]" />}
               </Button>
@@ -378,7 +378,7 @@ const Header = () => {
                 size="sm"
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
-                className={`transition-all duration-300 rounded-full border ${isDark ? 'bg-black text-white border-[var(--color-primary)] hover:bg-gray-200' : 'bg-white text-black border-[var(--color-primary)] hover:bg-[var(--color-primaryLight)]'}`}
+                className={`transition-all duration-300 rounded-full border ${isDark ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)] hover:bg-[var(--color-primaryHover)]' : 'bg-white text-[var(--color-primary)] border-[var(--color-primary)] hover:bg-[var(--color-primaryLight)]'}`}
               >
                 {isDark ? <Sun className="w-5 h-5 text-white" /> : <Moon className="w-5 h-5 text-[var(--color-primary)]" />}
               </Button>
