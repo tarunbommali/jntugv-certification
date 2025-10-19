@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { testimonials } from "../../utils/constants.js";
@@ -22,7 +23,7 @@ const Testimonial = () => {
 
   return (
     <div className={`${global_classnames.width.container} mx-auto p-2 py-8 md:p-6 text-center`}>
-      <h2 className="text-2xl font-bold mb-6 text-[#004080]">
+      <h2 className="text-2xl font-bold mb-6 text-[var(--color-primary)]">
         What Our Students Say
       </h2>
 
@@ -34,7 +35,7 @@ const Testimonial = () => {
           {/* Previous Icon */}
           <button
             onClick={prevTestimonial}
-            className="p-2 rounded-full bg-[#004080] text-white hover:bg-[#003366]"
+            className="p-2 rounded-full bg-[var(--color-primary)] text-white hover:bg-[var(--color-primaryHover)]"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
@@ -47,13 +48,13 @@ const Testimonial = () => {
               className="w-24 h-24 rounded-full object-cover mb-4"
             />
             <p className="italic text-gray-700 mb-2">"{text}"</p>
-            <h3 className="font-semibold text-lg text-[#183b56]">{name}</h3>
+            <h3 className="font-semibold text-lg text-[var(--color-textMedium)]">{name}</h3>
           </div>
 
           {/* Next Icon */}
           <button
             onClick={nextTestimonial}
-            className="p-2 rounded-full bg-[#004080] text-white hover:bg-[#003366]"
+            className="p-2 rounded-full bg-[var(--color-primary)] text-white hover:bg-[var(--color-primaryHover)]"
           >
             <ChevronRight className="h-6 w-6" />
           </button>

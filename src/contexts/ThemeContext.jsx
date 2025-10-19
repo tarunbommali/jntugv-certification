@@ -7,7 +7,7 @@ const DEFAULT_THEME = 'light';
 const THEME_COLORS = {
     light: {
         // Primary Accent (Instagram-like)
-        primary: '#E1306C',
+        primary: '#155dfc',
         primaryHover: '#C13584',
         primaryLight: '#FFF0F6',
 

@@ -46,7 +46,7 @@ const SignIn = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center justify-center space-x-2">
             <img src={logo} alt="JNTU-GV Logo" className="w-16 h-16" />
-            <span className="text-2xl font-extrabold text-[#004080]">
+            <span className="text-2xl font-extrabold text-[var(--color-primary)]">
               NxtGen Certification
             </span>
           </Link>
@@ -69,7 +69,7 @@ const SignIn = () => {
             {/* Input fields are wrapped in a div for consistent spacing */}
             <div>
               <input
-                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-[#004080] focus:border-[#004080] outline-none transition"
+                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -79,7 +79,7 @@ const SignIn = () => {
             </div>
             <div>
               <input
-                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-[#004080] focus:border-[#004080] outline-none transition"
+                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -92,9 +92,9 @@ const SignIn = () => {
             <button
               disabled={loading}
               type="submit"
-              className={`w-full text-white py-3 rounded-lg font-semibold transition-colors shadow-md flex items-center justify-center gap-2 ${
-                loading ? "bg-gray-500 cursor-not-allowed" : "bg-[#004080] hover:bg-[#003366]"
-            }`}
+        className={`w-full text-white py-3 rounded-lg font-semibold transition-colors shadow-md flex items-center justify-center gap-2 ${
+        loading ? "bg-gray-500 cursor-not-allowed" : "bg-[var(--color-primary)] hover:bg-[var(--color-primaryHover)]"
+      }`}
           >
             {loading && <Loader2 className="w-5 h-5 animate-spin" />}
             {loading ? "Signing In..." : (
@@ -136,7 +136,7 @@ const SignIn = () => {
           Don’t have an account?{" "}
           <Link
             to="/auth/signup"
-            className="text-[#004080] font-bold hover:underline"
+            className="text-[var(--color-primary)] font-bold hover:underline"
           >
             Sign Up
           </Link>

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-console */
 // src/pages/admin/AdminCoupons.jsx
 
 import { useState } from "react";
@@ -23,7 +25,6 @@ const items = [
   { label: "Admin", link: "/admin" },
   { label: "Coupons", link: "/admin/coupons" },
 ];
-
 
 const AdminCoupons = () => {
   const { isAdmin } = useAuth();
@@ -60,7 +61,7 @@ const AdminCoupons = () => {
 
   return (
     <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
-        {/* Page Title */}
+      {/* Page Title */}
       <PageTitle
         title="Coupon Management"
         description="Manage discount codes and promotional offers"

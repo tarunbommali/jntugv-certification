@@ -104,14 +104,14 @@ const Hero = () => {
     >
       <div className={`${global_classnames.width.container}   mx-auto px-6`}>
         {/* Main Title: Top and Center */}
-        <motion.h1
+          <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-3xl md:text-5xl font-semibold text-primary mb-16 leading-tight"
         >
           JNTU-GV State University
-          <span className="text-[#0056b3]"> Certification </span> in Advanced
+          <span className="text-[var(--color-primary)]"> Certification </span> in Advanced
           Technologies
         </motion.h1>
 
@@ -125,7 +125,7 @@ const Hero = () => {
           >
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 border-b-2 border-yellow-400 pb-2">
               Transform Your Career with{" "}
-              <span className="text-[#0056b3]">Industry-Relevant Skills</span>
+              <span className="text-[var(--color-primary)]">Industry-Relevant Skills</span>
             </h2>
 
             <p className="text-xl text-gray-700 leading-relaxed">
@@ -150,7 +150,7 @@ const Hero = () => {
                 <motion.li
                   key={idx}
                   variants={itemVariants}
-                  className="flex items-center gap-2 bg-[#004080] text-white font-medium px-4 py-3 rounded-xl shadow-lg hover:bg-[#0056b3] transition duration-300"
+                  className="flex items-center gap-2 bg-[var(--color-primary)] text-white font-medium px-4 py-3 rounded-xl shadow-lg hover:bg-[var(--color-primaryHover)] transition duration-300"
                 >
                   <CheckCircle className="h-5 w-5 text-yellow-400 min-w-5" />
                   <span className="text-sm md:text-base">{tech}</span>
@@ -160,7 +160,7 @@ const Hero = () => {
 
             {/* CTA Button */}
             <motion.div variants={itemVariants} className="pt-6">
-              <button className="bg-yellow-500 text-[#004080] font-bold text-lg px-8 py-4 rounded-full shadow-xl hover:bg-yellow-400 transform hover:scale-[1.02] transition duration-300">
+              <button className="bg-yellow-500 text-[var(--color-primary)] font-bold text-lg px-8 py-4 rounded-full shadow-xl hover:bg-yellow-400 transform hover:scale-[1.02] transition duration-300">
                 View All Courses & Enroll Now →
               </button>
             </motion.div>
