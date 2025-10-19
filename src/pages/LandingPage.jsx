@@ -1,7 +1,7 @@
-import React from 'react';
+import 'react';
 import PageContainer from '../components/layout/PageContainer';
 import Hero from '../components/landing/Hero';
-import CourseList from '../components/course/CourseList';
+import CourseList from '../components/Course/CourseList';
 import About from '../components/landing/About';
 import ContactSection from '../components/landing/ContactSection';
 import Skills from '../components/landing/Skills';

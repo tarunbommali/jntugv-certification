@@ -8,7 +8,12 @@ import { global_classnames } from '../../utils/classnames.js';
 import { getAllUsersData, createUserWithCredentials } from '../../firebase/services_modular/userOperations';
 import { getAllCourses } from '../../firebase/services_modular/courseOperations';
 import { createEnrollment } from '../../firebase/services_modular/enrollmentOperations';
+import PageContainer from '../../components/layout/PageContainer.jsx';
+const items = [
+    { label: 'Admin', link: '/admin' },
+    { label: 'User Management', link: '/admin/users' },
 
+]
 const UsersManagement = () => {
     const { isAdmin } = useAuth();
     const [users, setUsers] = useState([]);
@@ -149,10 +154,7 @@ const UsersManagement = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
-                
-                {/* Header */}
+        <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
                 <div className="mb-8">
                     <div className="flex items-center gap-4 mb-4">
                         
@@ -459,8 +461,8 @@ const UsersManagement = () => {
                         </div>
                     </div>
                 )}
-            </div>
-        </div>
+            
+        </PageContainer>
     );
 };
 

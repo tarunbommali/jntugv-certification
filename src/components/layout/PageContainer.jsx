@@ -1,39 +1,12 @@
-import React from 'react';
-import { cn } from '../../utils/cn';
+import BreadCrumbs from "../ui/breadcrumbs/Breadcrumbs.jsx";
 
-const PageContainer = ({ 
-  children, 
-  className, 
-  maxWidth = 'xl',
-  padding = 'default',
-  ...props 
-}) => {
-  const maxWidthClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-7xl',
-    '2xl': 'max-w-8xl',
-    full: 'max-w-full'
-  };
-
-  const paddingClasses = {
-    none: '',
-    sm: 'px-2',
-    default: 'px-4 sm:px-6 lg:px-8',
-    lg: 'px-6 sm:px-8 lg:px-12'
-  };
-
+const PageContainer = ({ children, className, items, ...props }) => {
   return (
     <div
-      className={cn(
-        'mx-auto w-full',
-        maxWidthClasses[maxWidth],
-        paddingClasses[padding],
-        className
-      )}
+      className={` min-h-screen lg:px-18 md:px-4 sm:px-0 xl:max-w-8xl `}
       {...props}
     >
+      {items && <BreadCrumbs items={items} />}
       {children}
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useRealtimeCourse, useRealtimeEnrollmentStatus, useRealtimeEnrollmentMutations } from '../hooks/useRealtimeFirebase';
@@ -9,8 +9,9 @@ import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import { Alert, AlertDescription, AlertIcon } from '../components/ui/Alert';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import Breadcrumbs from '../components/ui/breadcrumbs.jsx/Breadcrumbs';
+import Breadcrumbs from '../components/ui/breadcrumbs/Breadcrumbs';
 import { Clock, Globe, Star, Award, CheckCircle, Users, BookOpen } from 'lucide-react';
+import Pagecontainer from '../components/layout/PageContainer';
 
 const CourseDetailsPage = () => {
   const { courseId } = useParams();
@@ -63,9 +64,8 @@ const CourseDetailsPage = () => {
 
   if (courseLoading) {
     return (
-      <PageContainer className="min-h-screen">
-        <Breadcrumbs items={breadcrumbItems} />
-        <div className="mt-8">
+      <PageContainer items={breadcrumbItems} className="min-h-screen">
+         <div className="mt-8">
           <LoadingSpinner size="lg" message="Loading course details..." />
         </div>
       </PageContainer>
@@ -74,9 +74,8 @@ const CourseDetailsPage = () => {
 
   if (courseError || !course) {
     return (
-      <PageContainer className="min-h-screen">
-        <Breadcrumbs items={breadcrumbItems} />
-        <Alert variant="destructive" className="mt-8">
+      <PageContainer items={breadcrumbItems} className="min-h-screen">
+         <Alert variant="destructive" className="mt-8">
           <AlertIcon variant="destructive" />
           <AlertDescription>
             {courseError || "Course not found"}
@@ -90,9 +89,8 @@ const CourseDetailsPage = () => {
   const originalPrice = Number(course.originalPrice) || (price + 2000);
 
   return (
-    <PageContainer className="min-h-screen py-8">
-      <Breadcrumbs items={breadcrumbItems} />
-
+    <PageContainer items={breadcrumbItems} className="min-h-screen py-8">
+ 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">

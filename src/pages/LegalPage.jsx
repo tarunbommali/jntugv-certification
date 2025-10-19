@@ -1,7 +1,7 @@
-import React from "react";
+import "react";
 import { useParams } from "react-router-dom";
 import { global_classnames } from "../utils/classnames.js";
-import Breadcrumbs from "../components/ui/breadcrumbs.jsx/Breadcrumbs.jsx";
+import Breadcrumbs from "../components/ui/breadcrumbs/Breadcrumbs.jsx";
 
 // ---------------- Legal Content ----------------
 const legalContent = {

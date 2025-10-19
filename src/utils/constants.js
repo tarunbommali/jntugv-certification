@@ -1,5 +1,5 @@
 import { Globe, Briefcase, Computer } from "lucide-react";
-import { Brain, Cpu, Shield, Zap, Atom } from "lucide-react";
+// removed unused lucide-react icons to satisfy linter
 
 export const cardList = [
   { title: "Industry Ready", icon: Briefcase, subtitle: "Practical Projects" },

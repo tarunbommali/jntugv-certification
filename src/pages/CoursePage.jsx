@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useRealtime } from '../contexts/RealtimeContext';
-import PageContainer from '../components/layout/PageContainer';
-import CourseList from '../components/Course/CourseList';
-import Breadcrumbs from '../components/ui/breadcrumbs.jsx/Breadcrumbs';
-import { Alert, AlertDescription, AlertIcon } from '../components/ui/Alert';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useRealtime } from "../contexts/RealtimeContext";
+import PageContainer from "../components/layout/PageContainer";
+import CourseList from "../components/Course/CourseList";
+import Breadcrumbs from "../components/ui/breadcrumbs/Breadcrumbs";
+import { Alert, AlertDescription, AlertIcon } from "../components/ui/Alert";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const CoursePage = () => {
   const { currentUser, isAuthenticated } = useAuth();
-  const { courses, coursesLoading, coursesError, enrollments, enrollmentsLoading, isEnrolled } = useRealtime();
+  const {
+    courses,
+    coursesLoading,
+    coursesError,
+    enrollments,
+    enrollmentsLoading,
+    isEnrolled,
+  } = useRealtime();
   const [enrollmentStatus, setEnrollmentStatus] = useState({});
 
   const breadcrumbItems = [
@@ -28,15 +35,14 @@ const CoursePage = () => {
       acc[course.id] = isEnrolled(course.id);
       return acc;
     }, {});
-    
+
     setEnrollmentStatus(status);
   }, [courses, enrollments, isAuthenticated, currentUser, isEnrolled]);
 
   // Show loading state
   if (coursesLoading || enrollmentsLoading) {
     return (
-      <PageContainer className="min-h-screen">
-        <Breadcrumbs items={breadcrumbItems} />
+      <PageContainer className="min-h-screen" items={breadcrumbItems}>
         <div className="mt-8">
           <LoadingSpinner size="lg" message="Loading courses..." />
         </div>
@@ -45,22 +51,20 @@ const CoursePage = () => {
   }
 
   return (
-    <PageContainer className="min-h-screen">
-      <Breadcrumbs items={breadcrumbItems} />
-
+    <PageContainer className="min-h-screen" items={breadcrumbItems}>
       {/* Error Messages */}
       {coursesError && (
         <Alert variant="destructive" className="mt-4">
           <AlertIcon variant="destructive" />
-          <AlertDescription>
-            {coursesError}
-          </AlertDescription>
+          <AlertDescription>{coursesError}</AlertDescription>
         </Alert>
       )}
 
       {/* Page Title */}
       <div className="mt-8 mb-6">
-        <h1 className="text-3xl font-bold text-foreground">Available Courses</h1>
+        <h1 className="text-3xl font-bold text-foreground">
+          Available Courses
+        </h1>
         <p className="text-muted-foreground mt-2">
           Explore our comprehensive certification programs
         </p>

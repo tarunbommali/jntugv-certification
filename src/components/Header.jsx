@@ -1,241 +1,140 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
-import { Menu, X, ArrowRight, UserCircle, Moon, Sun, Clock, Briefcase } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, ArrowRight, UserCircle, Moon, Sun, Clock, Briefcase, Shield } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo.jpg";
 import useCountdownTimer from "../hooks/useCountdownTimer";
-import OfferModal from "./ui/modal/OfferModal.jsx"; // Assumed to exist
-import Contact from './ui/modal/Contact.jsx' // Assumed to exist
-import { useAuth } from "../contexts/AuthContext.jsx"; // Assumed to provide isAdmin
+import OfferModal from "./ui/modal/OfferModal.jsx";
+import Contact from './ui/modal/Contact.jsx'
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { global_classnames } from "../utils/classnames.js";
-import { useTheme } from "../contexts/ThemeContext.jsx"; // Assumed to exist
+import { useTheme } from "../contexts/ThemeContext.jsx";
+import UserAvatar from './UserAvatar';
+import TopOfferBar from "./TopOfferBar.jsx";
+import MobileNavigationDrawer from "./MobileNavigationDrawer.jsx";
 
-// --- Local Storage Key ---
+// --- Local Storage Keys ---
 const OFFER_DISMISSED_KEY = "nxtgen_offer_dismissed";
+const ADMIN_MODE_KEY = "nxtgen_admin_mode";
 
-// Helper function to get initials for placeholder avatar
-const getInitials = (name) => {
-    if (!name) return "U";
-    const parts = name.split(" ");
-    if (parts.length > 1) {
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-};
-
-// --- 1. User Avatar Component (Refactored for cleaner imports) ---
-const UserAvatar = ({ currentUser, userProfile, navigate }) => {
-    const photoUrl = currentUser?.photoURL;
-    const name = userProfile?.name || currentUser?.displayName || currentUser?.email?.split("@")[0];
-    const initials = getInitials(name);
-    const [imageLoadError, setImageLoadError] = useState(false);
-
-    useEffect(() => {
-        setImageLoadError(false);
-    }, [photoUrl]);
-
-    return (
-        <button
-            onClick={() => navigate("/profile")}
-            className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
-            title={`View Profile: ${currentUser.email}`}
-        >
-            {photoUrl && !imageLoadError ? (
-                <img
-                    src={photoUrl}
-                    alt="User Profile"
-                    className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
-                    onError={() => setImageLoadError(true)}
-                />
-            ) : (
-                <div className="w-10 h-10 p-2 rounded-full border-amber-200 border-2 bg-blue-600 text-white flex items-center justify-center font-light text-lg">
-                    {initials}
-                </div>
-            )}
-        </button>
-    );
-};
-
-// --- 2. Top Offer Bar Component (Refactored for reusability) ---
-const TopOfferBar = ({ formattedTime, handleDismissOffer, setIsContactModalOpen, setIsOfferModalOpen }) => {
-    return (
-        <div className="w-full text-white py-2 shadow-inner z-50 bg-[#004080]">
-            <div
-                className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-center text-sm font-semibold relative`}
-            >
-                {/* Contact Link */}
-                <button
-                    className="hidden md:flex items-center gap-1 text-gray-300 hover:text-white transition-colors"
-                    onClick={() => setIsContactModalOpen(true)}
-                >
-                    New Course Enquiry: India - +91 7780351078
-                </button>
-
-                {/* Offer Countdown Button */}
-                <button
-                    className="flex items-center gap-2 cursor-pointer text-[#f1f1f1] rounded-full px-4 py-1.5 transition-all text-xs sm:text-sm shadow-lg mx-auto md:mx-0"
-                    style={{ background: "#18bc62" }}
-                    onClick={() => setIsOfferModalOpen(true)}
-                >
-                    <Clock className="w-4 h-4" /> Career Level Up Offer! Ends in: **{formattedTime}**
-                    <ArrowRight className="w-4 h-4 ml-1" />
-                </button>
-
-                {/* Close Button */}
-                <button
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 p-1 text-gray-300 hover:text-white transition-colors text-right"
-                    onClick={handleDismissOffer}
-                    aria-label="Dismiss offer bar"
-                >
-                    <X className="w-5 h-5" />
-                </button>
-            </div>
-        </div>
-    );
-};
-
-// --- 3. Mobile Navigation Drawer (Refactored for reusability) ---
-const MobileNavigationDrawer = ({ 
-    setIsMenuOpen, 
-    navigate, 
-    isAuthenticated, 
-    currentUser, 
-    handleLogout, 
-    setIsContactModalOpen,
-    isAdmin
-}) => {
+const NavigationMenu = ({ isAdminMode, isAdminUser }) => {
+    const location = useLocation();
     
-    // Helper to close menu and navigate
-    const handleMobileLinkClick = (href) => {
-        setIsMenuOpen(false);
-        navigate(href);
+    // Standard user navigation
+    const userNavMenu = [
+        { id: 'courses', name: 'Courses', link: '/courses' }
+    ];
+
+    // Admin navigation
+    const adminNavMenu = [
+        { id: 'admin', name: 'Dashboard', link: '/admin' },
+        { id: 'analytics', name: 'Analytics', link: '/admin/analytics' },
+        { id: 'users', name: 'Users', link: '/admin/users' },
+        { id: 'courses', name: 'Courses', link: '/admin/courses' },
+        { id: 'coupons', name: 'Coupons', link: '/admin/coupons' },
+    ];
+
+    const navMenu = isAdminMode ? adminNavMenu : userNavMenu;
+    const BORDER_COLOR = 'border-blue-600';
+
+    // Function to check if a nav item is active based on current path
+    const isActiveNav = (navLink) => {
+        if (navLink === '/admin' && location.pathname === '/admin') {
+            return true;
+        }
+        if (navLink !== '/admin' && location.pathname.startsWith(navLink)) {
+            return true;
+        }
+        return false;
     };
 
     return (
-        <>
-            {/* Backdrop */}
-            <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-                onClick={() => setIsMenuOpen(false)}
-            />
-            {/* Drawer Content */}
-            <div className="fixed top-0 right-0 w-64 xs:w-72 sm:w-80 h-full p-6 shadow-2xl z-50 transition-transform transform translate-x-0 ease-in-out duration-300 animate-slide-in-right" style={{ background: "var(--color-card)" }}>
-
-                {/* Drawer Header (Close Button) */}
-                <div className="flex justify-end mb-8">
-                    <button
-                        className="p-2"
-                        style={{ color: "var(--color-primary)" }}
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        <X className="h-6 w-6" />
-                    </button>
-                </div>
-
-                {/* Navigation Links */}
-                <nav className="flex flex-col space-y-4 border-b border-gray-200 pb-6">
-                    
-                    {/* Admin Link (Mobile) */}
-                    {isAdmin && (
-                        <button
-                            onClick={() => handleMobileLinkClick("/admin")}
-                            className="text-xl font-semibold text-amber-600 hover:text-amber-800 transition-colors py-2 border-b border-gray-100 text-left flex items-center gap-2"
-                        >
-                            <Briefcase className="w-6 h-6" />
-                            Admin Dashboard
-                        </button>
-                    )}
-
-                    {/* Profile Link */}
-                    {isAuthenticated && (
-                        <button
-                            onClick={() => handleMobileLinkClick("/profile")}
-                            className="text-xl font-semibold text-blue-600 hover:text-blue-800 transition-colors py-2 border-b border-gray-100 text-left flex items-center gap-2"
-                        >
-                            <UserCircle className="w-6 h-6" />
-                            Profile
-                        </button>
-                    )}
-
+        <nav className="flex overflow-x-auto border-r pr-4 mr-2" style={{ borderColor: 'var(--color-border)' }}>
+            {navMenu.map((nav) => {
+                const isActive = isActiveNav(nav.link);
+                return (
                     <Link
-                        to="/courses"
-                        onClick={() => handleMobileLinkClick("/courses")}
-                        className="text-xl font-semibold transition-colors py-2 text-left"
-                        style={{ color: "var(--color-text)", borderBottom: "1px solid var(--color-border)" }}
+                        to={nav.link}
+                        key={nav.id}
+                        className={`
+                            flex items-center gap-2 px-3 py-1  text-sm font-medium whitespace-nowrap transition-all duration-200
+                            ${isActive
+                                ? ` text-blue-600 font-semibold`
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }
+                        `}
                     >
-                        Courses
+                        <span>{nav.name}</span>
                     </Link>
-                    
-                    {/* Mobile Contact Button */}
-                    <button
-                        onClick={() => {
-                            setIsMenuOpen(false);
-                            setIsContactModalOpen(true);
-                        }}
-                        className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors py-2 border-b border-gray-100 text-left"
-                    >
-                        Contact
-                    </button>
-                </nav>
-
-                {/* Mobile Auth/User Status */}
-                <div className="mt-8">
-                    {isAuthenticated ? (
-                        <div className="flex flex-col items-start space-y-3">
-                            <p className="text-base font-medium" style={{ color: "var(--color-text)" }}>
-                                Signed in as: <br />
-                                <strong className="break-all" style={{ color: "var(--color-primary)" }}>
-                                    {currentUser?.email}
-                                </strong>
-                            </p>
-                            <button
-                                onClick={handleLogout}
-                                className="w-full h-12 rounded-md text-white text-base font-medium hover:opacity-90 transition-colors shadow-md"
-                                style={{ background: "#dc2626" }}
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => handleMobileLinkClick("/auth/signin")}
-                            className="w-full h-12 rounded-md text-white text-base font-medium hover:opacity-90 transition-shadow shadow-md"
-                            style={{ background: "var(--color-primary)" }}
-                        >
-                            Login to Enroll
-                        </button>
-                    )}
-                </div>
-            </div>
-        </>
-    )
-}
-
-// --- 4. Main Header Component (The Parent) ---
+                );
+            })}
+        </nav>
+    );
+};
 
 const Header = () => {
-    const { toggleTheme, isDark, isAdmin } = useTheme(); // Assuming isAdmin is available via useTheme/useAuth setup
-    const { isAuthenticated, currentUser, userProfile, logout, isAdmin: isUserAdmin } = useAuth(); // Destructure isAdmin from useAuth
+    const { toggleTheme, isDark } = useTheme();
+    const { isAuthenticated, currentUser, userProfile, logout, isAdmin: isUserAdmin } = useAuth();
     
     // --- State & Handlers ---
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
     const [isOfferBarVisible, setIsOfferBarVisible] = useState(true);
-    const [activeAdminnav, setActiveAdminnav] = useState('Admin'); // State for admin nav selection
+    const [isAdminMode, setIsAdminMode] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
     const formattedTime = useCountdownTimer(9 * 3600 + 17 * 60 + 10);
     
     // Determine if the user is an admin
-    const isAdminUser = isUserAdmin; 
+    const isAdminUser = isUserAdmin;
 
-    // Load initial visibility state from localStorage on mount
+    // Load admin mode from localStorage on component mount
     useEffect(() => {
+        const savedAdminMode = localStorage.getItem(ADMIN_MODE_KEY);
+        if (savedAdminMode !== null) {
+            setIsAdminMode(savedAdminMode === 'true');
+        }
+        
         const dismissed = localStorage.getItem(OFFER_DISMISSED_KEY);
         if (dismissed === 'true') {
             setIsOfferBarVisible(false);
         }
     }, []);
+
+    // Save admin mode to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem(ADMIN_MODE_KEY, isAdminMode.toString());
+    }, [isAdminMode]);
+
+    // Reset admin mode when user logs out
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setIsAdminMode(false);
+            localStorage.setItem(ADMIN_MODE_KEY, 'false');
+        }
+    }, [isAuthenticated]);
+
+    // Auto-manage admin mode based on current route (except profile route)
+    useEffect(() => {
+        const isAdminRoute = location.pathname.startsWith('/admin');
+        const isProfileRoute = location.pathname === '/profile';
+        
+        // Don't change admin mode when navigating to profile
+        if (isProfileRoute) {
+            return;
+        }
+        
+        // Auto-disable admin mode if not on admin routes
+        if (!isAdminRoute && isAdminMode) {
+            setIsAdminMode(false);
+        }
+        
+        // Auto-enable admin mode if on admin routes
+        if (isAdminRoute && !isAdminMode && isAdminUser) {
+            setIsAdminMode(true);
+        }
+    }, [location.pathname, isAdminMode, isAdminUser]);
 
     // Handler: Dismiss the offer bar and save the preference
     const handleDismissOffer = () => {
@@ -243,26 +142,30 @@ const Header = () => {
         localStorage.setItem(OFFER_DISMISSED_KEY, 'true');
     };
 
+    // Handle admin mode toggle
+    const handleAdminModeToggle = () => {
+        const newMode = !isAdminMode;
+        setIsAdminMode(newMode);
+        
+        if (newMode) {
+            // If turning on admin mode, redirect to admin dashboard
+            navigate("/admin");
+        } else {
+            // If turning off admin mode, redirect to home page
+            navigate("/");
+        }
+    };
+
     const handleLogout = async () => {
         try {
             await logout();
+            setIsAdminMode(false);
+            localStorage.setItem(ADMIN_MODE_KEY, 'false');
             navigate("/");
         } catch (error) {
             console.error("Logout failed:", error);
         }
     };
-
-    // Admin Navigation Menu Definition
-    const AdminNavMenu = [
-        {id:"Admin", name:"Admin", link:"/admin" },
-        { id: 'Analytics', name: 'Analytics', link: "/admin/analytics" },
-        { id: 'users', name: 'Users', link: "/admin/users" },
-        { id: 'courses', name: 'Courses', link: "/admin/courses" },
-        { id: 'coupons', name: 'Coupons', link: "/admin/coupons" },
-    ];
-    
-    // CSS Variables for Admin nav
-    const BORDER_COLOR = 'border-blue-600'; 
 
     return (
         <>
@@ -287,7 +190,7 @@ const Header = () => {
             {/* Main Header (Sticky for desktop) */}
             <header className="sticky top-0 z-40 shadow-sm" style={{ background: "var(--color-card)", borderBottom: "1px solid var(--color-border)" }}>
                 <div
-                    className={`${global_classnames.width.container}  mx-auto px-4 sm:px-6 lg:px-8`}
+                    className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 `}
                 >
                     <div className="flex h-20 items-center justify-between">
                         {/* Logo and Branding */}
@@ -302,45 +205,38 @@ const Header = () => {
                                     NxtGen Certification
                                 </span>
                                 <span className="text-xs md:text-sm text-gray-500 hidden sm:flex">
-                                    <span className="font-semibold  italic">Powered by JNTU GV </span>
+                                    <span className="font-semibold italic">Powered by JNTU GV </span>
                                 </span>
                             </div>
                         </Link>
 
                         {/* Desktop Navigation & Auth Toggle */}
                         <div className="hidden md:flex items-center gap-4">
+                            {/* Navigation Menu (Changes based on admin mode) */}
+                            <NavigationMenu 
+                                isAdminMode={isAdminMode}
+                                isAdminUser={isAdminUser}
+                            />
 
-                            {/* 🚀 Conditional Admin Navigation 🚀 */}
+                            {/* Admin Mode Toggle */}
                             {isAdminUser && (
-                                <nav className="flex overflow-x-auto border-r pr-4 mr-2" style={{ borderColor: 'var(--color-border)' }}>
-                                    {AdminNavMenu.map((nav) => (
-                                        <Link
-                                            to={nav.link}
-                                            key={nav.id}
-                                            onClick={() => setActiveAdminnav(nav.id)}
-                                            className={`
-                                                flex items-center gap-2 px-3 py-1 border-b-2 text-sm font-medium whitespace-nowrap transition-all duration-200
-                                                ${activeAdminnav === nav.id
-                                                    ? `${BORDER_COLOR} text-blue-600 font-semibold`
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                                                }
-                                            `}
-                                        >
-                                             
-                                            <span>{nav.name}</span>
-                                        </Link>
-                                    ))}
-                                </nav>
+                                <div className="flex items-center gap-2 border-r pr-4 mr-2" style={{ borderColor: 'var(--color-border)' }}>
+                                    <Shield className="w-4 h-4 text-gray-500" />
+                                    <span className="text-sm text-gray-600">Admin</span>
+                                    <button
+                                        onClick={handleAdminModeToggle}
+                                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                            isAdminMode ? 'bg-blue-600' : 'bg-gray-300'
+                                        }`}
+                                    >
+                                        <span
+                                            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                                                isAdminMode ? 'translate-x-5' : 'translate-x-1'
+                                            }`}
+                                        />
+                                    </button>
+                                </div>
                             )}
-                            
-                            {/* Standard Courses Link */}
-                            <Link
-                                to="/courses"
-                                className="text-lg font-semibold transition-colors hover:text-blue-600"
-                                style={{ color: "var(--color-text)" }}
-                            >
-                                Courses
-                            </Link>
 
                             {/* Theme toggle (desktop) */}
                             <button
@@ -392,7 +288,7 @@ const Header = () => {
                     </div>
                 </div>
 
-                {/* Mobile Navigation Drawer (Rendered as separate component) */}
+                {/* Mobile Navigation Drawer */}
                 {isMenuOpen && (
                     <MobileNavigationDrawer
                         setIsMenuOpen={setIsMenuOpen}
@@ -401,7 +297,9 @@ const Header = () => {
                         currentUser={currentUser}
                         handleLogout={handleLogout}
                         setIsContactModalOpen={setIsContactModalOpen}
-                        isAdmin={isAdminUser}
+                        isAdminUser={isAdminUser}
+                        isAdminMode={isAdminMode}
+                        setIsAdminMode={handleAdminModeToggle}
                     />
                 )}
             </header>

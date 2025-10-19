@@ -1,7 +1,14 @@
-/* eslint-disable no-unused-vars */
+ 
 import { useState, useEffect } from "react";
-import UserAvatar from './UserAvatar'
 
+const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.split(" ");
+    if (parts.length > 1) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+};
 
 
 const UserAvatar = ({ currentUser, userProfile, navigate }) => {
@@ -13,6 +20,8 @@ const UserAvatar = ({ currentUser, userProfile, navigate }) => {
     useEffect(() => {
         setImageLoadError(false);
     }, [photoUrl]);
+
+    
 
     return (
         <button
@@ -35,6 +44,5 @@ const UserAvatar = ({ currentUser, userProfile, navigate }) => {
         </button>
     );
 };
-
   
   export default UserAvatar;

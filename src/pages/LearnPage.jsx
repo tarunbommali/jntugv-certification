@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 // src/pages/CourseContent.jsx
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useLearnPage } from '../contexts/LearnPageContext.jsx';
