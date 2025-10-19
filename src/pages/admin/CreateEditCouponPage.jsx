@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/admin/CreateEditCouponPage.jsx
 
 import { useEffect } from "react";
@@ -6,8 +7,8 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 import { useCouponLogic } from "../../hooks/useCouponLogic.js";
 import PageContainer from "../../components/layout/PageContainer.jsx";
 import { AlertCircle, Percent, DollarSign, ArrowLeft } from "lucide-react";
-import { global_classnames } from "../../utils/classnames.js";
-// ... other imports (kept minimal)
+
+import PageTitle from "../../components/ui/PageTitle.jsx";
 
 const PRIMARY_COLOR = "#0056D2";
 
@@ -38,8 +39,7 @@ const CreateEditCouponPage = () => {
       // Reset form for create mode
       resetForm();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [couponId, isEditing, loadCouponForEdit]);
+   }, [couponId, isEditing, loadCouponForEdit]);
 
   // ... loading and permission checks (omitted for brevity)
 
@@ -63,14 +63,10 @@ const CreateEditCouponPage = () => {
       items={breadcrumbItems}
       className="min-h-screen bg-gray-50 py-8"
     >
-      <div className="flex flex-col  gap-4 mb-4">
-        <h1 className="text-3xl font-extrabold text-gray-900 italic">
-          {isEditing ? "Edit Coupon" : "Create New Coupon"}
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Define the details and restrictions for this promotional code.
-        </p>
-      </div>
+      <PageTitle
+        title={isEditing ? "Edit Coupon" : "Create New Coupon"}
+        description="Define the details and restrictions for this promotional code."
+      />
 
       {/* Error Message */}
       {error && (

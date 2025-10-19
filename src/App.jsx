@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -27,6 +28,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import ProfileEdit from "./pages/ProfileEdit.jsx";
 import LegalPage from "./pages/LegalPage.jsx";
 import CreateEditCouponPage from "./pages/admin/CreateEditCouponPage.jsx";
+import UserManagementForm from "./pages/admin/UserManagementForm.jsx";
 
 // Lazy load admin components for code splitting
 const AdminPage = lazy(() => import("./pages/admin/AdminPage.jsx"));
@@ -123,6 +125,26 @@ const App = () => {
                           <ProtectedRoute requiredRole="admin">
                             <Suspense fallback={<LoadingScreen />}>
                               <UsersManagement />
+                            </Suspense>
+                          </ProtectedRoute>
+                        }
+                      />
+                       <Route
+                        path="/admin/users/create/new"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <Suspense fallback={<LoadingScreen />}>
+                              <UserManagementForm  />
+                            </Suspense>
+                          </ProtectedRoute>
+                        }
+                      />
+                        <Route
+                        path="/admin/users/manage/:userId"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <Suspense fallback={<LoadingScreen />}>
+                              <UserManagementForm />
                             </Suspense>
                           </ProtectedRoute>
                         }

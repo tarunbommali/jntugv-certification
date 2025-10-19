@@ -22,7 +22,6 @@ const Button = React.forwardRef(({ className, variant = 'primary', size = 'md', 
 
   const classes = cn(baseClasses, variants[variant], sizes[size], className);
 
-  // If asChild is true, render the single child element and merge classes/props
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, { className: cn(classes, children.props.className), ref, ...props });
   }

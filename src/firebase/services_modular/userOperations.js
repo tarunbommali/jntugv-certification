@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   doc,
   getDoc,
@@ -6,7 +7,6 @@ import {
   collection,
   getDocs,
   query,
-  where,
   orderBy,
   limit,
   serverTimestamp,
@@ -55,8 +55,8 @@ export const createOrUpdateUser = async (firebaseUser, additionalData = {}) => {
 
     return { success: true, data: userData };
   } catch (error) {
-    const norm = normalizeFirestoreError(error);
-    console.error("Error creating/updating user:", norm);
+  const norm = normalizeFirestoreError(error);
+  console.error("Error creating/updating user:", norm);
     return { success: false, error: norm.message || norm.code };
   }
 };
@@ -75,8 +75,8 @@ export const getUserProfile = async (uid) => {
       return { success: false, error: "User not found" };
     }
   } catch (error) {
-    const norm = normalizeFirestoreError(error);
-    console.error("Error fetching user profile:", norm);
+  const norm = normalizeFirestoreError(error);
+  console.error("Error fetching user profile:", norm);
     return { success: false, error: norm.message || norm.code };
   }
 };
@@ -95,8 +95,8 @@ export const updateUserProfile = async (uid, updateData) => {
     await updateDoc(userRef, updatePayload);
     return { success: true };
   } catch (error) {
-    const norm = normalizeFirestoreError(error);
-    console.error("Error updating user profile:", norm);
+  const norm = normalizeFirestoreError(error);
+  console.error("Error updating user profile:", norm);
     return { success: false, error: norm.message || norm.code };
   }
 };
@@ -117,13 +117,80 @@ export const getAllUsersData = async (limitCount = 100) => {
 
     return { success: true, data: users };
   } catch (error) {
-    const norm = normalizeFirestoreError(error);
-    console.warn("[getAllUsersData]", norm.code, norm.message);
+  const norm = normalizeFirestoreError(error);
+  console.warn("[getAllUsersData]", norm.code, norm.message);
     return {
       success: false,
       error: norm.code,
       message: `Failed to fetch user list: ${norm.message}`,
     };
+  }
+};
+
+/**
+ * Toggle user account status in Firestore (client-side)
+ * Note: Fully disabling a Firebase Auth account requires the Admin SDK on a trusted backend.
+ */
+export const toggleUserAccountStatus = async (uid, newStatus) => {
+  // Try calling secure Cloud Function first
+  const adminApiUrl = import.meta.env.VITE_ADMIN_API_URL || '/api/admin/toggleUser';
+  try {
+    const current = auth.currentUser;
+    if (current) {
+      const idToken = await current.getIdToken();
+      const resp = await fetch(adminApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ uid, action: newStatus === 'inactive' ? 'disable' : 'enable' })
+      });
+      const data = await resp.json();
+      if (resp.ok && data && data.success) {
+        return { success: true, via: 'function' };
+      }
+      // If function responded but with an error, continue to fallback
+    }
+  } catch (err) {
+    // Network or permission issue - fall back to Firestore update
+    console.warn('Admin function call failed, falling back to Firestore update', err);
+  }
+
+  // Fallback: update the Firestore user document (client-side change only)
+  try {
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, { status: newStatus, updatedAt: serverTimestamp() });
+    return { success: true, via: 'firestore' };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error("Error toggling user account status:", norm);
+    return { success: false, error: norm.message || norm.code };
+  }
+};
+
+/**
+ * Compatibility alias: getUserData
+ * Existing UI expects getUserData; map to getUserProfile
+ */
+export const getUserData = async (uid) => {
+  return await getUserProfile(uid);
+};
+
+/**
+ * Update user's role (isAdmin flag)
+ * newRole: 'admin' | 'student' | other
+ */
+export const updateUserRole = async (uid, newRole) => {
+  try {
+    const isAdmin = String(newRole).toLowerCase() === 'admin';
+    const userRef = doc(db, 'users', uid);
+    await updateDoc(userRef, { isAdmin, updatedAt: serverTimestamp() });
+    return { success: true };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error('Error updating user role:', norm);
+    return { success: false, error: norm.message || norm.code };
   }
 };
 
@@ -157,8 +224,8 @@ export const createUserWithCredentials = async ({ email, password, displayName, 
       }
     };
   } catch (error) {
-    const norm = normalizeFirestoreError(error);
-    console.error("Error creating user with credentials:", norm);
+  const norm = normalizeFirestoreError(error);
+  console.error("Error creating user with credentials:", norm);
     return { success: false, error: norm.message || norm.code };
   }
 };
@@ -170,4 +237,7 @@ export default {
   updateUserProfile,
   getAllUsersData,
   createUserWithCredentials,
+  toggleUserAccountStatus,
+  getUserData,
+  updateUserRole,
 };

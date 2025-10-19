@@ -7,7 +7,7 @@ import { Plus, Search, BookOpen, Users, Star, Clock } from "lucide-react";
 import { global_classnames } from "../../utils/classnames.js";
 import CourseCard from "../../components/Course/CourseCard.jsx";
 import PageContainer from "../../components/layout/PageContainer.jsx";
-
+import PageTitle from "../../components/ui/PageTitle.jsx";
 const items = [
   { label: "Admin", link: "/admin" },
   { label: "Courses", link: "/admin/courses" },
@@ -92,28 +92,25 @@ const Courses = () => {
 
   return (
     <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
-        <div className="flex flex-col  gap-4 mb-4">
-          <div className="flex flex-col">
-            <h1 className="text-3xl font-extrabold text-gray-900 italic">
-              Course Management
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Create and manage platform courses
-            </p>
+      <PageTitle
+        title="Course Management"
+        description="Create and manage platform courses"
+      />
 
-             <div className="flex  sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search courses..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+      <div className="flex  md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <div className="flex  sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex-1 max-w-md">
+            <div className="relative">
+              <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
+
             <Link
               to="/admin/courses/create/new"
               className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -122,57 +119,55 @@ const Courses = () => {
               <span>Create Course</span>
             </Link>
           </div>
-          </div>
-
-         
         </div>
+      </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
-            <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">
-              {courses.length}
-            </div>
-            <div className="text-sm text-gray-600">Total Courses</div>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+          <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+          <div className="text-2xl font-bold text-gray-900">
+            {courses.length}
           </div>
-          <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
-            <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">
-              {courses.filter((c) => c.status === "published").length}
-            </div>
-            <div className="text-sm text-gray-600">Published</div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
-            <Star className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">
-              {courses.reduce((acc, course) => acc + course.students, 0)}
-            </div>
-            <div className="text-sm text-gray-600">Total Students</div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
-            <Clock className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">
-              {courses.filter((c) => c.status === "draft").length}
-            </div>
-            <div className="text-sm text-gray-600">Drafts</div>
-          </div>
+          <div className="text-sm text-gray-600">Total Courses</div>
         </div>
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+          <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
+          <div className="text-2xl font-bold text-gray-900">
+            {courses.filter((c) => c.status === "published").length}
+          </div>
+          <div className="text-sm text-gray-600">Published</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+          <Star className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
+          <div className="text-2xl font-bold text-gray-900">
+            {courses.reduce((acc, course) => acc + course.students, 0)}
+          </div>
+          <div className="text-sm text-gray-600">Total Students</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+          <Clock className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+          <div className="text-2xl font-bold text-gray-900">
+            {courses.filter((c) => c.status === "draft").length}
+          </div>
+          <div className="text-sm text-gray-600">Drafts</div>
+        </div>
+      </div>
 
-        {/* Courses Grid */}
-        <div className="flex flex-wrap items-center my-4">
-          {filteredCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              showAdminOptions={true}
-              onEdit={handleEditCourse}
-              onDelete={handleDeleteCourse}
-              onView={handleViewCourse}
-            />
-          ))}
-        </div>
-      </PageContainer>
+      {/* Courses Grid */}
+      <div className="flex flex-wrap items-center my-4">
+        {filteredCourses.map((course) => (
+          <CourseCard
+            key={course.id}
+            course={course}
+            showAdminOptions={true}
+            onEdit={handleEditCourse}
+            onDelete={handleDeleteCourse}
+            onView={handleViewCourse}
+          />
+        ))}
+      </div>
+    </PageContainer>
   );
 };
 

@@ -16,13 +16,14 @@ import {
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import PageContainer from "../../components/layout/PageContainer.jsx";
-
+import PageTitle from "../../components/ui/PageTitle.jsx";
 const PRIMARY_COLOR = "#0056D2";
 
 const items = [
   { label: "Admin", link: "/admin" },
   { label: "Coupons", link: "/admin/coupons" },
 ];
+
 
 const AdminCoupons = () => {
   const { isAdmin } = useAuth();
@@ -59,16 +60,11 @@ const AdminCoupons = () => {
 
   return (
     <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
-      <div className="flex items-center gap-4 mb-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 italic">
-            Coupon Management
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Manage discount codes and promotional offers
-          </p>
-        </div>
-      </div>
+        {/* Page Title */}
+      <PageTitle
+        title="Coupon Management"
+        description="Manage discount codes and promotional offers"
+      />
 
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

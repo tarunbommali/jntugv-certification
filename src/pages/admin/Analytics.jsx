@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { global_classnames } from "../../utils/classnames.js";
 import PageContainer from "../../components/layout/PageContainer.jsx";
-
+import PageTitle from "../../components/ui/PageTitle.jsx";
 const items = [
   { label: "Admin", link: "/admin" },
   { label: "Analytics", link: "/admin/analytics" },
@@ -61,33 +61,28 @@ const Analytics = () => {
 
   return (
     <PageContainer items={items} className="min-h-screen  bg-gray-50 py-8">
-      <div className="flex items-center gap-4 mb-4">
-        <div>
-          <h1 className="text-3xl font-extrabold italic text-gray-900">
-            Analytics{" "}
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Platform performance and insights
-          </p>
-        </div>
+      <PageTitle
+        title="Analytics"
+        description="Platform performance and insights"
+      />
 
-        {/* Time Range Selector */}
-        <div className="flex gap-2 mb-6">
-          {["7d", "30d", "90d", "1y"].map((range) => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                timeRange === range
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
-              }`}
-            >
-              {range}
-            </button>
-          ))}
-        </div>
+      {/* Time Range Selector */}
+      <div className="flex gap-2 mb-6">
+        {["7d", "30d", "90d", "1y"].map((range) => (
+          <button
+            key={range}
+            onClick={() => setTimeRange(range)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              timeRange === range
+                ? "bg-blue-600 text-white"
+                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            {range}
+          </button>
+        ))}
       </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard

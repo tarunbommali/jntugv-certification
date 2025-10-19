@@ -17,7 +17,13 @@ export const USER_SCHEMA = {
   isAdmin: "boolean", // Admin privileges
   isActive: "boolean", // Account status
   emailVerified: "boolean",
-  
+  skills:["string"],
+  bio: "string",
+  socialLinks: {
+    linkedin: "string",
+    github: "string",
+  },
+
   // Timestamps
   createdAt: "timestamp",
   updatedAt: "timestamp",
@@ -27,7 +33,7 @@ export const USER_SCHEMA = {
   // Learning Progress
   totalCoursesEnrolled: "number",
   totalCoursesCompleted: "number",
-  learningStreak: "number", // Days of consecutive learning
+  learningStreak: "number", 
 }
 
 /**

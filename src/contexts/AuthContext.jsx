@@ -1,9 +1,8 @@
-/* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { createOrUpdateUser, getUserProfile } from '../firebase/services';
+import { createOrUpdateUser, getUserProfile, updateUserProfile } from '../firebase/services';
 
 const AuthContext = createContext(undefined);
 
@@ -50,6 +49,7 @@ export const AuthProvider = ({ children }) => {
     });
     
     if (!profileResult.success) {
+      /* eslint-disable-next-line no-console */
       console.error('Failed to create/update user profile:', profileResult.error);
     }
     
@@ -65,8 +65,34 @@ export const AuthProvider = ({ children }) => {
           // Fetch user profile using the new service
           const profileResult = await getUserProfile(user.uid);
           if (profileResult.success) {
-            setUserProfile(profileResult.data);
+            const profile = profileResult.data;
+            setUserProfile(profile);
+
+            // Daily learning streak update: if lastLoginAt is not today, increment streak and set lastLoginAt
+            try {
+              const isSameDay = (d1, d2) => {
+                if (!d1 || !d2) return false;
+                const a = d1 && d1.seconds ? new Date(d1.seconds * 1000) : new Date(d1);
+                const b = d2 && d2.seconds ? new Date(d2.seconds * 1000) : new Date(d2);
+                return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+              };
+
+              const now = new Date();
+              const last = profile.lastLoginAt || profile.updatedAt || null;
+              if (!isSameDay(last, now)) {
+                const newStreak = (profile.learningStreak || 0) + 1;
+                await updateUserProfile(user.uid, { learningStreak: newStreak, lastLoginAt: new Date() });
+                // refresh local copy
+                const refreshed = await getUserProfile(user.uid);
+                if (refreshed.success) setUserProfile(refreshed.data);
+              }
+            } catch (err) {
+              // non blocking
+              // eslint-disable-next-line no-console
+              console.warn('Failed to update learning streak in AuthContext', err);
+            }
           } else {
+            /* eslint-disable-next-line no-console */
             console.error('Failed to fetch user profile:', profileResult.error);
             // Provide minimal offline-safe profile
             setUserProfile({
@@ -77,6 +103,7 @@ export const AuthProvider = ({ children }) => {
             });
           }
         } catch (error) {
+          /* eslint-disable-next-line no-console */
           console.error('Failed to fetch user profile', error);
           // Provide minimal offline-safe profile
           setUserProfile({

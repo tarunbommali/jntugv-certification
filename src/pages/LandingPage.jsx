@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import 'react';
 import PageContainer from '../components/layout/PageContainer';
 import Hero from '../components/landing/Hero';

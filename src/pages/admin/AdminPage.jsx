@@ -5,6 +5,7 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 import { Navigate } from "react-router-dom";
 import { global_classnames } from "../../utils/classnames.js";
 import PageContainer from "../../components/layout/PageContainer.jsx";
+import PageTitle from "../../components/ui/PageTitle.jsx";
 
 const items = [{ label: "Admin", link: "/admin" }];
 const AdminPage = () => {
@@ -17,13 +18,9 @@ const AdminPage = () => {
   return (
     <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
       {/* Header */}
+ 
 
-      <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 italic">
-          Dashboard
-        </h1>
-        <p className="text-gray-600 mt-1">Overview</p>
-      </div>
+      <PageTitle title="Dashboard" description="Overview" />
 
       {/* Stats */}
       <div className="mt-12 bg-white rounded-xl shadow-md p-6">

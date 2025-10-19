@@ -3,7 +3,7 @@ import BreadCrumbs from "../ui/breadcrumbs/Breadcrumbs.jsx";
 const PageContainer = ({ children, className, items, ...props }) => {
   return (
     <div
-      className={` min-h-screen lg:px-18 md:px-4 sm:px-0 xl:max-w-8xl `}
+      className={`min-h-screen py-2 lg:px-18 md:px-4 sm:px-0 xl:max-w-8xl `}
       {...props}
     >
       {items && <BreadCrumbs items={items} />}
