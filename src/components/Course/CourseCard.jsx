@@ -60,7 +60,10 @@ const CourseCard = ({
         )}
 
         {/* Rating Badge */}
-        <div className="absolute top-3 right-3 bg-black/60 text-white text-sm px-2 py-1 rounded-lg flex items-center font-semibold">
+        <div 
+          className="absolute top-3 right-3 text-white text-sm px-2 py-1 rounded-lg flex items-center font-semibold"
+          style={{ background: "var(--color-textLow)" }}
+        >
           <Star size={14} className="fill-yellow-400 text-yellow-400 mr-1" />
           {course.rating || '4.5'}
         </div>
@@ -74,7 +77,7 @@ const CourseCard = ({
 
       <CardContent className="pt-0 pb-3">
         {/* Course Details */}
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="space-y-2 text-sm text-medium">
           <div className="flex items-center">
             <Clock size={16} className="mr-2" />
             <span>{course.duration || 'Self-Paced'}</span>
@@ -103,9 +106,9 @@ const CourseCard = ({
 
         {/* Pricing */}
         <div className="mt-4">
-          <div className="text-xl font-bold text-foreground">
+          <div className="text-xl font-bold text-high">
             ₹{price.toFixed(0)}
-            <span className="text-sm text-muted-foreground line-through ml-2 font-normal">
+            <span className="text-sm text-low line-through ml-2 font-normal">
               ₹{originalPrice.toFixed(0)}
             </span>
           </div>
@@ -124,7 +127,7 @@ const CourseCard = ({
         ) : (
           // Public view - Normal enrollment flow
           isEnrolled ? (
-            <Button asChild className="w-full bg-green-600 hover:bg-green-700">
+            <Button asChild variant="success" className="w-full">
               <Link to={`/learn/${course.id}`}>
                 <CheckCircle size={16} className="mr-2" />
                 Start Learning

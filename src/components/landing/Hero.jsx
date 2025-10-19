@@ -113,12 +113,12 @@ const Hero = () => {
             variants={containerVariants}
             className="w-full lg:w-1/2 space-y-8"
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground border-b-2 border-yellow-400 pb-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-high border-b-2 border-yellow-400 pb-2">
               Transform Your Career with{" "}
-              <span className="text-blue-600">Industry-Relevant Skills</span>
+              <span className="text-primary">Industry-Relevant Skills</span>
             </h2>
 
-            <p className="text-xl text-muted-foreground leading-relaxed">
+            <p className="text-xl text-medium leading-relaxed">
               Earn industry-recognized certification from JNTU-GV by completing
               intensive, real-world projects. Boost your practical skills and
               job readiness in the most demanded emerging tech domains.
@@ -140,7 +140,7 @@ const Hero = () => {
                 <motion.li
                   key={idx}
                   variants={itemVariants}
-                  className="flex items-center gap-2 bg-primary text-primary-foreground font-medium px-4 py-3 rounded-xl shadow-lg hover:bg-primary/90 transition duration-300"
+                  className="flex items-center gap-2 btn-primary font-medium px-4 py-3 rounded-xl shadow-lg hover:opacity-90 transition duration-300"
                 >
                   <CheckCircle className="h-5 w-5 text-yellow-400 min-w-5" />
                   <span className="text-sm md:text-base">{tech}</span>
