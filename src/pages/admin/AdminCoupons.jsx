@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 // src/pages/admin/AdminCoupons.jsx
 
 import { useState } from "react";
