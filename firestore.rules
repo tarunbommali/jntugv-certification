@@ -1,0 +1,296 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================================================
+    // HELPER FUNCTIONS
+    // ============================================================================
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user is enrolled in course
+    function isEnrolledInCourse(courseId) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/enrollments/$(request.auth.uid + '_' + courseId));
+    }
+    
+    // Validate required fields
+    function hasRequiredFields(fields) {
+      return fields.hasAll(['uid', 'email']) && 
+             fields.uid is string && 
+             fields.email is string;
+    }
+    
+    // ============================================================================
+    // USERS COLLECTION
+    // ============================================================================
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isOwner(userId);
+      
+      // Users can create their own profile
+      allow create: if isOwner(userId) && 
+                       hasRequiredFields(resource.data) &&
+                       resource.data.uid == request.auth.uid &&
+                       resource.data.email == request.auth.token.email;
+      
+      // Users can update their own profile (except admin status)
+      allow update: if isOwner(userId) && 
+                       !('isAdmin' in request.resource.data) &&
+                       request.resource.data.uid == resource.data.uid &&
+                       request.resource.data.email == resource.data.email;
+      
+      // Admins can read all user profiles
+      allow read: if isAdmin();
+      
+      // Admins can update user profiles (including admin status)
+      allow update: if isAdmin();
+      
+      // No one can delete user profiles
+      allow delete: if false;
+    }
+    
+    // ============================================================================
+    // COURSES COLLECTION
+    // ============================================================================
+    match /courses/{courseId} {
+      // Anyone can read published courses
+      allow read: if resource.data.isPublished == true;
+      
+      // Authenticated users can read their own unpublished courses
+      allow read: if isAuthenticated() && 
+                     resource.data.createdBy == request.auth.uid;
+      
+      // Admins can read all courses
+      allow read: if isAdmin();
+      
+      // Admins can create courses
+      allow create: if isAdmin() && 
+                       hasRequiredFields(resource.data, ['title', 'description', 'price']) &&
+                       resource.data.createdBy == request.auth.uid;
+      
+      // Course creators can update their own courses
+      allow update: if isAuthenticated() && 
+                       resource.data.createdBy == request.auth.uid &&
+                       !('createdBy' in request.resource.data);
+      
+      // Admins can update any course
+      allow update: if isAdmin();
+      
+      // Only admins can delete courses
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================================
+    // ENROLLMENTS COLLECTION
+    // ============================================================================
+    match /enrollments/{enrollmentId} {
+      // Users can read their own enrollments
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Admins can read all enrollments
+      allow read: if isAdmin();
+      
+      // Users can create their own enrollments
+      allow create: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(resource.data, ['userId', 'courseId', 'status']);
+      
+      // Users can update their own enrollment progress
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId &&
+                       request.resource.data.courseId == resource.data.courseId &&
+                       request.resource.data.status == resource.data.status;
+      
+      // Admins can update any enrollment
+      allow update: if isAdmin();
+      
+      // No one can delete enrollments
+      allow delete: if false;
+    }
+    
+    // ============================================================================
+    // PAYMENTS COLLECTION
+    // ============================================================================
+    match /payments/{paymentId} {
+      // Users can read their own payments
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Admins can read all payments
+      allow read: if isAdmin();
+      
+      // Users can create their own payments
+      allow create: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(resource.data, ['userId', 'courseId', 'amount']);
+      
+      // Users can update their own payment status
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId &&
+                       request.resource.data.courseId == resource.data.courseId &&
+                       request.resource.data.amount == resource.data.amount;
+      
+      // Admins can update any payment
+      allow update: if isAdmin();
+      
+      // No one can delete payments
+      allow delete: if false;
+    }
+    
+    // ============================================================================
+    // COUPONS COLLECTION
+    // ============================================================================
+    match /coupons/{couponCode} {
+      // Anyone can read active coupons
+      allow read: if resource.data.isActive == true;
+      
+      // Admins can read all coupons
+      allow read: if isAdmin();
+      
+      // Only admins can create coupons
+      allow create: if isAdmin() && 
+                       hasRequiredFields(resource.data, ['code', 'type', 'value']) &&
+                       resource.data.createdBy == request.auth.uid;
+      
+      // Only admins can update coupons
+      allow update: if isAdmin();
+      
+      // Only admins can delete coupons
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================================
+    // COURSE_CONTENT COLLECTION
+    // ============================================================================
+    match /course_content/{contentId} {
+      // Anyone can read content for published courses
+      allow read: if isAuthenticated() && 
+                     exists(/databases/$(database)/documents/courses/$(resource.data.courseId)) &&
+                     get(/databases/$(database)/documents/courses/$(resource.data.courseId)).data.isPublished == true;
+      
+      // Enrolled users can read content for their courses
+      allow read: if isAuthenticated() && 
+                     isEnrolledInCourse(resource.data.courseId);
+      
+      // Course creators can read their own content
+      allow read: if isAuthenticated() && 
+                     exists(/databases/$(database)/documents/courses/$(resource.data.courseId)) &&
+                     get(/databases/$(database)/documents/courses/$(resource.data.courseId)).data.createdBy == request.auth.uid;
+      
+      // Admins can read all content
+      allow read: if isAdmin();
+      
+      // Course creators can create content for their courses
+      allow create: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/courses/$(resource.data.courseId)) &&
+                       get(/databases/$(database)/documents/courses/$(resource.data.courseId)).data.createdBy == request.auth.uid;
+      
+      // Admins can create content
+      allow create: if isAdmin();
+      
+      // Course creators can update their own content
+      allow update: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/courses/$(resource.data.courseId)) &&
+                       get(/databases/$(database)/documents/courses/$(resource.data.courseId)).data.createdBy == request.auth.uid;
+      
+      // Admins can update any content
+      allow update: if isAdmin();
+      
+      // Only admins can delete content
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================================
+    // USER_PROGRESS COLLECTION
+    // ============================================================================
+    match /user_progress/{progressId} {
+      // Users can read their own progress
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Admins can read all progress
+      allow read: if isAdmin();
+      
+      // Users can create their own progress
+      allow create: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       hasRequiredFields(resource.data, ['userId', 'courseId']);
+      
+      // Users can update their own progress
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == resource.data.userId &&
+                       request.resource.data.courseId == resource.data.courseId;
+      
+      // Admins can update any progress
+      allow update: if isAdmin();
+      
+      // No one can delete progress
+      allow delete: if false;
+    }
+    
+    // ============================================================================
+    // ANALYTICS COLLECTION (Admin only)
+    // ============================================================================
+    match /analytics/{analyticsId} {
+      // Only admins can access analytics
+      allow read, write: if isAdmin();
+    }
+    
+    // ============================================================================
+    // SYSTEM COLLECTION (Admin only)
+    // ============================================================================
+    match /system/{systemId} {
+      // Only admins can access system settings
+      allow read, write: if isAdmin();
+    }
+    
+    // ============================================================================
+    // NOTIFICATIONS COLLECTION
+    // ============================================================================
+    match /notifications/{notificationId} {
+      // Users can read their own notifications
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Admins can read all notifications
+      allow read: if isAdmin();
+      
+      // System can create notifications
+      allow create: if isAuthenticated();
+      
+      // Users can update their own notifications (mark as read)
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+      
+      // Admins can update any notification
+      allow update: if isAdmin();
+      
+      // Users can delete their own notifications
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+      
+      // Admins can delete any notification
+      allow delete: if isAdmin();
+    }
+  }
+}
