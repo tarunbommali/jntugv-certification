@@ -7,7 +7,7 @@ const DEFAULT_THEME = 'light';
 const THEME_COLORS = {
   light: {
     // Primary Accent (CTA)
-    primary: '#007AFF', // Vibrant Blue
+    primary: '#0a66c2', // Vibrant Blue
     primaryHover: '#0056CC',
     
     // Background
@@ -71,6 +71,9 @@ const THEME_COLORS = {
   }
 };
 
+
+
+
 const ThemeContext = createContext(undefined);
 
 export const useTheme = () => {
@@ -100,6 +103,23 @@ export const ThemeProvider = ({ children }) => {
             Object.entries(colors).forEach(([key, value]) => {
                 root.style.setProperty(`--color-${key}`, value);
             });
+
+
+             
+        // Add gradient-specific variables
+        if (theme === 'light') {
+            root.style.setProperty('--gradient-from', '#0f172a'); // slate-950
+            root.style.setProperty('--gradient-to', '#1e293b');   // slate-800
+            root.style.setProperty('--gradient-accent-from', '#1e3a8a'); // blue-900
+            root.style.setProperty('--gradient-accent-to', '#1d4ed8');   // blue-700
+            root.style.setProperty('--subtitle-color', '#cbd5e1'); // slate-300
+        } else {
+            root.style.setProperty('--gradient-from', '#f8fafc'); // slate-50
+            root.style.setProperty('--gradient-to', '#e2e8f0');   // slate-200
+            root.style.setProperty('--gradient-accent-from', '#1e40af'); // blue-800
+            root.style.setProperty('--gradient-accent-to', '#1d4ed8');   // blue-600
+            root.style.setProperty('--subtitle-color', '#475569'); // slate-600
+        }
             
             // Set theme attribute for conditional styling
             if (theme === 'dark') {

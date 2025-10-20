@@ -220,7 +220,7 @@ const Header = () => {
         >
           <div className="flex h-20 items-center justify-between">
             {/* Logo and Branding */}
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2 outline-none border-none">
               <img
                 src={logo}
                 alt="NxtGen Logo"

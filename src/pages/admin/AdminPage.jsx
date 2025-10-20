@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/AdminPage.jsx
 
 import "react";
