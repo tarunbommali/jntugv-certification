@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'app_theme';
 const DEFAULT_THEME = 'light';
@@ -6,69 +6,67 @@ const DEFAULT_THEME = 'light';
 // LinkedIn-style color system for professional course website
 const THEME_COLORS = {
   light: {
-    // Primary Brand Colors (LinkedIn Blue)
-    primary: '#0A66C2', // LinkedIn Blue
-    primaryHover: '#004182', // Dark Blue for hover states
-    primaryLight: '#E8F3FF', // Light Blue for backgrounds
+    // Primary Accent (CTA)
+    primary: '#007AFF', // Vibrant Blue
+    primaryHover: '#0056CC',
     
-    // Background Colors
-    background: '#FFFFFF', // White background
-    backgroundAlt: '#F3F2EF', // Light Gray surface
+    // Background
+    background: '#F7F7F7', // Off-White/Very Light Gray
+    backgroundAlt: '#FFFFFF', // Pure White for contrast
     
     // Surface/Card Background
-    surface: '#F3F2EF', // Light Gray for cards
-    surfaceElevated: '#FFFFFF', // White for elevated surfaces
+    surface: '#FFFFFF', // Pure White
+    surfaceElevated: '#EFEFEF', // Light Gray for elevation
     
     // Text Colors
-    textHigh: '#191919', // Dark Gray for primary text
-    textMedium: '#666666', // Medium Gray for secondary text
-    textLow: '#8A8A8A', // Light Gray for hints/labels
+    textHigh: '#1A1A1A', // Near-Black for headings
+    textMedium: '#4A4A4A', // Dark Gray for body text
+    textLow: '#8A8A8A', // Medium Gray for hints/labels
     
     // Feedback Colors
-    success: '#38A169', // Green for success
-    error: '#D9534F', // Red for errors
+    success: '#38A169', // Bright Green
+    error: '#D9534F', // Vibrant Red/Orange
     warning: '#F59E0B', // Orange for warnings
     
     // Border and Divider
-    border: '#E0E0E0', // Light border
-    divider: '#E0E0E0', // Divider color
+    border: '#E2E8F0', // Light border
+    divider: '#F1F5F9', // Very light divider
     
     // Interactive States
     hover: '#F8FAFC', // Very light hover state
-    active: '#E8F3FF', // Light blue active state
+    active: '#E2E8F0', // Light active state
     disabled: '#CBD5E1', // Disabled state
   },
   dark: {
-    // Primary Brand Colors (LinkedIn Blue - consistent across themes)
-    primary: '#0A66C2', // LinkedIn Blue (same as light)
-    primaryHover: '#378FE9', // Light Blue for hover in dark theme
-    primaryLight: '#1A1D21', // Deep charcoal for backgrounds
+    // Primary Accent (CTA)
+    primary: '#4D9FFF', // Lighter/Desaturated Accent
+    primaryHover: '#66B3FF',
     
-    // Background Colors
-    background: '#1A1D21', // Deep Charcoal background
-    backgroundAlt: '#22272B', // Slightly lighter gray
+    // Background
+    background: '#121212', // Soft Charcoal/Dark Gray
+    backgroundAlt: '#1E1E1E', // Slightly lighter dark gray
     
     // Surface/Card Background
-    surface: '#22272B', // Slightly lighter gray for cards
-    surfaceElevated: '#2E3338', // Elevated dark surface
+    surface: '#2C2C2C', // Elevated Dark Gray (1dp)
+    surfaceElevated: '#212121', // Elevated Dark Gray (2dp)
     
     // Text Colors
-    textHigh: '#F3F6F8', // Off-White for primary text
-    textMedium: '#A3A6AA', // Gray for secondary text
-    textLow: '#757575', // Muted gray for hints/labels
+    textHigh: '#E0E0E0', // Off-White for headings
+    textMedium: '#AFAFAF', // Light Gray for body text
+    textLow: '#757575', // Muted Gray for hints/labels
     
     // Feedback Colors
-    success: '#6EE7B7', // Light green for success
-    error: '#FF6961', // Light red for errors
-    warning: '#FBBF24', // Light orange for warnings
+    success: '#6EE7B7', // Lighter Green
+    error: '#FF6961', // Lighter Red/Orange
+    warning: '#FBBF24', // Lighter Orange for warnings
     
     // Border and Divider
-    border: '#2E3338', // Dark border
-    divider: '#2E3338', // Dark divider
+    border: '#404040', // Dark border
+    divider: '#2A2A2A', // Dark divider
     
     // Interactive States
     hover: '#3A3A3A', // Dark hover state
-    active: '#2E3338', // Dark active state
+    active: '#4A4A4A', // Dark active state
     disabled: '#555555', // Disabled state
   }
 };

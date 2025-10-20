@@ -26,7 +26,6 @@ const items = [
   { label: "Coupons", link: "/admin/coupons" },
 ];
 
-
 const AdminCoupons = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate(); // Initialize useNavigate
@@ -62,7 +61,7 @@ const AdminCoupons = () => {
 
   return (
     <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
-        {/* Page Title */}
+      {/* Page Title */}
       <PageTitle
         title="Coupon Management"
         description="Manage discount codes and promotional offers"

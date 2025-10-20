@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import { X, Send, MessageSquare } from "lucide-react";
 // Assuming global_classnames provides primary colors for branding consistency
@@ -109,11 +111,11 @@ const WhatsAppChat = () => {
   const baseInputClasses = `
     flex h-10 w-full rounded-lg border bg-gray-50 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400
     disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-1
+    focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] mt-1
   `;
 
   // Use a fallback for the primary color from global_classnames
-  const primaryColor = global_classnames.button?.primary?.bg || '#004080'; 
+  const primaryColor = global_classnames.button?.primary?.bg || 'var(--color-primary)'; 
 
   return (
     <>
@@ -248,10 +250,10 @@ const WhatsAppChat = () => {
               </div>
 
               {/* Footer / Submit Button */}
-              <div
+                <div
                 className="p-4 bg-gray-50 rounded-b-xl"
                 style={{
-                  borderTop: `1px solid #e5e7eb`,
+                  borderTop: `1px solid var(--color-border)`,
                 }}
               >
                 <button
