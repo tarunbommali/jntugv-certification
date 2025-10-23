@@ -1,8 +1,14 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import { auth } from '../../firebase';
-import { createErrorResponse, withErrorHandling } from '../../utils/errorHandling';
+import { createErrorResponse } from '../../utils/errorHandling';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://us-central1-your-project-id.cloudfunctions.net/api';
+// Prefer explicit override, otherwise derive from Firebase project id
+const API_BASE_URL = import.meta.env.VITE_API_URL || (() => {
+  const pid = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+  if (!pid) return 'https://us-central1-your-project-id.cloudfunctions.net/api';
+  return `https://us-central1-${pid}.cloudfunctions.net/api`;
+})();
 
 // Helper function to get auth token
 const getAuthToken = async () => {

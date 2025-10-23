@@ -34,8 +34,8 @@ import { createErrorResponse } from "../../utils/errorHandling";
  */
 export const createEnrollment = async (enrollmentData) => {
   try {
-    // Validate enrollment data
-    validateEnrollment(enrollmentData);
+  // Validate enrollment data
+  validateEnrollmentData(enrollmentData);
 
     // Try API first
     const apiResult = await createEnrollmentViaAPI(enrollmentData);
@@ -162,6 +162,37 @@ export const getUserEnrollments = async (userId) => {
   }
 };
 
+
+// firebase/services_modular/enrollmentOperations.js
+
+// Add proper error handling and CORS workaround
+export const updateEnrollment = async (enrollmentId, updateData) => {
+  try {
+    // Prefer using admin API (Cloud Function). This function builds the URL
+    // from Vite env or Firebase project id in apiOperations.js.
+    const apiResult = await updateEnrollmentViaAPI(enrollmentId, updateData);
+    if (apiResult && apiResult.success) return apiResult;
+
+    // If API call returned an error object, fall back to direct Firestore update
+    console.warn('API updateEnrollment failed, falling back to Firestore:', apiResult?.error);
+  } catch (error) {
+    console.warn('API updateEnrollment failed, falling back to Firestore:', error);
+  }
+
+  // Fallback to direct Firebase update if Cloud Function fails or not available
+  try {
+    const docRef = doc(db, 'enrollments', enrollmentId);
+    await updateDoc(docRef, updateData);
+    return { success: true, data: { id: enrollmentId, ...updateData } };
+  } catch (fallbackError) {
+    return { 
+      success: false, 
+      error: `Failed to update enrollment: ${fallbackError.message}` 
+    };
+  }
+};
+
+
 /**
  * Check if user is enrolled in course
  */
@@ -262,34 +293,7 @@ export const getUserEnrollmentStats = async (userId) => {
   }
 };
 
-/**
- * Update enrollment record - Uses API first, falls back to client-side
- */
-export const updateEnrollment = async (enrollmentId, updateData) => {
-  try {
-    // Try API first
-    const apiResult = await updateEnrollmentViaAPI(enrollmentId, updateData);
-    if (apiResult.success) {
-      return apiResult;
-    }
-    
-    // Fallback to client-side update
-    console.warn('API update failed, falling back to client-side:', apiResult.error);
-    
-    const enrollmentRef = doc(db, "enrollments", enrollmentId);
-    const updatePayload = {
-      ...updateData,
-      updatedAt: serverTimestamp(),
-    };
-
-    await updateDoc(enrollmentRef, updatePayload);
-    return { success: true };
-  } catch (error) {
-    const norm = normalizeFirestoreError(error);
-    console.error("Error updating enrollment:", norm);
-    return { success: false, error: norm.message || norm.code };
-  }
-};
+ 
 
 /**
  * Delete enrollment record - Uses API first, falls back to client-side

@@ -107,7 +107,7 @@ const JoinCommunity = () => {
             <Sparkles className="h-4 w-4" />
             <span className="text-sm font-medium">Community</span>
           </motion.div>
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text  mb-4">
             Join Our Learning Community
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">

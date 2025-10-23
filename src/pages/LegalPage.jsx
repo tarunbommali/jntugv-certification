@@ -2,11 +2,14 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { global_classnames } from "../utils/classnames.js";
+import PageTitle from "../components/ui/PageTitle.jsx";
+import PageContainer from "../components/layout/PageContainer.jsx";
 
-// Minimal legal content mapping for /legal/:page
 const legalContent = {
   "privacy-policy": {
-    title: "Privacy Policy — JNTU-GV Certification",
+    title: "Privacy Policy",
+    description: "Learn how JNTU-GV (NxtGen Certification) collects, uses, and protects your personal information.",
+    lastUpdated: "October 1, 2025",
     body: `
       <p>
         This Privacy Policy explains how JNTU-GV (NxtGen Certification) collects, uses, and protects your personal information when you use our website and services.
@@ -17,7 +20,9 @@ const legalContent = {
     `,
   },
   "terms-of-service": {
-    title: "Terms & Conditions — JNTU-GV Certification",
+    title: "Terms & Conditions",
+    description: "Read the Terms & Conditions for using JNTU-GV (NxtGen Certification) services and website.",
+    lastUpdated: "October 1, 2025",
     body: `
       <p>
         By accessing or using the JNTU-GV certification website, you agree to these Terms & Conditions. Use the services only for lawful purposes and do not share credentials.
@@ -30,27 +35,53 @@ const legalContent = {
 };
 
 const LegalPage = () => {
-  const { page } = useParams(); // "privacy-policy" or "terms-of-service"
-
+  const { page } = useParams();
   const content = legalContent[page];
+
+  // Breadcrumb items without "Legal" in the middle
+  const getBreadcrumbItems = () => {
+    if (!content) {
+      return [
+        { label: "Home", link: "/" },
+        { label: "Page Not Found", link: null }
+      ];
+    }
+
+    return [
+      { label: "Home", link: "/" },
+      { label: content.title, link: null }
+    ];
+  };
+
+  const items = getBreadcrumbItems();
 
   if (!content) {
     return (
-      <div className={`${global_classnames.width.container} min-h-screen p-6`}>
+      <PageContainer
+        items={items}
+        className={`${global_classnames.width.container} min-h-screen p-6`}
+      >
         <h1 className="text-2xl font-bold mb-4">Page Not Found</h1>
         <p>The legal page you are looking for does not exist.</p>
         <p className="mt-4">
           <Link to="/">Return home</Link>
         </p>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className={`${global_classnames.width.container} min-h-screen p-6`}>
-      <h1 className="text-2xl font-bold mb-4">{content.title}</h1>
-      <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content.body }} />
-    </div>
+    <PageContainer
+      items={items}
+      className={`${global_classnames.width.container} min-h-screen p-6`}
+    >
+      <PageTitle title={content.title} description={content.description} />
+      <p className="text-gray-600 mb-2">Last updated: {content.lastUpdated}</p>
+      <div
+        className="prose max-w-none"
+        dangerouslySetInnerHTML={{ __html: content.body }}
+      />
+    </PageContainer>
   );
 };
 

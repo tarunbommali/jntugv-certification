@@ -4,7 +4,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRealtime } from "../contexts/RealtimeContext";
 import PageContainer from "../components/layout/PageContainer";
 import CourseList from "../components/Course/CourseList";
-import Breadcrumbs from "../components/ui/breadcrumbs/Breadcrumbs";
 import { Alert, AlertDescription, AlertIcon } from "../components/ui/Alert";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import PageTitle from "../components/ui/PageTitle";
@@ -20,168 +19,109 @@ const CoursePage = () => {
     isEnrolled,
   } = useRealtime();
   const [enrollmentStatus, setEnrollmentStatus] = useState({});
-
-  const dummyData = [
-    {
-      id: "emerging-technologies-2024", // or use the actual courseId from your database
-      title: "Emerging Technologies",
-      description:
-        "Master cutting-edge technologies shaping the future including AI, Blockchain, IoT, and Quantum Computing. Gain hands-on experience with real-world projects and industry applications.",
-      courseDescription:
-        "Comprehensive course covering the latest technological advancements and their practical implementations across various industries.",
-
-      // Pricing
-      price: 4999, // Current price
-      originalPrice: 8999, // Original price for showing discount
-
-      // Course metadata
-      isBestseller: true,
-      duration: "8 weeks",
-      mode: "Online",
-      rating: 4.8,
-      students: 1250,
-
-      // Visual
-      imageUrl:
-        "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-
-      // Course modules
-      modules: [
-        {
-          moduleKey: "intro-emerging-tech",
-          moduleTitle: "Introduction to Emerging Technologies",
-          videos: [
-            { title: "What are Emerging Technologies?", duration: "15:30" },
-            { title: "Technology Adoption Lifecycle", duration: "18:45" },
-            { title: "Future Trends Analysis", duration: "22:10" },
-          ],
-        },
-        {
-          moduleKey: "artificial-intelligence",
-          moduleTitle: "Artificial Intelligence & Machine Learning",
-          videos: [
-            { title: "AI Fundamentals", duration: "25:15" },
-            { title: "Machine Learning Algorithms", duration: "32:20" },
-            { title: "Deep Learning & Neural Networks", duration: "28:45" },
-            { title: "AI Ethics and Responsible AI", duration: "19:30" },
-          ],
-        },
-        {
-          moduleKey: "blockchain-web3",
-          moduleTitle: "Blockchain & Web3 Technologies",
-          videos: [
-            { title: "Blockchain Fundamentals", duration: "20:15" },
-            { title: "Smart Contracts & DApps", duration: "26:40" },
-            { title: "Cryptocurrencies & DeFi", duration: "24:25" },
-            { title: "NFTs and Digital Ownership", duration: "21:50" },
-          ],
-        },
-        {
-          moduleKey: "internet-of-things",
-          moduleTitle: "Internet of Things (IoT)",
-          videos: [
-            { title: "IoT Architecture & Components", duration: "18:20" },
-            { title: "IoT Sensors and Devices", duration: "23:15" },
-            { title: "IoT Data Analytics", duration: "27:30" },
-            { title: "Smart Cities & Industrial IoT", duration: "22:45" },
-          ],
-        },
-        {
-          moduleKey: "quantum-computing",
-          moduleTitle: "Quantum Computing",
-          videos: [
-            { title: "Quantum Mechanics Basics", duration: "29:10" },
-            { title: "Qubits and Quantum Gates", duration: "31:25" },
-            { title: "Quantum Algorithms", duration: "26:40" },
-            { title: "Quantum Cryptography", duration: "24:15" },
-          ],
-        },
-        {
-          moduleKey: "augmented-reality",
-          moduleTitle: "Augmented & Virtual Reality",
-          videos: [
-            { title: "AR/VR Fundamentals", duration: "19:45" },
-            { title: "3D Modeling and Animation", duration: "25:20" },
-            { title: "Spatial Computing", duration: "22:30" },
-            { title: "Metaverse Applications", duration: "20:15" },
-          ],
-        },
-        {
-          moduleKey: "biotechnology",
-          moduleTitle: "Biotechnology & Bioinformatics",
-          videos: [
-            { title: "Genetic Engineering", duration: "26:50" },
-            { title: "CRISPR and Gene Editing", duration: "24:25" },
-            { title: "Bioinformatics Tools", duration: "28:10" },
-            { title: "Personalized Medicine", duration: "23:45" },
-          ],
-        },
-        {
-          moduleKey: "robotics-automation",
-          moduleTitle: "Robotics & Automation",
-          videos: [
-            { title: "Robotics Fundamentals", duration: "21:30" },
-            { title: "Industrial Automation", duration: "25:45" },
-            { title: "Autonomous Systems", duration: "27:20" },
-            { title: "Human-Robot Interaction", duration: "22:15" },
-          ],
-        },
-        {
-          moduleKey: "capstone-project",
-          moduleTitle: "Capstone Project",
-          videos: [
-            { title: "Project Ideation", duration: "16:40" },
-            { title: "Technology Stack Selection", duration: "19:25" },
-            { title: "Implementation Guide", duration: "32:10" },
-            { title: "Deployment and Presentation", duration: "24:50" },
-          ],
-        },
-      ],
-
-      // Additional course details that might be used
-      category: "Technology",
-      level: "Intermediate",
-      instructor: "Dr. Sarah Chen",
-      language: "English",
-      certificateIncluded: true,
-      lastUpdated: "2024-01-15",
-      requirements: [
-        "Basic programming knowledge",
-        "Understanding of computer science fundamentals",
-        "Curiosity about technology trends",
-      ],
-      learningOutcomes: [
-        "Understand and apply emerging technologies in real-world scenarios",
-        "Develop AI and machine learning models",
-        "Create blockchain applications and smart contracts",
-        "Design IoT solutions for various industries",
-        "Understand quantum computing principles",
-        "Build AR/VR experiences",
-        "Apply biotech concepts in healthcare",
-        "Implement automation and robotics solutions",
-      ],
-    },
-  ];
+  const [filteredCourses, setFilteredCourses] = useState([]);
 
   const breadcrumbItems = [
     { label: "Home", link: "/" },
     { label: "Courses", link: "/courses" },
   ];
 
+  // Filter and transform courses data
+  useEffect(() => {
+    if (!courses || courses.length === 0) {
+      setFilteredCourses([]);
+      return;
+    }
+
+    // Filter only published courses and transform data
+    const publishedCourses = courses
+      .filter(
+        (course) => course.isPublished === true || course.status === "published"
+      )
+      .map((course) => {
+        // Calculate total lessons from modules
+        const totalLessons =
+          course.modules?.reduce((total, module) => {
+            return total + (module.lessons?.length || 0);
+          }, 0) || 0;
+
+        // Calculate total duration from modules
+        const totalDuration =
+          course.modules?.reduce((total, module) => {
+            const match = module.duration?.match(/(\d+)\s*hour/i);
+            const moduleHours = match ? parseInt(match[1]) : 0;
+            return total + moduleHours;
+          }, 0) || 0;
+
+        // Transform modules to match the expected format
+        const transformedModules =
+          course.modules?.map((module) => ({
+            moduleKey: module.id,
+            moduleTitle: module.title,
+            videos:
+              module.lessons?.map((lesson) => ({
+                title: lesson.title,
+                duration: lesson.duration,
+                type: lesson.type,
+              })) || [],
+          })) || [];
+
+        return {
+          id: course.id,
+          title: course.title,
+          description: course.shortDescription,
+          courseDescription: course.description,
+
+          // Pricing
+          price: course.price || 0,
+          originalPrice: course.originalPrice || course.price || 0,
+
+          // Course metadata
+          isBestseller: course.isBestseller || false,
+          duration:
+            totalDuration > 0 ? `${totalDuration} hours` : course.duration,
+          mode: "Online",
+          rating: course.averageRating || 4.5,
+          students: course.totalEnrollments || 0,
+
+          // Visual
+          imageUrl: course.imageUrl || "/api/placeholder/400/250",
+
+          // Course modules
+          modules: transformedModules,
+
+          // Additional course details
+          category: course.category,
+          level: course.level,
+          instructor: course.instructor,
+          language: course.language,
+          certificateIncluded: true,
+          lastUpdated: course.updatedAt,
+          requirements: course.requirements || [],
+          learningOutcomes: course.whatYouLearn || [],
+          isPublished: course.isPublished,
+          status: course.status,
+          createdAt: course.createdAt,
+        };
+      });
+
+    setFilteredCourses(publishedCourses);
+  }, [courses]);
+
   // Calculate enrollment status
   useEffect(() => {
-    if (!isAuthenticated || !currentUser) {
+    if (!isAuthenticated || !currentUser || !filteredCourses.length) {
       setEnrollmentStatus({});
       return;
     }
 
-    const status = courses.reduce((acc, course) => {
+    const status = filteredCourses.reduce((acc, course) => {
       acc[course.id] = isEnrolled(course.id);
       return acc;
     }, {});
 
     setEnrollmentStatus(status);
-  }, [courses, enrollments, isAuthenticated, currentUser, isEnrolled]);
+  }, [filteredCourses, enrollments, isAuthenticated, currentUser, isEnrolled]);
 
   // Show loading state
   if (coursesLoading || enrollmentsLoading) {
@@ -209,14 +149,46 @@ const CoursePage = () => {
         description="Explore our comprehensive certification programs"
       />
 
+      {/* No Courses Message */}
+      {!coursesLoading && filteredCourses.length === 0 && (
+        <div className="text-center py-12">
+          <div className="max-w-md mx-auto">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-12 h-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No courses available
+            </h3>
+            <p className="text-gray-600 mb-4">
+              There are no published courses at the moment. Please check back
+              later.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Course List */}
-      <CourseList
-        courses={dummyData}
-        loading={coursesLoading}
-        error={coursesError}
-        enrollmentStatus={enrollmentStatus}
-        className="mt-6"
-      />
+      {!coursesLoading && filteredCourses.length !== 0 && (
+        <CourseList
+          courses={filteredCourses}
+          loading={coursesLoading}
+          error={coursesError}
+          enrollmentStatus={enrollmentStatus}
+          className="mt-6"
+        />
+      )}
     </PageContainer>
   );
 };

@@ -1,94 +1,121 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { Quote, ExternalLink } from "lucide-react";
+import { Quote, Linkedin } from "lucide-react";
 import { motion } from "framer-motion";
 import { global_classnames } from "../../utils/classnames.js";
 import { InfiniteMovingCards } from "./InfiniteMovingCards.jsx";
 
-const testimonialsDummy = [
+const testimonialsData = [
   {
     name: "Priya Sharma",
-    title: "Software Engineer at Google",
+    title: "Student of JNTU-GV, CSE Department",
     image:
       "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
     quote:
-      "The AI/ML certification from JNTU-GV completely transformed my career. The hands-on projects and industry mentorship helped me land my dream job at Google.",
-    rating: 5,
-    course: "AI & Machine Learning",
-    linkedin: "https://linkedin.com/in/priya-sharma",
+      "The AI/ML certification from NxtGen helped me secure internships at top tech companies. The practical approach and industry-relevant curriculum made all the difference in my campus placements.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/priya-sharma",
   },
   {
     name: "Rajesh Kumar",
-    title: "Cybersecurity Analyst at Microsoft",
+    title: "Student of Gayatri Vidya Parishad",
     image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     quote:
-      "The cybersecurity program was incredibly comprehensive. I learned practical skills that I use every day in my role. The instructors were industry experts who really knew their stuff.",
-    rating: 5,
-    course: "Cybersecurity",
-    linkedin: "https://linkedin.com/in/rajesh-kumar",
+      "As an electronics student, the cybersecurity program gave me the cross-domain skills needed to transition into IT security. The hands-on labs and capstone project were exceptional.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/rajesh-kumar",
   },
   {
     name: "Anita Patel",
-    title: "Full-Stack Developer at Amazon",
+    title: "Student of JNTU-GV, IT Department",
     image:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     quote:
-      "The web development course gave me the confidence to switch careers. The curriculum was up-to-date with the latest technologies and the community support was amazing.",
-    rating: 5,
-    course: "Full-Stack Development",
-    linkedin: "https://linkedin.com/in/anita-patel",
+      "The full-stack development certification complemented my college curriculum perfectly. I built real projects that became talking points in my interviews and helped me get multiple job offers.",
+    sourceIcon:  Linkedin,
+    source: "https://linkedin.com/in/anita-patel",
   },
   {
     name: "Vikram Singh",
-    title: "Data Scientist at Netflix",
+    title: "Student of Andhra University",
     image:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
     quote:
-      "The data science program exceeded my expectations. The real-world projects and industry connections helped me understand how to apply concepts in actual business scenarios.",
-    rating: 5,
-    course: "Data Science",
-    linkedin: "https://linkedin.com/in/vikram-singh",
+      "Coming from a statistics background, the data science program helped me bridge the gap between theory and industry applications. The mentorship from industry experts was invaluable.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/vikram-singh",
   },
   {
     name: "Sneha Reddy",
-    title: "Product Manager at Meta",
+    title: "Student of JNTU-GV, ECE Department",
     image:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
     quote:
-      "The product management certification gave me the strategic thinking framework I needed to excel in my role. The case studies were incredibly relevant.",
-    rating: 5,
-    course: "Product Management",
-    linkedin: "https://linkedin.com/in/sneha-reddy",
+      "The product management certification helped me think beyond technical skills. I learned user-centric design and product strategy that helped me lead college tech projects effectively.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/sneha-reddy",
   },
   {
     name: "Arjun Mehta",
-    title: "Cloud Architect at AWS",
+    title: "Student of Gayatri College of Engineering",
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
     quote:
-      "The cloud computing program provided hands-on experience with real AWS projects. The instructors were current industry practitioners.",
-    rating: 5,
-    course: "Cloud Computing",
-    linkedin: "https://linkedin.com/in/arjun-mehta",
+      "The cloud computing program gave me practical AWS experience that directly helped in my final year project. I deployed scalable applications that impressed my professors and recruiters alike.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/arjun-mehta",
+  },
+  {
+    name: "Divya Nair",
+    title: "Student of JNTU-GV, AIML Department",
+    image:
+      "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=150&h=150&fit=crop&crop=face",
+    quote:
+      "The specialized AI certification enhanced my college learning with real-world implementations. I worked on live projects that are now part of my portfolio and helped me secure a research internship.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/divya-nair",
+  },
+  {
+    name: "Karthik Malhotra",
+    title: "Student of Vishnu Institute of Technology",
+    image:
+      "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face",
+    quote:
+      "As a mechanical engineering student, the programming foundations course opened up new career paths for me. I successfully transitioned to software development roles thanks to the comprehensive curriculum.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/karthik-malhotra",
+  },
+  {
+    name: "Meera Iyer",
+    title: "Student of JNTU-GV, CSE Department",
+    image:
+      "https://images.unsplash.com/photo-1534751516642-a1af1ef26a56?w=150&h=150&fit=crop&crop=face",
+    quote:
+      "The blockchain certification provided cutting-edge knowledge that wasn't covered in my college syllabus. I developed a decentralized application for my final year project that received special recognition.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/meera-iyer",
+  },
+  {
+    name: "Sanjay Joshi",
+    title: "Student of Gayatri Vidya Parishad College",
+    image:
+      "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150&h=150&fit=crop&crop=face",
+    quote:
+      "The IoT specialization helped me combine my electronics knowledge with software skills. I built smart campus solutions that were implemented in our college, giving me practical experience beyond textbooks.",
+    sourceIcon: Linkedin,
+    source: "https://linkedin.com/in/sanjay-joshi",
   },
 ];
-
 const Testimonial = () => {
-  const handleLinkedInClick = (e, url) => {
-    e.stopPropagation();
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  // Transform testimonialsDummy to match InfiniteMovingCards format
-  const testimonialItems = testimonialsDummy.map((testimonial) => ({
+  const testimonialItems = testimonialsData.map((testimonial) => ({
     name: testimonial.name,
-    title: testimonial.role || testimonial.title,
-    quote: testimonial.content || testimonial.quote,
+    title: testimonial.title,
+    quote: testimonial.quote,
     image: testimonial.image,
-    rating: testimonial.rating,
-    course: testimonial.course,
-    linkedin: testimonial.linkedin,
+    sourceIcon: "",
+    source: testimonial.source,
+    sourceIcon: testimonial.sourceIcon,
   }));
 
   return (
@@ -111,7 +138,7 @@ const Testimonial = () => {
             <Quote className="h-4 w-4" />
             <span className="text-sm font-medium">Success Stories</span>
           </motion.div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text  mb-4">
             What Our Students Say
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">

@@ -129,10 +129,10 @@ const About = () => {
             <Target className="h-4 w-4" />
             <span className="text-sm font-medium">About Us</span>
           </motion.div>
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text  mb-4">
             Empowering the Next Generation of Tech Professionals
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl text-left md:mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl md:text-center sm:text-left md:mx-auto">
             JNTU-GV Certification Platform is designed to bridge the gap between
             academic learning and industry requirements, providing students with
             practical skills and recognized credentials for successful careers

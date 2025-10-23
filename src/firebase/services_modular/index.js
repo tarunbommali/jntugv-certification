@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import * as user from "./userOperations.js";
 import * as course from "./courseOperations.js";
 import * as enrollment from "./enrollmentOperations.js";

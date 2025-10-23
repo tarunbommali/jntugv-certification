@@ -91,6 +91,47 @@ export const getAllCourses = async (limitCount = 50) => {
   }
 };
 
+// src/services/firebaseService.js - Add these functions
+
+/**
+ * Delete course (Admin only)
+ */
+export const deleteCourse = async (courseId) => {
+  try {
+    const courseRef = doc(db, "courses", courseId);
+    await deleteDoc(courseRef);
+    return { success: true };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error("Error deleting course:", norm);
+    return { success: false, error: norm.message || norm.code };
+  }
+};
+
+/**
+ * Get courses by instructor
+ */
+export const getCoursesByInstructor = async (instructorId) => {
+  try {
+    const coursesRef = collection(db, "courses");
+    const q = query(
+      coursesRef,
+      where("createdBy", "==", instructorId),
+      orderBy("createdAt", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+    const courses = snapshot.docs.map((d) =>
+      mapCourseToV2({ id: d.id, ...d.data() })
+    );
+    return { success: true, data: courses };
+  } catch (error) {
+    const norm = normalizeFirestoreError(error);
+    console.error("Error fetching instructor courses:", norm);
+    return { success: false, error: norm.message || norm.code };
+  }
+};
+
 /**
  * Get course by ID
  */
@@ -161,3 +202,4 @@ export const updateCourse = async (courseId, updateData) => {
     return { success: false, error: norm.message || norm.code };
   }
 };
+

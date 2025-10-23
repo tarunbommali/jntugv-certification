@@ -2,70 +2,81 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// Import Layout Components
+// ----------------------------
+// Layout & UI Components
+// ----------------------------
 import AppLayout from "./components/layout/AppLayout.jsx";
 import { LoadingScreen } from "./components/ui/LoadingSpinner.jsx";
+import NotFound from "./components/Error/NotFound.jsx";
+import ProtectedRoute from "./components/Auth/ProtectedRoute.jsx";
 
-// Import Context Providers
+// ----------------------------
+// Context Providers
+// ----------------------------
 import { AuthProvider } from "./contexts/AuthContext.jsx";
-import { CourseProvider } from "./contexts/CourseContext.jsx";
 import { UserProvider } from "./contexts/UserContext.jsx";
+import { CourseProvider } from "./contexts/CourseContext.jsx";
 import { PaymentProvider } from "./contexts/PaymentContext.jsx";
 import { LearnPageProvider } from "./contexts/LearnPageContext.jsx";
 import { RealtimeProvider } from "./contexts/RealtimeContext.jsx";
-import NotFound from "./components/Error/NotFound.jsx";
 
-// Import Page Components
-import ProtectedRoute from "./components/Auth/ProtectedRoute.jsx";
-import SignIn from "./pages/SignIn.jsx";
-import SignUp from "./pages/SignUp.jsx";
+// ----------------------------
+// Public Pages
+// ----------------------------
 import LandingPage from "./pages/LandingPage.jsx";
 import CoursePage from "./pages/CoursePage.jsx";
 import CourseDetailsPage from "./pages/CourseDetailsPage.jsx";
-import LearnPage from "./pages/LearnPage.jsx";
-import CheckoutPage from "./pages/CheckoutPage.jsx";
+import LegalPage from "./pages/LegalPage.jsx";
+import SignIn from "./pages/SignIn.jsx";
+import SignUp from "./pages/SignUp.jsx";
+
+// ----------------------------
+// Protected User Pages
+// ----------------------------
 import ProfilePage from "./pages/ProfilePage.jsx";
 import ProfileEdit from "./pages/ProfileEdit.jsx";
-import LegalPage from "./pages/LegalPage.jsx";
-import CreateEditCouponPage from "./pages/admin/CreateEditCouponPage.jsx";
-import UserManagementForm from "./pages/admin/UserManagementForm.jsx";
+import LearnPage from "./pages/LearnPage.jsx";
+import CheckoutPage from "./pages/CheckoutPage.jsx";
 
-// Lazy load admin components for code splitting
+// ----------------------------
+// Admin Pages (Lazy Loaded for Performance)
+// ----------------------------
 const AdminPage = lazy(() => import("./pages/admin/AdminPage.jsx"));
 const Analytics = lazy(() => import("./pages/admin/Analytics.jsx"));
 const CourseForm = lazy(() => import("./pages/admin/CourseForm.jsx"));
+const CourseManagement = lazy(() => import("./pages/admin/CourseManagement.jsx"));
 const UsersManagement = lazy(() => import("./pages/admin/UsersManagement.jsx"));
+const UserManagementForm = lazy(() => import("./pages/admin/UserManagementForm.jsx"));
 const AdminCoupons = lazy(() => import("./pages/admin/AdminCoupons.jsx"));
-const Courses = lazy(() => import("./pages/admin/Courses.jsx"));
+const CreateEditCouponPage = lazy(() => import("./pages/admin/CreateEditCouponPage.jsx"));
 const EnrollmentManagement = lazy(() => import("./pages/admin/EnrollmentManagement.jsx"));
 
+// ----------------------------
+// Main Application
+// ----------------------------
 const App = () => {
   return (
     <Router>
-      {/* Start of Nested Providers */}
+      {/* Context Providers (Outer → Inner hierarchy) */}
       <AuthProvider>
         <UserProvider>
           <CourseProvider>
             <PaymentProvider>
               <LearnPageProvider>
                 <RealtimeProvider>
-                  {/* The AppLayout wraps the visible parts of the application */}
                   <AppLayout>
                     <Routes>
                       {/* Public Routes */}
                       <Route path="/" element={<LandingPage />} />
                       <Route path="/courses" element={<CoursePage />} />
-                      <Route
-                        path="/course/:courseId"
-                        element={<CourseDetailsPage />}
-                      />
+                      <Route path="/course/:courseId" element={<CourseDetailsPage />} />
                       <Route path="/legal/:page" element={<LegalPage />} />
 
-                      {/* Auth Routes (No Header/Footer) */}
+                      {/* Auth Routes (No Layout Header/Footer) */}
                       <Route path="/auth/signin" element={<SignIn />} />
                       <Route path="/auth/signup" element={<SignUp />} />
 
-                      {/* Protected User Routes */}
+                      {/* User Protected Routes */}
                       <Route
                         path="/profile"
                         element={
@@ -74,7 +85,7 @@ const App = () => {
                           </ProtectedRoute>
                         }
                       />
-                       <Route
+                      <Route
                         path="/profile/edit"
                         element={
                           <ProtectedRoute>
@@ -99,7 +110,7 @@ const App = () => {
                         }
                       />
 
-                      {/* Admin Routes with Code Splitting */}
+                      {/*  Admin Routes (Lazy Loaded) */}
                       <Route
                         path="/admin"
                         element={
@@ -130,17 +141,17 @@ const App = () => {
                           </ProtectedRoute>
                         }
                       />
-                       <Route
+                      <Route
                         path="/admin/users/create/new"
                         element={
                           <ProtectedRoute requiredRole="admin">
                             <Suspense fallback={<LoadingScreen />}>
-                              <UserManagementForm  />
+                              <UserManagementForm />
                             </Suspense>
                           </ProtectedRoute>
                         }
                       />
-                        <Route
+                      <Route
                         path="/admin/users/manage/:userId"
                         element={
                           <ProtectedRoute requiredRole="admin">
@@ -155,7 +166,27 @@ const App = () => {
                         element={
                           <ProtectedRoute requiredRole="admin">
                             <Suspense fallback={<LoadingScreen />}>
-                              <Courses />
+                              <CourseManagement />
+                            </Suspense>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/admin/courses/create/new"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <Suspense fallback={<LoadingScreen />}>
+                              <CourseForm />
+                            </Suspense>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/admin/courses/edit/:courseId"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <Suspense fallback={<LoadingScreen />}>
+                              <CourseForm />
                             </Suspense>
                           </ProtectedRoute>
                         }
@@ -171,39 +202,15 @@ const App = () => {
                         }
                       />
                       <Route
-                        path="/admin/enrollments"
-                        element={
-                          <ProtectedRoute requiredRole="admin">
-                            <Suspense fallback={<LoadingScreen />}>
-                              <EnrollmentManagement />
-                            </Suspense>
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin/courses/edit/:courseId"
-                        element={
-                          <ProtectedRoute requiredRole="admin">
-                            <Suspense fallback={<LoadingScreen />}>
-                              <CourseForm />
-                            </Suspense>
-                          </ProtectedRoute>
-                        }
-                      />
-
-                      <Route
                         path="/admin/coupons/create"
                         element={
                           <ProtectedRoute requiredRole="admin">
                             <Suspense fallback={<LoadingScreen />}>
-                              {/* No couponId means creation mode */}
                               <CreateEditCouponPage />
                             </Suspense>
                           </ProtectedRoute>
                         }
                       />
-
-                      {/* CORRECTED: Admin Coupon Edit Route */}
                       <Route
                         path="/admin/coupons/edit/:couponId"
                         element={
@@ -215,17 +222,17 @@ const App = () => {
                         }
                       />
                       <Route
-                        path="/admin/courses/create/new"
+                        path="/admin/enrollments"
                         element={
                           <ProtectedRoute requiredRole="admin">
                             <Suspense fallback={<LoadingScreen />}>
-                              <CourseForm />
+                              <EnrollmentManagement />
                             </Suspense>
                           </ProtectedRoute>
                         }
                       />
 
-                      {/* 404 Route */}
+                      {/* 404 Fallback */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </AppLayout>
@@ -235,7 +242,6 @@ const App = () => {
           </CourseProvider>
         </UserProvider>
       </AuthProvider>
-      {/* End of Nested Providers */}
     </Router>
   );
 };

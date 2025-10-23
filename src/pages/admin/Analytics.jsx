@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/admin/AdminAnalytics.jsx
 
 import React, { useState, useEffect } from "react";

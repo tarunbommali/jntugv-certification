@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-console */
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { 
   getUserPaymentHistory, 

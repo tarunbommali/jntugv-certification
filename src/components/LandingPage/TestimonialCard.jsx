@@ -1,10 +1,7 @@
-/* eslint-disable no-unused-vars */
-
 const TestimonialCard = ({ item, idx }) => {
   return (
     <li
-      href={item.source}
-      className="relative w-[380px] max-w-full shrink-0 rounded-3xl  px-6 py-6 shadow-lg transition-all duration-300 hover:scale-105  group"
+      className="relative w-[380px] border border-[#cdcdcd] max-w-full shrink-0 rounded-3xl  px-6 py-6 shadow-lg transition-all duration-300 hover:scale-105  group "
       key={`${item.name}-${idx}`}
     >
       {/* Card Content */}
@@ -34,11 +31,13 @@ const TestimonialCard = ({ item, idx }) => {
             </div>
           </div>
         </div>
-
         {/* Quote Content */}
-        <blockquote className="text-base font-semibold leading-relaxed mb-4 py-4 flex-1">
+        <blockquote className="text-base font-semibold leading-relaxed mb-4 py-4 flex-1 select-none cursor-default">
           "{item.quote}"
         </blockquote>
+        <a target="_blank" rel="noopener noreferrer" href={item.source}>
+          <item.sourceIcon className="absolute top-4 right-4 h-5 w-5 text-muted-foreground hover:text-primary transition-colors duration-300" />
+        </a>
       </div>
     </li>
   );

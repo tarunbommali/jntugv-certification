@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 // src/contexts/LearnPageContext.jsx (Previously CourseContentContext.jsx)
 
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';

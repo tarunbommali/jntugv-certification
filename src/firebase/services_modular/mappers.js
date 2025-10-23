@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { serverTimestamp } from "firebase/firestore";
 
 export const mapUserToV2 = (raw) => {
