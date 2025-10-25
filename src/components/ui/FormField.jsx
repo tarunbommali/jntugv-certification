@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Alert, AlertDescription } from './Alert';
 import { cn } from '../../utils/cn';
+import { useTheme } from '../../contexts/ThemeContext'; // Import your theme context
 
 const FormField = ({ 
   label, 
@@ -12,12 +13,28 @@ const FormField = ({
   onChange, 
   error, 
   className,
-  rows = 3, // Added rows prop for textarea
-  children, // For select options
+  rows = 3,
+  children,
   ...props 
 }) => {
   const [touched, setTouched] = useState(false);
+  const { theme, colors } = useTheme(); // Get theme and colors from context
   const showError = touched && error;
+
+  // Get border colors based on theme
+  const getBorderColor = () => {
+    if (showError) {
+      return colors.error; // Use error color from theme
+    }
+    return colors.border; // Use border color from theme
+  };
+
+  const getFocusColor = () => {
+    if (showError) {
+      return colors.error; // Use error color from theme
+    }
+    return colors.primary; // Use primary color from theme
+  };
 
   const handleBlur = () => {
     setTouched(true);
@@ -32,6 +49,14 @@ const FormField = ({
   };
 
   const renderField = () => {
+    const baseStyles = {
+      borderColor: getBorderColor(),
+    };
+
+    const focusStyles = {
+      '--focus-ring-color': getFocusColor(),
+    };
+
     switch (type) {
       case 'textarea':
         return (
@@ -42,11 +67,12 @@ const FormField = ({
             placeholder={placeholder}
             required={required}
             rows={rows}
+            style={baseStyles}
             className={cn(
-              'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-colors resize-y min-h-[80px]',
+              'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring-color)] transition-colors resize-y min-h-[80px]',
               showError 
-                ? 'border-destructive focus:ring-destructive' 
-                : 'border-border focus:ring-primary'
+                ? 'border-destructive' 
+                : 'border-border'
             )}
             {...props}
           />
@@ -59,11 +85,12 @@ const FormField = ({
             onChange={handleChange}
             onBlur={handleBlur}
             required={required}
+            style={baseStyles}
             className={cn(
-              'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-colors',
+              'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring-color)] transition-colors',
               showError 
-                ? 'border-destructive focus:ring-destructive' 
-                : 'border-border focus:ring-primary'
+                ? 'border-destructive' 
+                : 'border-border'
             )}
             {...props}
           >
@@ -79,16 +106,30 @@ const FormField = ({
               checked={value || false}
               onChange={handleChange}
               onBlur={handleBlur}
+              style={{
+                borderColor: showError ? colors.error : colors.border,
+                color: colors.primary,
+              }}
               className={cn(
-                'h-4 w-4 text-primary focus:ring-primary border-border rounded',
+                'h-4 w-4 focus:ring-[var(--focus-ring-color)] rounded',
                 showError ? 'border-destructive' : 'border-border'
               )}
               {...props}
             />
             {label && (
-              <label className="ml-2 block text-sm text-foreground">
+              <label 
+                className="ml-2 block text-sm"
+                style={{ color: colors.textMedium }}
+              >
                 {label}
-                {required && <span className="text-destructive ml-1">*</span>}
+                {required && (
+                  <span 
+                    className="ml-1"
+                    style={{ color: colors.error }}
+                  >
+                    *
+                  </span>
+                )}
               </label>
             )}
           </div>
@@ -103,11 +144,12 @@ const FormField = ({
             onBlur={handleBlur}
             placeholder={placeholder}
             required={required}
+            style={baseStyles}
             className={cn(
-              'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-colors',
+              'w-full px-3 py-2 border outline-none rounded-md focus:ring-2 focus:ring-[var(--focus-ring-color)] transition-colors',
               showError 
-                ? 'border-destructive focus:ring-destructive' 
-                : 'border-border focus:ring-primary'
+                ? 'border-destructive' 
+                : 'border-border'
             )}
             {...props}
           />
@@ -116,20 +158,45 @@ const FormField = ({
   };
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div 
+      className={cn('space-y-2', className)}
+      style={type !== 'checkbox' ? { '--focus-ring-color': getFocusColor() } : {}}
+    >
       {/* Don't show label for checkboxes since it's rendered inline */}
       {type !== 'checkbox' && label && (
-        <label className="block text-sm font-medium text-foreground">
+        <label 
+          className="block text-sm font-medium"
+          style={{ color: colors.textMedium }}
+        >
           {label}
-          {required && <span className="text-destructive ml-1">*</span>}
+          {required && (
+            <span 
+              className="ml-1"
+              style={{ color: colors.error }}
+            >
+              *
+            </span>
+          )}
         </label>
       )}
       
       {renderField()}
       
       {showError && (
-        <Alert variant="destructive" className="py-2">
-          <AlertDescription className="text-sm">{error}</AlertDescription>
+        <Alert 
+          variant="destructive" 
+          className="py-2"
+          style={{
+            backgroundColor: theme === 'dark' ? `${colors.error}20` : `${colors.error}10`,
+            borderColor: colors.error,
+          }}
+        >
+          <AlertDescription 
+            className="text-sm"
+            style={{ color: colors.error }}
+          >
+            {error}
+          </AlertDescription>
         </Alert>
       )}
     </div>

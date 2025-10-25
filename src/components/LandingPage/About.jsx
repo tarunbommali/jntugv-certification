@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
 import PageContainer from "../layout/PageContainer";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
-import Badge from "../ui/Badge";
 import {
   GraduationCap,
   Users,
@@ -13,77 +11,24 @@ import {
   Star,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  features,
+  stats,
+  containerVariants,
+  itemVariants,
+  floatVariants,
+} from "./LandingPageConstants";
+import AnimatedSectionHeader from "./AnimatedSectionHeader.jsx";
 
 const About = () => {
-  const features = [
-    {
-      icon: GraduationCap,
-      title: "Industry-Recognized Certificates",
-      description:
-        "Get certified by JNTU-GV with credentials recognized by top companies worldwide.",
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      icon: Users,
-      title: "Expert Instructors",
-      description:
-        "Learn from industry professionals with years of real-world experience and proven expertise.",
-      gradient: "from-green-500 to-emerald-500",
-    },
-    {
-      icon: Award,
-      title: "Hands-On Projects",
-      description:
-        "Build real projects and portfolios that showcase your skills to employers and clients.",
-      gradient: "from-purple-500 to-pink-500",
-    },
-    {
-      icon: Globe,
-      title: "Global Community",
-      description:
-        "Join thousands of learners from around the world in our supportive and collaborative community.",
-      gradient: "from-orange-500 to-red-500",
-    },
-  ];
-
-  const stats = [
-    { number: "100+", label: "Students Enrolled" },
-    { number: "95%", label: "Completion Rate" },
-    { number: "50+", label: "Industry Partners" },
-    { number: "24/7", label: "Support Available" },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-      },
-    },
-  };
-
-  const floatVariants = {
-    float: {
-      y: [0, -10, 0],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
-    },
+  const iconComponents = {
+    GraduationCap,
+    Users,
+    Award,
+    Globe,
+    Target,
+    Rocket,
+    Star,
   };
 
   return (
@@ -114,31 +59,14 @@ const About = () => {
       />
 
       <PageContainer>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16 relative z-10"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-4"
-          >
-            <Target className="h-4 w-4" />
-            <span className="text-sm font-medium">About Us</span>
-          </motion.div>
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text  mb-4">
-            Empowering the Next Generation of Tech Professionals
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl md:text-center sm:text-left md:mx-auto">
-            JNTU-GV Certification Platform is designed to bridge the gap between
-            academic learning and industry requirements, providing students with
-            practical skills and recognized credentials for successful careers
-            in technology.
-          </p>
-        </motion.div>
+        <AnimatedSectionHeader
+          badge={{
+            icon: Target,
+            text: "About Us",
+          }}
+          title="Empowering the Next Generation of Tech Professionals"
+          description="JNTU-GV Certification Platform is designed to bridge the gap between academic learning and industry requirements, providing students with practical skills and recognized credentials for successful careers in technology."
+         />
 
         {/* Stats Section */}
         <motion.div
@@ -163,7 +91,6 @@ const About = () => {
                 <motion.div
                   variants={floatVariants}
                   animate="float"
-                  
                   className="text-3xl md:text-4xl font-bold text-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)]   mb-2"
                 >
                   {stat.number}
@@ -184,42 +111,45 @@ const About = () => {
           viewport={{ once: true, amount: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 relative z-10"
         >
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              whileHover={{
-                y: -8,
-                scale: 1.02,
-                transition: { type: "spring", stiffness: 300 },
-              }}
-              className="group relative"
-            >
-              {/* Gradient Border Effect */}
-              <div
-                className={`absolute -inset-0.5 bg-gradient-to-r ${feature.gradient} rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-300`}
-              />
+          {features.map((feature, index) => {
+            const IconComponent = iconComponents[feature.icon];
+            return (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover={{
+                  y: -8,
+                  scale: 1.02,
+                  transition: { type: "spring", stiffness: 300 },
+                }}
+                className="group relative"
+              >
+                {/* Gradient Border Effect */}
+                <div
+                  className={`absolute -inset-0.5 bg-gradient-to-r ${feature.gradient} rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-300`}
+                />
 
-              <Card className="relative bg-gradient-to-br from-background to-muted/50 rounded-2xl border border-border/50 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 h-full text-center group-hover:border-primary/30">
-                <CardHeader className="p-0 mb-4">
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    className={`mx-auto w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg`}
-                  >
-                    <feature.icon className="h-6 w-6" />
-                  </motion.div>
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors duration-300">
-                    {feature.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <p className="text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                <Card className="relative bg-gradient-to-br from-background to-muted/50 rounded-2xl border border-border/50 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 h-full text-center group-hover:border-primary/30">
+                  <CardHeader className="p-0 mb-4">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className={`mx-auto w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg`}
+                    >
+                      <IconComponent className="h-6 w-6" />
+                    </motion.div>
+                    <CardTitle className="text-lg group-hover:text-primary transition-colors duration-300">
+                      {feature.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <p className="text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </motion.div>
 
         {/* Mission Section */}
@@ -290,8 +220,6 @@ const About = () => {
                     </p>
                   </motion.div>
                 </div>
-
-               
               </CardContent>
             </div>
           </Card>

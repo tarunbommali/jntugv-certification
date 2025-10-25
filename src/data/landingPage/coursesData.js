@@ -1,0 +1,33 @@
+// Courses data
+export const courses = [
+  {
+    id: 1,
+    title: "AI & Machine Learning",
+    description: "Master artificial intelligence and machine learning concepts with hands-on projects.",
+    duration: "6 months",
+    students: "2.5k",
+    rating: 4.9,
+    level: "Advanced",
+    category: "AI/ML",
+    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
+    gradient: "from-purple-500 to-pink-500",
+    price: "₹24,999",
+    originalPrice: "₹34,999",
+    featured: true,
+  },
+  {
+    id: 8,
+    title: "Quantum Computing",
+    description: "Explore quantum algorithms, quantum gates, and programming quantum computers.",
+    duration: "7 months",
+    students: "600",
+    rating: 4.9,
+    level: "Expert",
+    category: "Quantum",
+    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=250&fit=crop",
+    gradient: "from-violet-500 to-purple-500",
+    price: "₹34,999",
+    originalPrice: "₹44,999",
+    featured: true,
+  },
+];

@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
               './src/pages/admin/CourseForm.jsx',
               './src/pages/admin/UsersManagement.jsx',
               './src/pages/admin/AdminCoupons.jsx',
-              './src/pages/admin/Courses.jsx'
+              './src/pages/admin/CourseManagement.jsx'
             ],
             // UI components
             ui: [

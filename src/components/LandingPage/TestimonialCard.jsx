@@ -13,7 +13,7 @@ const TestimonialCard = ({ item, idx }) => {
               <img
                 src={item.image}
                 alt={item.name}
-                className="w-full h-full rounded-xl object-cover shadow-md"
+                className="w-full h-full rounded-full object-cover shadow-md"
               />
               <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/30 rounded-xl opacity-20" />
             </div>

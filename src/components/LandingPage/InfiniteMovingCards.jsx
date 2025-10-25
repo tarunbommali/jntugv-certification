@@ -2,7 +2,7 @@
 "use client";
 
 import { cn } from "../../utils/cn";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import TestimonialCard from "./TestimonialCard";
 
 
@@ -13,8 +13,8 @@ export const InfiniteMovingCards = ({
   pauseOnHover = true,
   className,
 }) => {
-  const containerRef = React.useRef(null);
-  const scrollerRef = React.useRef(null);
+  const containerRef = useRef(null);
+  const scrollerRef = useRef(null);
 
   useEffect(() => {
     addAnimation();

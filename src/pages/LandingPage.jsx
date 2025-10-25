@@ -8,7 +8,7 @@ import Skills from "../components/LandingPage/Skills";
 import JoinCommunity from "../components/LandingPage/JoinCommunity";
 import Testimonial from "../components/LandingPage/Testimonial";
 import { useRealtime } from "../contexts/RealtimeContext";
-import FeaturedCourses from "../components/LandingPage/FeaturedCourses ";
+import FeaturedCourses from "../components/LandingPage/FeaturedCourses";
 
 const LandingPage = () => {
   const { courses, coursesLoading } = useRealtime();
