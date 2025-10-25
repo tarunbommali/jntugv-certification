@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 
 import {
@@ -23,7 +24,7 @@ import {
   updateEnrollmentViaAPI, 
   deleteEnrollmentViaAPI 
 } from "./apiOperations";
-import { createErrorResponse } from "../../utils/errorHandling";
+import { createErrorResponse, ERROR_TYPES } from "../../utils/errorHandling";
 
 // ============================================================================
 // ENROLLMENT OPERATIONS
@@ -42,9 +43,19 @@ export const createEnrollment = async (enrollmentData) => {
     if (apiResult.success) {
       return apiResult;
     }
-    
+
+    const canFallback = [
+      ERROR_TYPES.NETWORK,
+      ERROR_TYPES.SERVER,
+      ERROR_TYPES.UNKNOWN,
+    ].includes(apiResult?.errorType);
+
+    if (!canFallback) {
+      return apiResult;
+    }
+
     // Fallback to client-side creation
-    console.warn('API enrollment creation failed, falling back to client-side:', apiResult.error);
+    console.warn('API enrollment creation failed, falling back to client-side:', apiResult?.error);
     
     // Create V2 enrollment with explicit enrollmentId
     const enrollmentId = enrollmentData.enrollmentId ?? uuidv4();
@@ -99,9 +110,19 @@ export const getUserEnrollments = async (userId) => {
     if (apiResult.success) {
       return apiResult;
     }
-    
+
+    const canFallback = [
+      ERROR_TYPES.NETWORK,
+      ERROR_TYPES.SERVER,
+      ERROR_TYPES.UNKNOWN,
+    ].includes(apiResult?.errorType);
+
+    if (!canFallback) {
+      return apiResult;
+    }
+
     // Fallback to client-side query
-    console.warn('API fetch failed, falling back to client-side:', apiResult.error);
+    console.warn('API fetch failed, falling back to client-side:', apiResult?.error);
     
     const enrollmentsRef = collection(db, "enrollments");
     const q = query(
@@ -165,33 +186,24 @@ export const getUserEnrollments = async (userId) => {
 
 // firebase/services_modular/enrollmentOperations.js
 
-// Add proper error handling and CORS workaround
+// In enrollmentOperations.js - temporary fix
 export const updateEnrollment = async (enrollmentId, updateData) => {
   try {
-    // Prefer using admin API (Cloud Function). This function builds the URL
-    // from Vite env or Firebase project id in apiOperations.js.
-    const apiResult = await updateEnrollmentViaAPI(enrollmentId, updateData);
-    if (apiResult && apiResult.success) return apiResult;
-
-    // If API call returned an error object, fall back to direct Firestore update
-    console.warn('API updateEnrollment failed, falling back to Firestore:', apiResult?.error);
-  } catch (error) {
-    console.warn('API updateEnrollment failed, falling back to Firestore:', error);
-  }
-
-  // Fallback to direct Firebase update if Cloud Function fails or not available
-  try {
+    // Temporarily bypass API and use Firestore directly
+    console.log('Using Firestore fallback for updateEnrollment');
     const docRef = doc(db, 'enrollments', enrollmentId);
-    await updateDoc(docRef, updateData);
+    await updateDoc(docRef, {
+      ...updateData,
+      updatedAt: serverTimestamp()
+    });
     return { success: true, data: { id: enrollmentId, ...updateData } };
-  } catch (fallbackError) {
+  } catch (error) {
     return { 
       success: false, 
-      error: `Failed to update enrollment: ${fallbackError.message}` 
+      error: `Failed to update enrollment: ${error.message}` 
     };
   }
 };
-
 
 /**
  * Check if user is enrolled in course
@@ -305,9 +317,19 @@ export const deleteEnrollment = async (enrollmentId) => {
     if (apiResult.success) {
       return apiResult;
     }
-    
+
+    const canFallback = [
+      ERROR_TYPES.NETWORK,
+      ERROR_TYPES.SERVER,
+      ERROR_TYPES.UNKNOWN,
+    ].includes(apiResult?.errorType);
+
+    if (!canFallback) {
+      return apiResult;
+    }
+
     // Fallback to client-side deletion
-    console.warn('API deletion failed, falling back to client-side:', apiResult.error);
+    console.warn('API deletion failed, falling back to client-side:', apiResult?.error);
     
     // Get enrollment data before deletion
     const enrollmentDoc = await getDoc(doc(db, "enrollments", enrollmentId));

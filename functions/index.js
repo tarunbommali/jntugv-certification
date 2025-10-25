@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const express = require('express');
@@ -7,7 +8,39 @@ const cors = require('cors');
 admin.initializeApp();
 
 const app = express();
-app.use(cors({ origin: true }));
+
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200,
+};
+
+// Basic CORS headers + early preflight handling to ensure OPTIONS succeeds before auth checks
+app.use((req, res, next) => {
+  const origin = req.headers.origin || '*';
+  const requestHeaders = req.headers['access-control-request-headers'];
+
+  res.set('Access-Control-Allow-Origin', origin);
+  res.set('Vary', 'Origin');
+  res.set('Access-Control-Allow-Credentials', 'true');
+  res.set('Access-Control-Allow-Methods', corsOptions.methods.join(','));
+  const allowedHeaders = requestHeaders
+    ? requestHeaders
+    : `${corsOptions.allowedHeaders.join(',')},authorization`;
+
+  res.set('Access-Control-Allow-Headers', allowedHeaders);
+  res.set('Access-Control-Max-Age', '86400');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(corsOptions.optionsSuccessStatus).end();
+  }
+
+  return next();
+});
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Middleware to validate an Authorization: Bearer <idToken> header
@@ -22,7 +55,6 @@ async function verifyAuth(req, res, next) {
     req.auth = decoded;
     return next();
   } catch (error) {
-    /* eslint-disable-next-line no-console */
     console.error('verifyAuth error:', error && error.message ? error.message : error);
     return res.status(401).json({ success: false, error: 'Invalid auth token' });
   }
@@ -60,7 +92,6 @@ app.post('/admin/toggleUser', verifyAuth, verifyAdmin, async (req, res) => {
 
     return res.json({ success: true });
   } catch (err) {
-    /* eslint-disable-next-line no-console */
     console.error('Cloud Function toggleUser error:', err);
     const msg = err && err.message ? err.message : String(err);
     return res.status(500).json({ success: false, error: msg || 'UNKNOWN' });

@@ -44,13 +44,23 @@ import CheckoutPage from "./pages/CheckoutPage.jsx";
 const AdminPage = lazy(() => import("./pages/admin/AdminPage.jsx"));
 const Analytics = lazy(() => import("./pages/admin/Analytics.jsx"));
 const CourseForm = lazy(() => import("./pages/admin/CourseForm.jsx"));
-const CourseManagement = lazy(() => import("./pages/admin/CourseManagement.jsx"));
+const CourseManagement = lazy(() =>
+  import("./pages/admin/CourseManagement.jsx")
+);
 const UsersManagement = lazy(() => import("./pages/admin/UsersManagement.jsx"));
-const UserManagementForm = lazy(() => import("./pages/admin/UserManagementForm.jsx"));
+const UserManagementForm = lazy(() =>
+  import("./pages/admin/UserManagementForm.jsx")
+);
 const AdminCoupons = lazy(() => import("./pages/admin/AdminCoupons.jsx"));
-const CreateEditCouponPage = lazy(() => import("./pages/admin/CreateEditCouponPage.jsx"));
-const EnrollmentManagement = lazy(() => import("./pages/admin/EnrollmentManagement.jsx"));
-
+const CreateEditCouponPage = lazy(() =>
+  import("./pages/admin/CreateEditCouponPage.jsx")
+);
+const EnrollmentManagement = lazy(() =>
+  import("./pages/admin/EnrollmentManagement.jsx")
+);
+const ManualEnrollmentForm = lazy(() =>
+  import("./pages/admin/ManualEnrollmentForm.jsx")
+);
 // ----------------------------
 // Main Application
 // ----------------------------
@@ -69,7 +79,10 @@ const App = () => {
                       {/* Public Routes */}
                       <Route path="/" element={<LandingPage />} />
                       <Route path="/courses" element={<CoursePage />} />
-                      <Route path="/course/:courseId" element={<CourseDetailsPage />} />
+                      <Route
+                        path="/course/:courseId"
+                        element={<CourseDetailsPage />}
+                      />
                       <Route path="/legal/:page" element={<LegalPage />} />
 
                       {/* Auth Routes (No Layout Header/Footer) */}
@@ -227,6 +240,17 @@ const App = () => {
                           <ProtectedRoute requiredRole="admin">
                             <Suspense fallback={<LoadingScreen />}>
                               <EnrollmentManagement />
+                            </Suspense>
+                          </ProtectedRoute>
+                        }
+                      />
+
+                      <Route
+                        path="/admin/enrollments/manual"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <Suspense fallback={<LoadingScreen />}>
+                              <ManualEnrollmentForm />
                             </Suspense>
                           </ProtectedRoute>
                         }

@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext.jsx";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Edit,
@@ -32,11 +32,12 @@ import {
   calculateStats,
   getCleanEnrollmentData,
   isValidEnrollment,
-} from "../../utils/helper/enrollmentHelpers.js";
+} from "../../utils/helper/enrollmentHelpers.jsx";
 import {
   editEnrollmentFormConfig,
   manualEnrollmentFormConfig,
 } from "../../configs/enrollmentFormConfigs.js";
+import ManualEnrollmentForm from "./ManualEnrollmentForm.jsx"; // Import the new component
 
 const items = [
   { label: "Admin", link: "/admin" },
@@ -45,14 +46,9 @@ const items = [
 
 const EnrollmentManagement = () => {
   const { isAdmin } = useAuth();
-  const {
-    enrollments,
-    users,
-    courses,
-    loading,
-    error,
-    refreshData,
-  } = useEnrollmentContext();
+  const { enrollments, users, courses, loading, error, refreshData } =
+    useEnrollmentContext();
+  const navigate = useNavigate();
 
   // State
   const [searchTerm, setSearchTerm] = useState("");
@@ -87,8 +83,8 @@ const EnrollmentManagement = () => {
 
   // Toast notification helper
   const showToast = (message, type = "success") => {
-    setActionMessage({ show: true, message, type });
-    setTimeout(() => setActionMessage({ show: false, message: "", type: "success" }), 5000);
+    setActionMessage({ message, type });
+    setTimeout(() => setActionMessage({ message: "", type: "" }), 5000);
   };
 
   // Clean and filter enrollments
@@ -162,9 +158,16 @@ const EnrollmentManagement = () => {
     }
   };
 
-  const handleManualEnrollment = async () => {
-    const { userId, courseId, status, paidAmount, paymentMethod, paymentReference } = manualEnrollmentForm;
-    
+  const handleManualEnrollment = async (formData) => {
+    const {
+      userId,
+      courseId,
+      status,
+      paidAmount,
+      paymentMethod,
+      paymentReference,
+    } = formData;
+
     if (!userId || !courseId) {
       showToast("Please select both user and course", "error");
       return;
@@ -172,8 +175,8 @@ const EnrollmentManagement = () => {
 
     setProcessing(true);
     try {
-      const selectedCourse = courses.find(c => c.courseId === courseId);
-      const selectedUser = users.find(u => u.uid === userId);
+      const selectedCourse = courses.find((c) => c.courseId === courseId);
+      const selectedUser = users.find((u) => u.uid === userId);
 
       const enrollmentData = {
         userId: userId,
@@ -199,7 +202,11 @@ const EnrollmentManagement = () => {
           paymentMethod: "offline",
           paymentReference: "",
         });
-        showToast(`Successfully enrolled ${selectedUser?.displayName || selectedUser?.email} in ${selectedCourse?.title}`);
+        showToast(
+          `Successfully enrolled ${
+            selectedUser?.displayName || selectedUser?.email
+          } in ${selectedCourse?.title}`
+        );
         refreshData();
       } else {
         throw new Error(result.error || "Failed to create enrollment");
@@ -212,8 +219,8 @@ const EnrollmentManagement = () => {
   };
 
   const handleCourseChange = (courseId) => {
-    const selectedCourse = courses.find(c => c.courseId === courseId);
-    setManualEnrollmentForm(prev => ({
+    const selectedCourse = courses.find((c) => c.courseId === courseId);
+    setManualEnrollmentForm((prev) => ({
       ...prev,
       courseId: courseId,
       paidAmount: selectedCourse?.price || 0,
@@ -223,7 +230,7 @@ const EnrollmentManagement = () => {
   // Format date for display
   const formatDate = (date) => {
     if (!date) return "N/A";
-    
+
     try {
       if (date.toDate) {
         // Firebase timestamp
@@ -231,7 +238,7 @@ const EnrollmentManagement = () => {
       } else if (date instanceof Date) {
         // JavaScript Date object
         return date.toLocaleDateString();
-      } else if (typeof date === 'string') {
+      } else if (typeof date === "string") {
         // ISO string
         return new Date(date).toLocaleDateString();
       }
@@ -281,8 +288,12 @@ const EnrollmentManagement = () => {
               <AlertCircle className="w-5 h-5 text-red-400" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error loading data</h3>
-              <div className="mt-2 text-sm text-red-700"><p>{error}</p></div>
+              <h3 className="text-sm font-medium text-red-800">
+                Error loading data
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -300,14 +311,13 @@ const EnrollmentManagement = () => {
             className="mb-0"
           />
         </div>
-
-        <button
-          onClick={() => setShowManualEnrollment(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Manual Enrollment</span>
-        </button>
+ <button
+      onClick={() => navigate("/admin/enrollments/manual")}
+      className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
+    >
+      <UserPlus className="w-4 h-4" />
+      <span>Manual Enrollment</span>
+    </button>
       </div>
 
       {/* Filters */}
@@ -322,8 +332,10 @@ const EnrollmentManagement = () => {
             className="mb-0"
           >
             <option value="ALL">All Statuses</option>
-            {getUniqueStatuses(cleanEnrollments).map(status => (
-              <option key={status} value={status}>{status}</option>
+            {getUniqueStatuses(cleanEnrollments).map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
             ))}
           </FormField>
 
@@ -336,7 +348,7 @@ const EnrollmentManagement = () => {
             className="mb-0"
           >
             <option value="ALL">All Users</option>
-            {users.map(user => (
+            {users.map((user) => (
               <option key={user.uid} value={user.uid}>
                 {user.displayName || user.email}
               </option>
@@ -352,7 +364,7 @@ const EnrollmentManagement = () => {
             className="mb-0"
           >
             <option value="ALL">All Courses</option>
-            {courses.map(course => (
+            {courses.map((course) => (
               <option key={course.courseId} value={course.courseId}>
                 {course.title} {!course.isPublished && "(Draft)"}
               </option>
@@ -368,7 +380,9 @@ const EnrollmentManagement = () => {
             <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>No enrollments found matching your criteria.</p>
             {cleanEnrollments.length === 0 && (
-              <p className="text-sm mt-2">No enrollments have been created yet.</p>
+              <p className="text-sm mt-2">
+                No enrollments have been created yet.
+              </p>
             )}
           </div>
         ) : (
@@ -376,13 +390,27 @@ const EnrollmentManagement = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    User
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Payment
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -421,7 +449,7 @@ const EnrollmentManagement = () => {
 
       {/* Manual Enrollment Modal */}
       {showManualEnrollment && (
-        <ManualEnrollmentModal
+        <ManualEnrollmentForm
           form={manualEnrollmentForm}
           setForm={setManualEnrollmentForm}
           onClose={() => setShowManualEnrollment(false)}
@@ -430,8 +458,6 @@ const EnrollmentManagement = () => {
           loading={processing}
           users={users}
           courses={courses}
-          config={manualEnrollmentFormConfig}
-          getPublishedCourses={getPublishedCourses}
         />
       )}
     </PageContainer>
@@ -439,7 +465,14 @@ const EnrollmentManagement = () => {
 };
 
 // Sub-components for better organization
-const EnrollmentRow = ({ enrollment, onEdit, onDelete, getStatusIcon, getStatusColor, formatDate }) => (
+const EnrollmentRow = ({
+  enrollment,
+  onEdit,
+  onDelete,
+  getStatusIcon,
+  getStatusColor,
+  formatDate,
+}) => (
   <tr key={enrollment.id} className="hover:bg-gray-50">
     <td className="px-6 py-4 whitespace-nowrap">
       <div className="flex items-center">
@@ -470,7 +503,11 @@ const EnrollmentRow = ({ enrollment, onEdit, onDelete, getStatusIcon, getStatusC
       </div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(enrollment.status)}`}>
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+          enrollment.status
+        )}`}
+      >
         {getStatusIcon(enrollment.status)}
         <span className="ml-1">{enrollment.status}</span>
       </span>
@@ -525,7 +562,9 @@ const StatsSection = ({ stats }) => (
       <div className="text-sm text-gray-600">Total Enrollments</div>
     </div>
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
-      <div className="text-2xl font-bold text-green-600">{stats.successful}</div>
+      <div className="text-2xl font-bold text-green-600">
+        {stats.successful}
+      </div>
       <div className="text-sm text-gray-600">Successful</div>
     </div>
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
@@ -533,17 +572,27 @@ const StatsSection = ({ stats }) => (
       <div className="text-sm text-gray-600">Pending</div>
     </div>
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
-      <div className="text-2xl font-bold text-purple-600">${stats.totalRevenue}</div>
+      <div className="text-2xl font-bold text-purple-600">
+        ${stats.totalRevenue}
+      </div>
       <div className="text-sm text-gray-600">Total Revenue</div>
     </div>
   </div>
 );
 
-const EditEnrollmentModal = ({ enrollment, form, setForm, onClose, onSave, loading, config }) => (
+const EditEnrollmentModal = ({
+  enrollment,
+  form,
+  setForm,
+  onClose,
+  onSave,
+  loading,
+  config,
+}) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
       <h3 className="text-lg font-semibold mb-4">Edit Enrollment</h3>
-      
+
       <div className="space-y-4">
         <FormField
           label={config.status.label}
@@ -552,8 +601,10 @@ const EditEnrollmentModal = ({ enrollment, form, setForm, onClose, onSave, loadi
           onChange={(value) => setForm({ ...form, status: value })}
           className="mb-0"
         >
-          {config.status.options.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+          {config.status.options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </FormField>
 
@@ -573,8 +624,10 @@ const EditEnrollmentModal = ({ enrollment, form, setForm, onClose, onSave, loadi
           onChange={(value) => setForm({ ...form, paymentMethod: value })}
           className="mb-0"
         >
-          {config.paymentMethod.options.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+          {config.paymentMethod.options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </FormField>
 
@@ -601,110 +654,6 @@ const EditEnrollmentModal = ({ enrollment, form, setForm, onClose, onSave, loadi
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
           {loading ? "Updating..." : "Update"}
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-const ManualEnrollmentModal = ({ form, setForm, onClose, onSave, onCourseChange, loading, users, courses, config, getPublishedCourses }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-      <h3 className="text-lg font-semibold mb-4">Manual Enrollment</h3>
-      
-      <div className="space-y-4">
-        {/* User Selection */}
-        <FormField
-          label={config.userId.label}
-          type={config.userId.type}
-          value={form.userId}
-          onChange={(value) => setForm({ ...form, userId: value })}
-          className="mb-0"
-        >
-          <option value="">Choose a user</option>
-          {users.map(user => (
-            <option key={user.uid} value={user.uid}>
-              {user.displayName || user.email}
-            </option>
-          ))}
-        </FormField>
-
-        {/* Course Selection */}
-        <FormField
-          label={config.courseId.label}
-          type={config.courseId.type}
-          value={form.courseId}
-          onChange={(value) => onCourseChange(value)}
-          className="mb-0"
-        >
-          <option value="">Choose a course</option>
-          {getPublishedCourses(courses).map(course => (
-            <option key={course.courseId} value={course.courseId}>
-              {course.title} - ₹{course.price || 0}
-            </option>
-          ))}
-        </FormField>
-        <p className="text-xs text-gray-500 mt-1">Only published courses are shown</p>
-
-        {/* Course Fee Display */}
-        {form.courseId && (
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <div className="text-sm text-blue-800">
-              <strong>Course Fee:</strong> ₹{form.paidAmount}
-            </div>
-          </div>
-        )}
-
-        {/* Status */}
-        <FormField
-          label={config.status.label}
-          type={config.status.type}
-          value={form.status}
-          onChange={(value) => setForm({ ...form, status: value })}
-          className="mb-0"
-        >
-          {config.status.options.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </FormField>
-
-        {/* Payment Method */}
-        <FormField
-          label={config.paymentMethod.label}
-          type={config.paymentMethod.type}
-          value={form.paymentMethod}
-          onChange={(value) => setForm({ ...form, paymentMethod: value })}
-          className="mb-0"
-        >
-          {config.paymentMethod.options.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </FormField>
-
-        {/* Payment Reference */}
-        <FormField
-          label={config.paymentReference.label}
-          type={config.paymentReference.type}
-          value={form.paymentReference}
-          onChange={(value) => setForm({ ...form, paymentReference: value })}
-          placeholder={config.paymentReference.placeholder}
-          className="mb-0"
-        />
-      </div>
-
-      <div className="flex justify-end space-x-3 mt-6">
-        <button
-          onClick={onClose}
-          className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onSave}
-          disabled={loading || !form.userId || !form.courseId}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
-        >
-          {loading ? "Enrolling..." : "Enroll User"}
         </button>
       </div>
     </div>

@@ -410,7 +410,7 @@ const FeaturedCourses = () => {
       </PageContainer>
 
       {/* Custom CSS to hide scrollbar */}
-      <style jsx>{`
+      <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

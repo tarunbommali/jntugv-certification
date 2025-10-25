@@ -75,7 +75,7 @@ export const InfiniteMovingCards = ({
       )}>
       
       {/* Add CSS styles inline or make sure they're in your global CSS */}
-      <style jsx>{`
+      <style>{`
         @keyframes scroll {
           to {
             transform: translateX(calc(-50% - 0.5rem));
@@ -89,7 +89,7 @@ export const InfiniteMovingCards = ({
         .hover\\:\\[animation-play-state\\:paused\\]:hover {
           animation-play-state: paused;
         }
-      `}</style>
+  `}</style>
 
       <ul
         ref={scrollerRef}

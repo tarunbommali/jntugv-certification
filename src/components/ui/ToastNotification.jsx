@@ -193,7 +193,7 @@ const ToastNotification = ({
       </div>
 
       {/* CSS Animation for Progress Bar */}
-      <style jsx>{`
+      <style>{`
         @keyframes shrinkWidth {
           from { width: 100%; }
           to { width: 0%; }

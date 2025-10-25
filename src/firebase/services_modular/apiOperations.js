@@ -3,12 +3,60 @@
 import { auth } from '../../firebase';
 import { createErrorResponse } from '../../utils/errorHandling';
 
-// Prefer explicit override, otherwise derive from Firebase project id
-const API_BASE_URL = import.meta.env.VITE_API_URL || (() => {
-  const pid = import.meta.env.VITE_FIREBASE_PROJECT_ID;
-  if (!pid) return 'https://us-central1-your-project-id.cloudfunctions.net/api';
-  return `https://us-central1-${pid}.cloudfunctions.net/api`;
-})();
+const trimTrailingSlash = (value = '') => value.replace(/\/+$/, '');
+
+const joinUrlSegments = (base, endpoint) => {
+  if (!base) return endpoint;
+  if (base.endsWith('/') && endpoint.startsWith('/')) {
+    return `${base}${endpoint.slice(1)}`;
+  }
+  if (!base.endsWith('/') && !endpoint.startsWith('/')) {
+    return `${base}/${endpoint}`;
+  }
+  return `${base}${endpoint}`;
+};
+
+// Determine one or more base URLs. Prefer explicit override, fall back to proxy in dev,
+// then to the deployed Cloud Function URL.
+const resolveApiBaseCandidates = () => {
+  const candidates = [];
+  const explicit = import.meta.env.VITE_API_URL?.trim();
+  if (explicit) {
+    candidates.push(trimTrailingSlash(explicit));
+    return candidates;
+  }
+
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID?.trim();
+  const remoteBase = projectId
+    ? `https://us-central1-${projectId}.cloudfunctions.net/api`
+    : undefined;
+
+  if (import.meta.env.DEV) {
+    // Use the Vite proxy when available. Developers can disable it by setting
+    // VITE_USE_DEV_PROXY=false in .env if they prefer direct calls.
+    const proxyDisabled = import.meta.env.VITE_USE_DEV_PROXY === 'false';
+    if (!proxyDisabled) {
+      candidates.push('/__api');
+    }
+    if (remoteBase) {
+      candidates.push(trimTrailingSlash(remoteBase));
+    }
+    if (candidates.length > 0) {
+      return candidates;
+    }
+  }
+
+  if (remoteBase) {
+    candidates.push(trimTrailingSlash(remoteBase));
+  } else {
+    // Helpful fallback, but this will 404 until the developer configures env vars.
+    candidates.push('https://us-central1-your-project-id.cloudfunctions.net/api');
+  }
+
+  return candidates;
+};
+
+const API_BASE_CANDIDATES = resolveApiBaseCandidates();
 
 // Helper function to get auth token
 const getAuthToken = async () => {
@@ -19,32 +67,69 @@ const getAuthToken = async () => {
 
 // Helper function to make API calls
 const apiCall = async (endpoint, options = {}) => {
-  try {
-    const token = await getAuthToken();
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers,
-      },
-    });
+  const token = await getAuthToken();
+  const requestHeaders = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+    ...options.headers,
+  };
 
-    const data = await response.json();
-    
-    if (!response.ok) {
-      const error = new Error(data.error || `HTTP ${response.status}`);
-      error.code = response.status >= 500 ? 'server-error' : 'client-error';
-      error.status = response.status;
-      throw error;
+  const errors = [];
+
+  for (const base of API_BASE_CANDIDATES) {
+    const url = joinUrlSegments(base, endpoint);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: requestHeaders,
+      });
+
+      const contentType = response.headers.get('content-type') || '';
+      let payload;
+
+      if (contentType.includes('application/json')) {
+        payload = await response.json();
+      } else {
+        const text = await response.text();
+        const error = new Error(
+          text || `Unexpected response from API (status ${response.status})`
+        );
+        error.code = contentType.includes('text/html') ? 'invalid-response' : undefined;
+        error.status = response.status;
+        error.apiBase = base;
+        error.rawResponse = text;
+        throw error;
+      }
+
+      if (!response.ok || payload?.success === false) {
+        const error = new Error(
+          payload?.error || payload?.message || `HTTP ${response.status}`
+        );
+        error.code = response.status >= 500 ? 'server-error' : 'client-error';
+        error.status = response.status;
+        error.apiBase = base;
+        error.payload = payload;
+        throw error;
+      }
+
+      return payload;
+    } catch (error) {
+      error.apiBase = error.apiBase || base;
+      errors.push(error);
+      const isRelativeBase = typeof base === 'string' && base.startsWith('/');
+      const isClientError = error.status && error.status < 500;
+      const shouldRetry = !isClientError || isRelativeBase;
+
+      if (!shouldRetry) {
+        break;
+      }
     }
-    
-    return data;
-  } catch (error) {
-    return createErrorResponse(error, `API Call to ${endpoint}`);
   }
+
+  const finalError = errors.pop() || new Error('API request failed');
+  return createErrorResponse(finalError, `API Call to ${endpoint}`);
 };
 
 // ============================================================================
