@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
-import PageContainer from "../layout/PageContainer";
+import PageContainer from "../../layout/PageContainer.jsx";
 import {
   useFormValidation,
   validationRules,
-} from "../../hooks/useFormValidation";
+} from "../../../hooks/useFormValidation.js";
 import {
   Mail,
   Phone,
@@ -13,17 +13,13 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import {
-  contactInfo,
-  faqItems,
-  containerVariants,
-} from "./LandingPageConstants";
-import AnimatedSectionHeader from "./AnimatedSectionHeader.jsx";
+import { contactInfo } from "../../../data/landingPage/contactInfo.js";
+import { containerVariants } from "../../../data/landingPage/animationVariants.js";
+import AnimatedSectionHeader from "../ui/AnimatedSectionHeader.jsx";
 import GradientContactCard from "./GradientContactCard.jsx";
-import ContactForm from "./ContactForm.jsx"; 
-import FAQSection from "./FAQSection.jsx"; 
+import ContactForm from "./ContactForm.jsx";
 
-const ContactSection = () => {
+const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
@@ -86,9 +82,10 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-20 px-2 relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
+      
       <motion.div
         animate={{
           rotate: 360,
@@ -100,6 +97,7 @@ const ContactSection = () => {
         }}
         className="absolute top-10 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"
       />
+      
       <motion.div
         animate={{
           rotate: -360,
@@ -113,6 +111,7 @@ const ContactSection = () => {
       />
 
       <PageContainer>
+        {/* Header Section */}
         <AnimatedSectionHeader
           badge={{
             icon: MessageCircle,
@@ -142,9 +141,8 @@ const ContactSection = () => {
           })}
         </motion.div>
 
-        {/* Contact Form & FAQ */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
-          {/* Contact Form */}
+        {/* Contact Form Section */}
+        <div className="relative z-10">
           <ContactForm
             values={values}
             errors={errors}
@@ -154,13 +152,10 @@ const ContactSection = () => {
             isSubmitting={isSubmitting}
             submitStatus={submitStatus}
           />
-
-          {/* FAQ Section */}
-          <FAQSection faqItems={faqItems} />
         </div>
       </PageContainer>
     </section>
   );
 };
 
-export default ContactSection;
+export default Contact;

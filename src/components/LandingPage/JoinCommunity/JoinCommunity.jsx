@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
-import PageContainer from "../layout/PageContainer";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import PageContainer from "../../layout/PageContainer.jsx";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card.jsx";
 import { Users, MessageCircle, Calendar, Award, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { communityFeatures } from "../../../data/landingPage/communityFeatures.js";
 import {
-  communityFeatures,
   containerVariants,
   itemVariants,
-} from "./LandingPageConstants";
-import AnimatedSectionHeader from "./AnimatedSectionHeader.jsx";
+} from "../../../data/landingPage/animationVariants.js";
+import AnimatedSectionHeader from "../ui/AnimatedSectionHeader.jsx";
 
 const JoinCommunity = () => {
   const iconComponents = {
@@ -20,7 +20,7 @@ const JoinCommunity = () => {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-20 px-2 relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
       <motion.div

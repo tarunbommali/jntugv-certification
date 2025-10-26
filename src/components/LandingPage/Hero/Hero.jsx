@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { Rocket } from "lucide-react";
 import { motion } from "framer-motion";
-import AnimatedSectionHeader from "./AnimatedSectionHeader.jsx";
+import AnimatedSectionHeader from "../ui/AnimatedSectionHeader.jsx";
 import HeroContent from "./HeroContent.jsx";
-import PageContainer from "../layout/PageContainer";
-import { heroStats } from "./LandingPageConstants";
+import PageContainer from "../../layout/PageContainer.jsx";
+import { heroStats } from "../../../data/landingPage/heroData.js";
 
 const Hero = () => {
   const pieData = [
@@ -13,7 +13,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="pt-20 pb-16 relative overflow-hidden">
+    <section className="pt-20 px-2 pb-16 relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
       <motion.div

@@ -1,14 +1,17 @@
 /* eslint-disable no-unused-vars */
 import { useState, useRef, useEffect } from "react";
-import PageContainer from "../layout/PageContainer";
+import PageContainer from "../../layout/PageContainer.jsx";
 import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { courses, containerVariants } from "./LandingPageConstants";
-import AnimatedSectionHeader from "./AnimatedSectionHeader.jsx";
+import { courses as fallbackCourses } from "../../../data/landingPage/coursesData.js";
+import { containerVariants } from "../../../data/landingPage/animationVariants.js";
+import AnimatedSectionHeader from "../ui/AnimatedSectionHeader.jsx";
 import FeaturedCourseCard from "./FeaturedCourseCard.jsx";
 // FeaturedCourseCard component
 
-const FeaturedCourses = () => {
+const FeaturedCourses = ({ courses }) => {
+  const courseList =
+    Array.isArray(courses) && courses.length > 0 ? courses : fallbackCourses;
   const [hoveredCourse, setHoveredCourse] = useState(null);
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -124,7 +127,7 @@ const FeaturedCourses = () => {
             >
               {/* Add padding to first and last items for better scroll experience */}
               <div className="flex-shrink-0 w-4" />
-              {courses.map((course, index) => (
+              {courseList.map((course) => (
                 <FeaturedCourseCard
                   key={course.id}
                   course={course}

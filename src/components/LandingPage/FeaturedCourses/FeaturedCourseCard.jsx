@@ -5,12 +5,12 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "../ui/Card";
-import Button from "../ui/Button";
-import Badge from "../ui/Badge";
+} from "../../ui/Card";
+import Button from "../../ui/Button";
+import Badge from "../../ui/Badge";
 import { Clock, Users, Star, ArrowRight, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { itemVariants } from "./LandingPageConstants";
+import { itemVariants } from "../../../data/landingPage/animationVariants.js";
   
 
 const FeaturedCourseCard = ({ course, hoveredCourse, setHoveredCourse }) => {

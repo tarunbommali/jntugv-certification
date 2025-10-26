@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
-import Button from "../ui/Button";
-import FormField from "../ui/FormField";
-import { Alert, AlertDescription, AlertIcon } from "../ui/Alert";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card";
+import Button from "../../ui/Button";
+import FormField from "../../ui/FormField";
+import { Alert, AlertDescription, AlertIcon } from "../../ui/Alert";
 import { Send } from "lucide-react";
 
 const ContactForm = ({

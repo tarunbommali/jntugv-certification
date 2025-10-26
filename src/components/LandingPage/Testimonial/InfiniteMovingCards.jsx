@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 "use client";
 
-import { cn } from "../../utils/cn";
+import { cn } from "../../../utils/cn.js";
 import { useEffect, useState, useRef } from "react";
 import TestimonialCard from "./TestimonialCard";
 

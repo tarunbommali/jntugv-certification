@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { Quote } from "lucide-react";
 import { motion } from "framer-motion";
-import { global_classnames } from "../../utils/classnames.js";
-import { InfiniteMovingCards } from "./InfiniteMovingCards.jsx";
-import AnimatedSectionHeader from "./AnimatedSectionHeader.jsx";
-import { testimonialsData } from '../../data/landingPage/testimonials.js';
+ import { InfiniteMovingCards } from "./InfiniteMovingCards.jsx";
+import AnimatedSectionHeader from "../ui/AnimatedSectionHeader.jsx";
+import { testimonialsData } from '../../../data/landingPage/testimonials.js';
+import PageContainer from "../../layout/PageContainer.jsx";
 
 const Testimonial = () => {
   // Map the data to match your TestimonialCard component structure
@@ -19,7 +19,7 @@ const Testimonial = () => {
 
   return (
     <section className="py-12 md:py-20 relative overflow-hidden">
-      <div className={`${global_classnames.width.container} mx-auto px-4 relative`}>
+      <PageContainer className={` mx-auto px-4 relative`}>
         <AnimatedSectionHeader
           badge={{
             icon: Quote,
@@ -36,7 +36,7 @@ const Testimonial = () => {
           pauseOnHover={true}
           className="mt-8"
         />
-      </div>
+      </PageContainer>
     </section>
   );
 };

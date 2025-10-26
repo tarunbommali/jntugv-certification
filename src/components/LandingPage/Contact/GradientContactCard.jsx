@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
-import { itemVariants } from "./LandingPageConstants";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/Card";
+import { itemVariants } from "../../../data/landingPage/animationVariants.js";
 
 const GradientContactCard = ({ info, IconComponent }) => {
   return (
