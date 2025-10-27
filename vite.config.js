@@ -47,7 +47,9 @@ export default defineConfig(({ mode }) => {
           }
         }
       },
-      chunkSizeWarningLimit: 1000, // Increase warning limit to 1000 kB
+  // Increase Vite's chunk size warning limit to avoid noisy warnings for
+  // larger vendor/admin bundles. Set to 2000 KB (2 MB).
+  chunkSizeWarningLimit: 2000,
     }
   }
 })

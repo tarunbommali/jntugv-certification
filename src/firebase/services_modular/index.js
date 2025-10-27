@@ -5,6 +5,7 @@ import * as enrollment from "./enrollmentOperations.js";
 import * as coupon from "./couponOperations.js";
 import * as payment from "./paymentOperations.js";
 import * as progress from "./userProgressOperations.js";
+import { getProfileViaAPI, updateProfileViaAPI } from "./apiOperations.js";
 
 // Named exports
 export const createOrUpdateUser = user.createOrUpdateUser;
@@ -39,6 +40,7 @@ export const getUserPaymentHistory = payment.getUserPaymentHistory;
 export const getUserProgress = progress.getUserProgress;
 export const updateUserProgress = progress.updateUserProgress;
 export const getSecureVideoAccessUrl = progress.getSecureVideoAccessUrl;
+export { getProfileViaAPI, updateProfileViaAPI };
 
 // Fallback placeholders for less-used functions
 export const getCourseContent = async (...args) => ({
@@ -93,6 +95,9 @@ const defaultExport = {
   getUserProgress,
   updateUserProgress,
   getSecureVideoAccessUrl,
+  // Profile API
+  getProfileViaAPI,
+  updateProfileViaAPI,
 
   // Misc
   getCourseContent,

@@ -21,7 +21,9 @@ import { normalizeFirestoreError } from "./mappers";
 import { 
   createUserViaAPI, 
   toggleUserStatusViaAPI, 
-  getUsersViaAPI 
+  getUsersViaAPI,
+  getProfileViaAPI,
+  updateProfileViaAPI,
 } from "./apiOperations";
 import { createErrorResponse, validateEmail, validatePassword, validateRequired } from "../../utils/errorHandling";
 
@@ -72,14 +74,31 @@ export const createOrUpdateUser = async (firebaseUser, additionalData = {}) => {
  */
 export const getUserProfile = async (uid) => {
   try {
+    // If uid matches current authenticated user, prefer API call which may
+    // include derived fields or server-side logic. Otherwise fall back to Firestore read.
+    const currentUid = auth?.currentUser?.uid;
+    if ((!uid && currentUid) || (uid && currentUid && uid === currentUid)) {
+      try {
+        const apiResult = await getProfileViaAPI();
+        if (apiResult && apiResult.success) {
+          return { success: true, data: apiResult.data };
+        }
+        // If API fails, continue to fallback to Firestore
+        console.warn('getProfileViaAPI failed, falling back to Firestore', apiResult?.error);
+      } catch (apiErr) {
+        console.warn('getProfileViaAPI threw, falling back to Firestore', apiErr);
+      }
+    }
+
+    // Firestore fallback (or when fetching other users by UID)
+    if (!uid) throw new Error('UID required to fetch other users');
     const userRef = doc(db, "users", uid);
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
       return { success: true, data: { id: userSnap.id, ...userSnap.data() } };
-    } else {
-      return { success: false, error: "User not found" };
     }
+    return { success: false, error: "User not found" };
   } catch (error) {
   const norm = normalizeFirestoreError(error);
   console.error("Error fetching user profile:", norm);
@@ -92,6 +111,23 @@ export const getUserProfile = async (uid) => {
  */
 export const updateUserProfile = async (uid, updateData) => {
   try {
+    const currentUid = auth?.currentUser?.uid;
+
+    // If updating the current user's profile, try the API first which also
+    // synchronizes Firebase Auth profile fields (displayName/photoURL).
+    if (currentUid && uid === currentUid) {
+      try {
+        const apiResult = await updateProfileViaAPI(updateData);
+        if (apiResult && apiResult.success) {
+          return { success: true, data: apiResult.data };
+        }
+        console.warn('updateProfileViaAPI failed, falling back to Firestore', apiResult?.error);
+      } catch (apiErr) {
+        console.warn('updateProfileViaAPI threw, falling back to Firestore', apiErr);
+      }
+    }
+
+    // Firestore update fallback
     const userRef = doc(db, "users", uid);
     const updatePayload = {
       ...updateData,

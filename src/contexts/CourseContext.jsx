@@ -2,91 +2,74 @@
 // src/contexts/CourseContext.jsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import {
-  getAllCourses,
   getCourseById,
-  createCourse,
-  updateCourse,
-  deleteCourse,
+  deleteCourse as deleteCourseService,
 } from "../firebase/services_modular/courseOperations";
+import {
+  useRealtimeCourses,
+  useRealtimeCourseMutations,
+} from "../hooks/useRealtimeFirebase";
 
 const CourseContext = createContext(undefined);
 
 // Custom hook for Firebase operations
 const useCourseOperations = () => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // Use real-time courses hook (onSnapshot under the hood)
+  const {
+    data: realtimeCourses,
+    loading: realtimeLoading,
+    error: realtimeError,
+  } = useRealtimeCourses({ limitCount: 200, publishedOnly: false });
+
+  const { createCourse: createCourseMut, updateCourse: updateCourseMut } =
+    useRealtimeCourseMutations();
+
   const [error, setError] = useState(null);
 
   // Fetch all courses
   const fetchCourses = useCallback(
     async (options = {}) => {
       const { forceRefresh = false, limit = 50 } = options;
-
-      if (courses.length > 0 && !forceRefresh) return;
-
-      setLoading(true);
+      // With real-time listener the data is kept in realtimeCourses and
+      // automatically updated via onSnapshot. We still keep this method to
+      // preserve the previous API surface and allow consumers to force a
+      // non-real-time refresh if needed (not implemented here).
+      if (!forceRefresh) return;
+      // If a forced refresh is requested, fall back to client-side cache
+      // refresh by simply clearing any local error state. Caller may chain
+      // additional logic if needed.
       setError(null);
-
-      try {
-        const result = await getAllCourses(limit);
-        if (result.success) {
-          setCourses(result.data || []);
-        } else {
-          setError(result.error || "Failed to fetch courses");
-        }
-      } catch (err) {
-        setError(err.message || "An error occurred while fetching courses");
-      } finally {
-        setLoading(false);
-      }
     },
-    [courses]
+    []
   );
 
   // Fetch single course by ID
   const fetchCourseById = useCallback(async (courseId) => {
     if (!courseId) throw new Error("Course ID is required");
-
-    setLoading(true);
+    // One-off fetch for a specific course (useful in admin edit flows).
     setError(null);
-
     try {
       const result = await getCourseById(courseId);
-      if (result.success) {
-        return result.data;
-      } else {
-        setError(result.error || "Course not found");
-        return null;
-      }
+      if (result.success) return result.data;
+      setError(result.error || "Course not found");
+      return null;
     } catch (err) {
       setError(err.message || "Failed to fetch course");
       return null;
-    } finally {
-      setLoading(false);
     }
   }, []);
 
   // Create new course
   const addCourse = async (courseData) => {
-    setLoading(true);
     setError(null);
-
     try {
-      const result = await createCourse(courseData);
-
-      if (result.success) {
-        // Add the new course to local state
-        setCourses((prev) => [result.data, ...prev]);
-        return result.data;
-      } else {
-        setError(result.error || "Failed to create course");
-        return null;
-      }
+      const result = await createCourseMut(courseData);
+      if (result?.success) return result.data || { id: result.data?.id };
+      setError(result?.error || "Failed to create course");
+      return null;
     } catch (err) {
       setError(err.message || "Failed to create course");
       return null;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -95,36 +78,15 @@ const useCourseOperations = () => {
     if (!courseId) {
       throw new Error("Course ID is required");
     }
-
-    setLoading(true);
     setError(null);
-
     try {
-      const result = await updateCourse(courseId, updateData);
-
-      if (result.success) {
-        // Update course in local state
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === courseId
-              ? {
-                  ...course,
-                  ...updateData,
-                  updatedAt: new Date().toISOString(),
-                }
-              : course
-          )
-        );
-        return true;
-      } else {
-        setError(result.error || "Failed to update course");
-        return false;
-      }
+      const result = await updateCourseMut(courseId, updateData);
+      if (result?.success) return true;
+      setError(result?.error || "Failed to update course");
+      return false;
     } catch (err) {
       setError(err.message || "Failed to update course");
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -133,27 +95,15 @@ const useCourseOperations = () => {
     if (!courseId) {
       throw new Error("Course ID is required");
     }
-
-    setLoading(true);
     setError(null);
-
     try {
-      // Note: You'll need to implement deleteCourse in your firebaseService
-      const result = await deleteCourse(courseId);
-
-      if (result.success) {
-        // Remove course from local state
-        setCourses((prev) => prev.filter((course) => course.id !== courseId));
-        return true;
-      } else {
-        setError(result.error || "Failed to delete course");
-        return false;
-      }
+      const result = await deleteCourseService(courseId);
+      if (result.success) return true;
+      setError(result.error || "Failed to delete course");
+      return false;
     } catch (err) {
       setError(err.message || "Failed to delete course");
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -169,9 +119,10 @@ const useCourseOperations = () => {
   const clearError = () => setError(null);
 
   return {
-    courses,
-    loading,
-    error,
+    // Use real-time course list as source-of-truth
+    courses: realtimeCourses || [],
+    loading: realtimeLoading,
+    error: error || realtimeError,
     fetchCourses,
     fetchCourseById,
     addCourse,

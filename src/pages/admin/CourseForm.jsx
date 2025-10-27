@@ -37,9 +37,11 @@ import ToastNotification from "../../components/ui/ToastNotification.jsx";
 import LoadingSpinner from "../../components/ui/LoadingSpinner.jsx";
  
 
+import { useRealtimeCourse } from "../../hooks/useRealtimeFirebase.js";
+
 const CourseForm = () => {
   const { isAdmin, currentUser } = useAuth();
-  const { createCourse, updateCourse, fetchCourseById } = useCourseContext();
+  const { createCourse, updateCourse } = useCourseContext();
   const { courseId } = useParams();
   const navigate = useNavigate();
 
@@ -111,14 +113,9 @@ const CourseForm = () => {
           setFormData({ ...emptyCourse, createdBy: currentUser?.uid || "" });
           setModules([]);
         } else {
-          console.log("📘 Fetching course with ID:", actualCourseId);
-          const courseData = await fetchCourseById(actualCourseId);
-          if (!courseData) throw new Error("Course not found");
-
-          const mappedCourseData = mapCourseDataToForm(courseData);
-          setFormData(mappedCourseData);
-          setModules(courseData.modules || []);
-          console.log("✅ Course data loaded successfully");
+          // Real-time subscription will populate the form; mark loading
+          // and let the realtime hook update the form via a separate effect.
+          console.log("📘 Subscribing to realtime course with ID:", actualCourseId);
         }
       } catch (err) {
         console.error("❌ Failed to fetch course:", err);
@@ -130,7 +127,43 @@ const CourseForm = () => {
 
     fetchCourseData();
     // ⚙️ Only stable dependencies
-  }, [isAdmin, isNewCourse, actualCourseId, currentUser, fetchCourseById]);
+  }, [isAdmin, isNewCourse, actualCourseId, currentUser]);
+
+  // Subscribe to the single course in real-time when editing
+  const { course: realtimeCourse, loading: realtimeCourseLoading, error: realtimeCourseError } =
+    useRealtimeCourse(isEditCourse ? actualCourseId : null, { enabled: isEditCourse });
+
+  // When the realtime course data arrives, map it to form and modules
+  useEffect(() => {
+    if (!isEditCourse) return;
+
+    if (realtimeCourseLoading) {
+      setLoading(true);
+      return;
+    }
+
+    setLoading(false);
+
+    if (realtimeCourseError) {
+      console.error("Realtime course error:", realtimeCourseError);
+      setCourseNotFound(true);
+      return;
+    }
+
+    if (!realtimeCourse) {
+      setCourseNotFound(true);
+      return;
+    }
+
+    try {
+      const mapped = mapCourseDataToForm(realtimeCourse);
+      setFormData(mapped);
+      setModules(realtimeCourse.modules || []);
+      console.log("✅ Realtime course data loaded into form");
+    } catch (err) {
+      console.error("Failed to map realtime course data:", err);
+    }
+  }, [realtimeCourse, realtimeCourseLoading, realtimeCourseError, isEditCourse]);
 
   /* --- Form Submission --- */
   const handleSubmit = async (e) => {

@@ -5,11 +5,13 @@ import {
   Mail,
   LogOut,
   BookOpen,
-  Shield,
-  TrendingUp,
   UserCircle,
   PencilLine,
   AlertTriangle,
+  Phone,
+  Linkedin,
+  Github,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { useUser } from "../contexts/UserContext.jsx"; // Context providing enrollments
@@ -129,13 +131,13 @@ const ProfilePage = () => {
     fullName: userProfile?.name || currentUser?.displayName || "N/A",
     email: currentUser?.email || "N/A",
     phone: userProfile?.phone || "N/A",
-    college: userProfile?.college || "JNTU-GV Student",
+  college: userProfile?.college || "",
     gender: userProfile?.gender || "Not Specified",
-    skills:
-      userProfile?.skills && Array.isArray(userProfile.skills)
-        ? userProfile.skills
-        : ["AI", "ML Basics", "Python"],
+    skills: userProfile?.skills && Array.isArray(userProfile.skills) ? userProfile.skills : [],
     photoUrl: currentUser?.photoURL,
+    bio: userProfile?.bio || "",
+    socialLinks: userProfile?.socialLinks || {},
+    dateOfBirth: userProfile?.dateOfBirth || null,
     initials: getInitials(userProfile?.name || currentUser?.displayName),
   };
 
@@ -194,7 +196,7 @@ const ProfilePage = () => {
               {profileData.email}
             </p>
             <p className="text-sm text-muted mt-1 flex items-center justify-center md:justify-start gap-1">
-              <School className="w-4 h-4" /> {profileData.college}
+              <School className="w-4 h-4" /> {profileData.college || "Not specified"}
             </p>
           </div>
 
@@ -225,21 +227,65 @@ const ProfilePage = () => {
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* LEFT COLUMN: User Details and Skills */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Profile Details Card */}
+          <div className="p-6 rounded-xl shadow-md card">
+            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">Profile Details</h2>
+            <div className="space-y-3 text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-gray-500" />
+                <span className="font-medium">{profileData.phone || "N/A"}</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-500" />
+                <span>{profileData.dateOfBirth ? profileData.dateOfBirth : "Date of birth not set"}</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <UserCircle className="w-4 h-4 text-gray-500" />
+                <span>{profileData.gender}</span>
+              </div>
+
+              {profileData.bio ? (
+                <div>
+                  <h3 className="mt-2 text-sm font-semibold">About</h3>
+                  <p className="text-sm text-gray-600">{profileData.bio}</p>
+                </div>
+              ) : null}
+
+              <div className="mt-2 flex items-center gap-3">
+                {profileData.socialLinks?.linkedin && (
+                  <a href={profileData.socialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-indigo-600 hover:underline">
+                    <Linkedin className="w-4 h-4" /> LinkedIn
+                  </a>
+                )}
+
+                {profileData.socialLinks?.github && (
+                  <a href={profileData.socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-gray-800 hover:underline">
+                    <Github className="w-4 h-4" /> GitHub
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Skills Section */}
           <div className="p-6 rounded-xl shadow-md card">
-            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">
-              Current Skills
-            </h2>
+            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">Current Skills</h2>
             <div className="flex flex-wrap gap-2">
-              {profileData.skills.map((skill, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 rounded-full text-sm font-medium"
-                  style={{ background: "#e0f2fe", color: "#0369a1" }}
-                >
-                  {skill}
-                </span>
-              ))}
+              {profileData.skills && profileData.skills.length > 0 ? (
+                profileData.skills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 rounded-full text-sm font-medium"
+                    style={{ background: "#e0f2fe", color: "#0369a1" }}
+                  >
+                    {skill}
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm text-gray-500">No skills added</span>
+              )}
             </div>
           </div>
         </div>
@@ -248,9 +294,12 @@ const ProfilePage = () => {
         <div className="lg:col-span-2 space-y-8">
           {/* Enrolled Courses */}
           <div className="p-6 rounded-xl shadow-md card">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4 flex items-center gap-3">
               <BookOpen className="w-6 h-6" style={{ color: PRIMARY_BLUE }} />
-              Enrolled Courses ({enrollments.length})
+              <span>Enrolled Courses</span>
+              <span className="ml-2 inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+                {loadingEnrollments ? '...' : (enrollments?.length || 0)}
+              </span>
             </h2>
 
             {enrollments.length > 0 ? (

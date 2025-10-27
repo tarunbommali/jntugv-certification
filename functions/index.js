@@ -331,4 +331,73 @@ app.get('/admin/courses', verifyAuth, verifyAdmin, async (req, res) => {
   }
 });
 
+// GET /profile - return current authenticated user's profile from Firestore
+app.get('/profile', verifyAuth, async (req, res) => {
+  try {
+    const uid = req.auth.uid;
+    const userRef = admin.firestore().collection('users').doc(uid);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ success: false, error: 'User profile not found' });
+    }
+
+    return res.json({ success: true, data: { uid: userDoc.id, ...userDoc.data() } });
+  } catch (err) {
+    console.error('Cloud Function getProfile error:', err);
+    const msg = err && err.message ? err.message : String(err);
+    return res.status(500).json({ success: false, error: msg || 'UNKNOWN' });
+  }
+});
+
+// PUT /profile - update current user's profile (Firestore + optional Firebase Auth fields)
+app.put('/profile', verifyAuth, async (req, res) => {
+  try {
+    const uid = req.auth.uid;
+    const payload = req.body || {};
+
+    // Only allow a whitelist of profile fields to be updated
+    const allowedFields = [
+      'displayName',
+      'phone',
+      'photoURL',
+      'bio',
+      'address',
+    ];
+
+    const updateData = {};
+    allowedFields.forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(payload, key)) {
+        updateData[key] = payload[key];
+      }
+    });
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ success: false, error: 'No valid fields provided to update' });
+    }
+
+    updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+    // Update Firestore profile
+    await admin.firestore().collection('users').doc(uid).update(updateData);
+
+    // If displayName or photoURL changed, also update Firebase Auth profile
+    const authUpdate = {};
+    if (updateData.displayName) authUpdate.displayName = updateData.displayName;
+    if (updateData.photoURL) authUpdate.photoURL = updateData.photoURL;
+
+    if (Object.keys(authUpdate).length > 0) {
+      await admin.auth().updateUser(uid, authUpdate);
+    }
+
+    const updatedDoc = await admin.firestore().collection('users').doc(uid).get();
+
+    return res.json({ success: true, data: { uid: updatedDoc.id, ...updatedDoc.data() } });
+  } catch (err) {
+    console.error('Cloud Function updateProfile error:', err);
+    const msg = err && err.message ? err.message : String(err);
+    return res.status(500).json({ success: false, error: msg || 'UNKNOWN' });
+  }
+});
+
 exports.api = functions.https.onRequest(app);

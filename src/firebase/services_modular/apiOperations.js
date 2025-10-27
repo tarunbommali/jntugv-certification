@@ -164,6 +164,28 @@ export const getUsersViaAPI = async (limit = 100, offset = 0) => {
 };
 
 // ============================================================================
+// PROFILE API OPERATIONS
+// ============================================================================
+
+/**
+ * Get current authenticated user's profile via API
+ */
+export const getProfileViaAPI = async () => {
+  return await apiCall('/profile');
+};
+
+/**
+ * Update current authenticated user's profile via API
+ * updateData: object with allowed profile fields
+ */
+export const updateProfileViaAPI = async (updateData) => {
+  return await apiCall('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(updateData),
+  });
+};
+
+// ============================================================================
 // ENROLLMENT MANAGEMENT API OPERATIONS
 // ============================================================================
 
@@ -219,6 +241,8 @@ export default {
   createUserViaAPI,
   toggleUserStatusViaAPI,
   getUsersViaAPI,
+  getProfileViaAPI,
+  updateProfileViaAPI,
   
   // Enrollment operations
   createEnrollmentViaAPI,
