@@ -6,7 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import { useCouponLogic } from "../../hooks/useCouponLogic.js";
 import PageContainer from "../../components/layout/PageContainer.jsx";
-import { AlertCircle, Percent, DollarSign, ArrowLeft } from "lucide-react";
+import { AlertCircle, Percent, IndianRupee, ArrowLeft } from "lucide-react";
 
 import PageTitle from "../../components/ui/PageTitle.jsx";
 
@@ -55,8 +55,7 @@ const CreateEditCouponPage = () => {
     },
   ];
 
-  // ... onSubmit function and component JSX (omitted for brevity)
-
+ 
   return (
     // ... full component JSX
     <PageContainer
@@ -177,7 +176,7 @@ const CreateEditCouponPage = () => {
                   {formData.type === "percent" ? (
                     <Percent className="w-5 h-5" />
                   ) : (
-                    <DollarSign className="w-5 h-5" />
+                    <IndianRupee className="w-5 h-5" />
                   )}
                 </div>
               </div>

@@ -15,7 +15,7 @@ import {
   Shield,
   UserX,
   CreditCard,
-  DollarSign,
+  IndianRupee,
 } from "lucide-react";
 import PageContainer from "../../components/layout/PageContainer.jsx";
 import {
@@ -31,7 +31,7 @@ import {
   deleteEnrollment 
 } from "../../firebase/services_modular/enrollmentOperations";
 import PageTitle from "../../components/ui/PageTitle.jsx";
-import EnrollmentManagement from "../../components/admin/EnrollmentManagement.jsx";
+import EnrollmentManagement from "./EnrollmentManagement.jsx";
 
 const UserManagementForm = () => {
   const { isAdmin } = useAuth();
@@ -263,9 +263,9 @@ const UserManagementForm = () => {
         });
       }
 
-      const successMessage = isCreationMode
-        ? `User created and enrolled in ${selectedCourses.length} course(s) with ${paymentMethod} payment! Total: $${totalAmount}. Redirecting...`
-        : `Successfully enrolled user in ${selectedCourses.length} course(s) with ${paymentMethod} payment! Total: $${totalAmount}.`;
+  const successMessage = isCreationMode
+    ? `User created and enrolled in ${selectedCourses.length} course(s) with ${paymentMethod} payment! Total: ₹${totalAmount}. Redirecting...`
+    : `Successfully enrolled user in ${selectedCourses.length} course(s) with ${paymentMethod} payment! Total: ₹${totalAmount}.`;
 
       setSuccess(successMessage);
       setSelectedCourses([]);
@@ -638,7 +638,7 @@ const UserManagementForm = () => {
                       </div>
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-2">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
+                          <IndianRupee className="w-4 h-4 text-gray-400" />
                           <span className="text-sm text-gray-600">Price:</span>
                         </div>
                         <input
@@ -658,7 +658,7 @@ const UserManagementForm = () => {
                           placeholder="0.00"
                         />
                         <span className="text-sm text-gray-500">
-                          (Original: ${course.price || 0})
+                          (Original: ₹{course.price || 0})
                         </span>
                       </div>
                     </div>
@@ -687,14 +687,14 @@ const UserManagementForm = () => {
                         className="flex justify-between text-sm"
                       >
                         <span className="text-blue-700">{course?.title}</span>
-                        <span className="font-medium">${price}</span>
+                        <span className="font-medium">₹{price}</span>
                       </div>
                     );
                   })}
                   <div className="border-t border-blue-200 pt-2 mt-2">
                     <div className="flex justify-between font-bold text-blue-900">
                       <span>Total Amount:</span>
-                      <span>${totalAmount}</span>
+                      <span>₹{totalAmount}</span>
                     </div>
                   </div>
                 </div>
@@ -742,7 +742,7 @@ const UserManagementForm = () => {
                           : "border-gray-300 hover:border-gray-400"
                       }`}
                     >
-                      <DollarSign className="w-5 h-5 mx-auto mb-1" />
+                      <IndianRupee className="w-5 h-5 mx-auto mb-1" />
                       <div className="font-medium">Free Enrollment</div>
                       <div className="text-xs text-gray-500">Complimentary</div>
                     </button>
@@ -814,9 +814,9 @@ const UserManagementForm = () => {
                     {offlinePaymentDetails.amountPaid > 0 &&
                       offlinePaymentDetails.amountPaid !== totalAmount && (
                         <div className="mt-2 text-sm text-yellow-700">
-                          <strong>Note:</strong> Paid amount ($
+                          <strong>Note:</strong> Paid amount (₹
                           {offlinePaymentDetails.amountPaid}) differs from total
-                          (${totalAmount})
+                          (₹{totalAmount})
                         </div>
                       )}
                   </div>
@@ -829,7 +829,7 @@ const UserManagementForm = () => {
                   </h4>
                   <div className="flex justify-between text-sm">
                     <span>Total Course Fees:</span>
-                    <span className="font-medium">${totalAmount}</span>
+                    <span className="font-medium">₹{totalAmount}</span>
                   </div>
                   <div className="flex justify-between text-sm mt-1">
                     <span>Payment Method:</span>
@@ -842,7 +842,7 @@ const UserManagementForm = () => {
                       <div className="flex justify-between text-sm mt-1">
                         <span>Amount Paid:</span>
                         <span className="font-medium text-green-600">
-                          ${offlinePaymentDetails.amountPaid}
+                          ₹{offlinePaymentDetails.amountPaid}
                         </span>
                       </div>
                     )}

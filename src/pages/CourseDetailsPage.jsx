@@ -28,7 +28,9 @@ import {
   CheckCircle,
   Users,
   BookOpen,
+  Play,
 } from "lucide-react";
+import { formatINR, toNumber } from "../utils/currency";
 
 const CourseDetailsPage = () => {
   const { courseId } = useParams();
@@ -133,6 +135,7 @@ const CourseDetailsPage = () => {
 
   // Use course data if available, otherwise use dummy data
   const displayCourse = course || dummyData;
+  const contentType = (course?.contentType || 'modules');
 
   const breadcrumbItems = [
     { label: "Home", link: "/" },
@@ -180,8 +183,8 @@ const CourseDetailsPage = () => {
   // Show warning if using dummy data but don't block rendering
   const showDummyDataWarning = courseError || !course;
 
-  const price = Number(displayCourse.price) || 0;
-  const originalPrice = Number(displayCourse.originalPrice) || price + 2000;
+  const price = toNumber(displayCourse.price, 0);
+  const originalPrice = toNumber(displayCourse.originalPrice, price + 2000);
 
   return (
     <PageContainer items={breadcrumbItems} className="min-h-screen py-8">
@@ -252,12 +255,12 @@ const CourseDetailsPage = () => {
                 </div>
               </div>
 
-              {/* Course Modules */}
+              {/* Course Modules/Series */}
               {displayCourse.modules && displayCourse.modules.length > 0 && (
                 <div>
                   <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                     <BookOpen size={20} />
-                    Course Modules
+                    {contentType === 'series' ? 'Video Series' : 'Course Modules'}
                   </h3>
                   <div className="space-y-3">
                     {displayCourse.modules.map((module, index) => (
@@ -270,12 +273,34 @@ const CourseDetailsPage = () => {
                             module.title ||
                             `Module ${index + 1}`}
                         </h4>
-                        {module.videos && module.videos.length > 0 && (
-                          <div className="text-sm text-muted-foreground">
-                            {module.videos.length} video
-                            {module.videos.length !== 1 ? "s" : ""}
-                          </div>
-                        )}
+                        {/* Items list: supports both lessons and videos */}
+                        {(() => {
+                          const items = Array.isArray(module.lessons)
+                            ? module.lessons
+                            : Array.isArray(module.videos)
+                            ? module.videos
+                            : [];
+                          return (
+                            <div>
+                              <div className="text-sm text-muted-foreground mb-2">
+                                {items.length} {contentType === 'series' ? (items.length === 1 ? 'video' : 'videos') : (items.length === 1 ? 'lesson' : 'lessons')}
+                              </div>
+                              {items.length > 0 && (
+                                <div className="space-y-2">
+                                  {items.map((item, i) => (
+                                    <div key={item.id || i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/20">
+                                      <Play className="w-4 h-4 text-blue-600" />
+                                      <div className="flex-1">
+                                        <div className="text-sm font-medium">{item.title || `Item ${i + 1}`}</div>
+                                        <div className="text-xs text-muted-foreground">{item.duration || '—'}</div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>
@@ -303,13 +328,13 @@ const CourseDetailsPage = () => {
               {/* Pricing */}
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-foreground">
-                  ₹{price.toFixed(0)}
+                  {formatINR(price)}
                 </div>
                 <div className="text-lg text-muted-foreground line-through">
-                  ₹{originalPrice.toFixed(0)}
+                  {formatINR(originalPrice)}
                 </div>
                 <div className="text-sm text-green-600 font-medium">
-                  Save ₹{(originalPrice - price).toFixed(0)}
+                  Save {formatINR(originalPrice - price)}
                 </div>
               </div>
 

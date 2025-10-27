@@ -2,7 +2,7 @@
 // USER PROGRESS OPERATIONS
 // ============================================================================
 
-import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 import { mapProgressToV2, normalizeFirestoreError } from "./mappers";
 import { checkUserEnrollment } from "./enrollmentOperations";
@@ -25,7 +25,6 @@ export const getUserProgress = async (userId, courseId) => {
     }
   } catch (error) {
     const norm = normalizeFirestoreError(error);
-    console.error("Error fetching user progress:", norm);
     return { success: false, error: norm.message || norm.code };
   }
 };
@@ -37,12 +36,11 @@ export const updateUserProgress = async (userId, courseId, progressData) => {
   try {
     const progressRef = doc(db, "user_progress", `${userId}_${courseId}`);
     const updatePayload = { ...progressData, updatedAt: serverTimestamp() };
-
-    await updateDoc(progressRef, updatePayload);
+    // Use setDoc with merge to create-or-update seamlessly
+    await setDoc(progressRef, updatePayload, { merge: true });
     return { success: true };
   } catch (error) {
     const norm = normalizeFirestoreError(error);
-    console.error("Error updating user progress:", norm);
     return { success: false, error: norm.message || norm.code };
   }
 };
@@ -60,7 +58,7 @@ export const getSecureVideoAccessUrl = async (userId, courseId, videoKey) => {
     // In real backend, sign and return a time-limited URL from private storage
     // Here we just echo the key as a stand-in
     return { success: true, data: { signedUrl: String(videoKey) } };
-  } catch (error) {
+  } catch {
     return { success: false, error: "UNKNOWN" };
   }
 };

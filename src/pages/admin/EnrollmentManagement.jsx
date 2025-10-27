@@ -1,14 +1,13 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-console */
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import {
   Search,
   Edit,
   Trash2,
   Calendar,
-  DollarSign,
+  IndianRupee,
   User,
   BookOpen,
   UserPlus,
@@ -22,7 +21,7 @@ import {
 import PageContainer from "../../components/layout/PageContainer.jsx";
 import PageTitle from "../../components/ui/PageTitle.jsx";
 import FormField from "../../components/ui/FormField.jsx";
-import { useEnrollmentContext } from "../../hooks/admin/useEnrollmentContext.js";
+import { useRealtimeAdminEnrollments, useRealtimeAdminUsers, useRealtimeCourses } from "../../hooks/useRealtimeFirebase";
 import {
   getStatusIcon,
   getStatusColor,
@@ -46,8 +45,10 @@ const items = [
 
 const EnrollmentManagement = () => {
   const { isAdmin } = useAuth();
-  const { enrollments, users, courses, loading, error, refreshData } =
-    useEnrollmentContext();
+  // Real-time sources
+  const { data: rtEnrollments, loading: enrollLoading, error: enrollError } = useRealtimeAdminEnrollments({ limitCount: 500 });
+  const { data: rtUsers, loading: usersLoading, error: usersError } = useRealtimeAdminUsers({ limitCount: 1000 });
+  const { data: rtCourses, loading: coursesLoading, error: coursesError } = useRealtimeCourses({ limitCount: 500, publishedOnly: false });
   const navigate = useNavigate();
 
   // State
@@ -86,6 +87,19 @@ const EnrollmentManagement = () => {
     setActionMessage({ message, type });
     setTimeout(() => setActionMessage({ message: "", type: "" }), 5000);
   };
+
+  // Normalize realtime users and courses for easy joining
+  const users = (rtUsers || []).map(u => ({ ...u, uid: u.uid || u.id }));
+  const courses = (rtCourses || []).map(c => ({ ...c, courseId: c.courseId || c.id }));
+
+  // Join user and course onto each enrollment (real-time)
+  const enrollments = (rtEnrollments || []).map(e => ({
+    ...e,
+    id: e.id,
+    user: users.find(u => String(u.uid) === String(e.userId)) || null,
+    course: courses.find(c => String(c.courseId) === String(e.courseId)) || null,
+    paidAmount: e.paidAmount ?? e.amount ?? e.paymentDetails?.amountPaid ?? 0,
+  }));
 
   // Clean and filter enrollments
   const cleanEnrollments = enrollments
@@ -126,7 +140,6 @@ const EnrollmentManagement = () => {
       if (result.success) {
         setEditingEnrollment(null);
         showToast("Enrollment updated successfully");
-        refreshData();
       } else {
         throw new Error(result.error || "Failed to update enrollment");
       }
@@ -147,7 +160,6 @@ const EnrollmentManagement = () => {
       const result = await deleteEnrollment(enrollmentId);
       if (result.success) {
         showToast("Enrollment deleted successfully");
-        refreshData();
       } else {
         throw new Error(result.error || "Failed to delete enrollment");
       }
@@ -175,7 +187,7 @@ const EnrollmentManagement = () => {
 
     setProcessing(true);
     try {
-      const selectedCourse = courses.find((c) => c.courseId === courseId);
+  const selectedCourse = courses.find((c) => String(c.courseId) === String(courseId));
       const selectedUser = users.find((u) => u.uid === userId);
 
       const enrollmentData = {
@@ -191,7 +203,21 @@ const EnrollmentManagement = () => {
         enrolledAt: new Date(),
       };
 
-      const result = await createEnrollment(enrollmentData);
+      const result = await createEnrollment({
+        userId,
+        courseId,
+        courseTitle: selectedCourse?.title || selectedCourse?.courseTitle || "Course",
+        coursePrice: parseFloat(paidAmount) || selectedCourse?.price || 0,
+        status,
+        enrolledBy: 'admin',
+        paymentData: {
+          method: paymentMethod,
+          reference: paymentReference,
+          amountPaid: parseFloat(paidAmount) || selectedCourse?.price || 0,
+          amount: parseFloat(paidAmount) || selectedCourse?.price || 0,
+          paymentId: `ADMIN_${Date.now()}`,
+        },
+      });
       if (result.success) {
         setShowManualEnrollment(false);
         setManualEnrollmentForm({
@@ -207,7 +233,7 @@ const EnrollmentManagement = () => {
             selectedUser?.displayName || selectedUser?.email
           } in ${selectedCourse?.title}`
         );
-        refreshData();
+        // realtime will update automatically
       } else {
         throw new Error(result.error || "Failed to create enrollment");
       }
@@ -249,7 +275,9 @@ const EnrollmentManagement = () => {
   };
 
   // Loading State
-  if (loading && enrollments.length === 0) {
+  const loading = enrollLoading || usersLoading || coursesLoading;
+  const error = enrollError || usersError || coursesError;
+  if (loading && (rtEnrollments?.length || 0) === 0) {
     return (
       <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
         <div className="p-8 text-center">
@@ -490,17 +518,18 @@ const EnrollmentRow = ({
       </div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
-      <div className="text-sm font-medium text-gray-900">
-        {enrollment.course?.title || "Unknown Course"}
-      </div>
-      <div className="text-sm text-gray-500">
-        {enrollment.course?.category || "Uncategorized"}
-        {!enrollment.course?.isPublished && (
-          <span className="ml-2 text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
-            Draft
-          </span>
-        )}
-      </div>
+      {(
+        (enrollment.course?.title || enrollment.course?.courseTitle) && (
+          <div className="text-sm font-medium text-gray-900">
+            {enrollment.course?.title || enrollment.course?.courseTitle}
+          </div>
+        )
+      )}
+      {enrollment.course?.category && (
+        <div className="text-sm text-gray-500">
+          {enrollment.course.category}
+        </div>
+      )}
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
       <span
@@ -514,7 +543,7 @@ const EnrollmentRow = ({
     </td>
     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
       <div className="flex items-center">
-        <DollarSign className="w-4 h-4 mr-1" />
+        <IndianRupee className="w-4 h-4 mr-1" />
         {enrollment.paidAmount || 0}
       </div>
     </td>
@@ -573,7 +602,7 @@ const StatsSection = ({ stats }) => (
     </div>
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
       <div className="text-2xl font-bold text-purple-600">
-        ${stats.totalRevenue}
+        ₹{stats.totalRevenue}
       </div>
       <div className="text-sm text-gray-600">Total Revenue</div>
     </div>

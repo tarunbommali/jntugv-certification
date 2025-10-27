@@ -331,6 +331,123 @@ app.get('/admin/courses', verifyAuth, verifyAdmin, async (req, res) => {
   }
 });
 
+// GET /admin/courses/:courseId
+app.get('/admin/courses/:courseId', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const docRef = await admin.firestore().collection('courses').doc(courseId).get();
+    if (!docRef.exists) {
+      return res.status(404).json({ success: false, error: 'Course not found' });
+    }
+    return res.json({ success: true, data: { courseId: docRef.id, ...docRef.data() } });
+  } catch (err) {
+    console.error('Cloud Function getCourse error:', err);
+    const msg = err && err.message ? err.message : String(err);
+    return res.status(500).json({ success: false, error: msg || 'UNKNOWN' });
+  }
+});
+
+// POST /admin/courses
+app.post('/admin/courses', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const payload = req.body || {};
+
+    // Minimal validation
+    const title = String(payload.title || '').trim();
+    if (!title || title.length < 3) {
+      return res.status(400).json({ success: false, error: 'Title is required (min 3 chars)' });
+    }
+
+    const courseData = {
+      ...payload,
+      title,
+      createdBy: req.auth.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      totalEnrollments: 0,
+      averageRating: 0,
+      totalRatings: 0,
+      isPublished: false,
+      isFeatured: Boolean(payload.isFeatured),
+      status: 'draft',
+    };
+
+    // Disallow client-supplied timestamps/derived fields
+    delete courseData.id;
+    delete courseData.courseId;
+    delete courseData.totalEnrollments;
+    delete courseData.averageRating;
+    delete courseData.totalRatings;
+    delete courseData.createdAt; // we set above
+    delete courseData.updatedAt; // we set above
+
+    const ref = await admin.firestore().collection('courses').add({
+      ...payload,
+      title,
+      createdBy: req.auth.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      totalEnrollments: 0,
+      averageRating: 0,
+      totalRatings: 0,
+      isPublished: false,
+      isFeatured: Boolean(payload.isFeatured),
+      status: 'draft',
+    });
+
+    return res.json({ success: true, data: { id: ref.id } });
+  } catch (err) {
+    console.error('Cloud Function createCourse error:', err);
+    const msg = err && err.message ? err.message : String(err);
+    return res.status(500).json({ success: false, error: msg || 'UNKNOWN' });
+  }
+});
+
+// PUT /admin/courses/:courseId
+app.put('/admin/courses/:courseId', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const updateData = req.body || {};
+
+    // Remove non-updatable/derived fields
+    const forbidden = [
+      'id','courseId','createdAt','createdBy','totalEnrollments','averageRating','totalRatings'
+    ];
+    forbidden.forEach((k) => delete updateData[k]);
+
+    // Optional validation
+    if (updateData.title) {
+      const t = String(updateData.title).trim();
+      if (!t || t.length < 3) {
+        return res.status(400).json({ success: false, error: 'Invalid title' });
+      }
+      updateData.title = t;
+    }
+
+    updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+    await admin.firestore().collection('courses').doc(courseId).update(updateData);
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Cloud Function updateCourse error:', err);
+    const msg = err && err.message ? err.message : String(err);
+    return res.status(500).json({ success: false, error: msg || 'UNKNOWN' });
+  }
+});
+
+// DELETE /admin/courses/:courseId
+app.delete('/admin/courses/:courseId', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    await admin.firestore().collection('courses').doc(courseId).delete();
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Cloud Function deleteCourse error:', err);
+    const msg = err && err.message ? err.message : String(err);
+    return res.status(500).json({ success: false, error: msg || 'UNKNOWN' });
+  }
+});
+
 // GET /profile - return current authenticated user's profile from Firestore
 app.get('/profile', verifyAuth, async (req, res) => {
   try {
@@ -363,6 +480,14 @@ app.put('/profile', verifyAuth, async (req, res) => {
       'photoURL',
       'bio',
       'address',
+      // Extended fields for ProfileEdit
+      'firstName',
+      'lastName',
+      'college',
+      'gender',
+      'dateOfBirth',
+      'skills',
+      'socialLinks',
     ];
 
     const updateData = {};
@@ -374,6 +499,33 @@ app.put('/profile', verifyAuth, async (req, res) => {
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ success: false, error: 'No valid fields provided to update' });
+    }
+
+    // Basic server-side validations
+    const errors = [];
+    if (updateData.displayName && String(updateData.displayName).trim().length < 3) {
+      errors.push('Display name must be at least 3 characters');
+    }
+    if (updateData.phone && !/^\+?[0-9\-()\s]{7,20}$/.test(String(updateData.phone))) {
+      errors.push('Invalid phone number format');
+    }
+    if (updateData.photoURL) {
+      try { new URL(String(updateData.photoURL)); } catch { errors.push('Invalid photoURL'); }
+    }
+    if (updateData.bio && String(updateData.bio).length > 1000) {
+      errors.push('Bio is too long (max 1000 characters)');
+    }
+    if (updateData.address && String(updateData.address).length > 500) {
+      errors.push('Address is too long (max 500 characters)');
+    }
+    if (updateData.skills && !Array.isArray(updateData.skills)) {
+      errors.push('Skills must be an array');
+    }
+    if (updateData.socialLinks && typeof updateData.socialLinks !== 'object') {
+      errors.push('Social links must be an object');
+    }
+    if (errors.length) {
+      return res.status(400).json({ success: false, error: errors.join('; ') });
     }
 
     updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();

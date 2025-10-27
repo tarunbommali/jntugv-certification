@@ -12,9 +12,10 @@ const ContentTab = ({
     addLesson,
     deleteLesson,
     totalLessons,
-    totalDuration
+    totalDuration,
+    contentType = 'modules',
+    onContentTypeChange,
 }) => {
-    const [contentType, setContentType] = useState('modules');
     const [expandedLessons, setExpandedLessons] = useState({});
 
     const toggleLessonExpansion = (lessonId) => {
@@ -106,7 +107,7 @@ const ContentTab = ({
                     <div className="flex bg-gray-100 rounded-lg p-1">
                         <button
                             type="button"
-                            onClick={() => setContentType('modules')}
+                            onClick={() => onContentTypeChange ? onContentTypeChange('modules') : null}
                             className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
                                 contentType === 'modules' 
                                     ? 'bg-white text-blue-600 shadow-sm' 
@@ -118,7 +119,7 @@ const ContentTab = ({
                         </button>
                         <button
                             type="button"
-                            onClick={() => setContentType('series')}
+                            onClick={() => onContentTypeChange ? onContentTypeChange('series') : null}
                             className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
                                 contentType === 'series' 
                                     ? 'bg-white text-blue-600 shadow-sm' 

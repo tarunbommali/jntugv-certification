@@ -4,12 +4,12 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { 
-    getCourseContent, 
+    getCourseById,
     getUserProgress, 
     updateUserProgress,
     checkUserEnrollment,
     getSecureVideoAccessUrl 
-} from '../firebase/services'; // Assuming services are defined
+} from '../firebase/services';
 import { useAuth } from './AuthContext';
 
 // 🚨 FIX 1: Rename the context constant here to match the Provider/Hook names
@@ -33,6 +33,7 @@ export const LearnPageProvider = ({ children }) => {
     const { currentUser, isAuthenticated } = useAuth();
     
     const [courseContent, setCourseContent] = useState([]);
+    const [contentType, setContentType] = useState('modules');
     const [currentModule, setCurrentModule] = useState(null);
     const [loadingContent, setLoadingContent] = useState(false);
     const [contentError, setContentError] = useState(null);
@@ -40,6 +41,7 @@ export const LearnPageProvider = ({ children }) => {
     const [userProgress, setUserProgress] = useState(null);
     const [loadingProgress, setLoadingProgress] = useState(false);
     const [progressError, setProgressError] = useState(null);
+    const [currentCourseId, setCurrentCourseId] = useState(null);
     
     const [enrollmentStatus, setEnrollmentStatus] = useState({
         isEnrolled: false,
@@ -117,18 +119,79 @@ export const LearnPageProvider = ({ children }) => {
         }
 
         try {
-            // Force fallback (offline mode)
+            setCurrentCourseId(courseId);
+            // Fallback sample mode
             if (courseId === FALLBACK_COURSE_ID && currentEnrollmentStatus.isEnrolled) {
                 setCourseContent(EMERGING_TECH_COURSE_CONTENT);
                 setCurrentModule(EMERGING_TECH_COURSE_CONTENT[0]);
-            } else {
+                return;
+            }
+
+            // Load course and map modules -> learn page format
+            const result = await getCourseById(courseId);
+            if (!result.success || !result.data) {
                 setCourseContent([]);
                 setCurrentModule(null);
+                setContentError(result.error || 'Course not found');
+                return;
             }
+
+            const ct = result.data.contentType || 'modules';
+            setContentType(ct);
+
+            const rawModules = Array.isArray(result.data.modules) ? result.data.modules : [];
+            // Sort modules by common order keys if available
+            const sortByOrder = (a, b) => {
+                const ao = a.order ?? a.position ?? a.index ?? 0;
+                const bo = b.order ?? b.position ?? b.index ?? 0;
+                return ao - bo;
+            };
+            const normalizedModules = rawModules
+              .slice()
+              .sort(sortByOrder)
+              .map((m, idx) => {
+                // items can be m.lessons or m.videos depending on schema
+                const items = Array.isArray(m.lessons) ? m.lessons : (Array.isArray(m.videos) ? m.videos : []);
+                // Prefer only playable video-type items for Learn page
+                const filteredItems = items.filter((it) => {
+                    if (ct === 'series') return true; // treat all as videos
+                    // For modules, only include lessons that are videos
+                    return !it.type || it.type === 'video';
+                });
+                const itemsSorted = filteredItems.slice().sort((a, b) => {
+                    const ao = a.order ?? a.position ?? a.index ?? 0;
+                    const bo = b.order ?? b.position ?? b.index ?? 0;
+                    return ao - bo;
+                });
+                const videos = itemsSorted.map((v, vIdx) => ({
+                    id: v.videoId || v.id || `V${vIdx + 1}`,
+                    title: v.title || `Video ${vIdx + 1}`,
+                    // Map content (from Admin form) to url; fallback to url/videoKey
+                    url: v.content || v.url || v.videoKey || '',
+                    duration: v.duration || v.duration_min || undefined,
+                    resources: Array.isArray(v.resources) ? v.resources : undefined,
+                }));
+                return {
+                    id: m.moduleKey || m.id || `M${idx + 1}`,
+                    title: m.moduleTitle || m.title || `Module ${idx + 1}`,
+                    description: result.data.courseDescription || '',
+                    duration: m.duration || (m.moduleVideoCount ? m.moduleVideoCount * 30 : undefined),
+                    videos,
+                };
+            });
+
+            const securedModules = await attachSecureUrls(courseId, normalizedModules);
+            setCourseContent(securedModules);
+            setCurrentModule(securedModules[0] || null);
+        } catch (err) {
+            console.error('Failed to load course content:', err);
+            setContentError('Failed to load course content.');
+            setCourseContent([]);
+            setCurrentModule(null);
         } finally {
             setLoadingContent(false);
         }
-    }, [isAuthenticated, currentUser, checkEnrollment, currentModule]); 
+    }, [isAuthenticated, currentUser, checkEnrollment, attachSecureUrls]); 
     
     // Fetch user progress for a course (Logic kept the same)
     const fetchUserProgress = useCallback(async (courseId) => {
@@ -164,12 +227,12 @@ export const LearnPageProvider = ({ children }) => {
     const clearCourseData = useCallback(() => { /* ... */ }, []);
 
     // Fetch progress when content loads/user changes
+    // Fetch progress as soon as we know the course id (don’t wait for module)
     useEffect(() => {
-        if (isAuthenticated && currentUser && currentModule) {
-             const id = currentModule.courseId || FALLBACK_COURSE_ID; 
-             fetchUserProgress(id);
+        if (isAuthenticated && currentUser && currentCourseId) {
+            fetchUserProgress(currentCourseId);
         }
-    }, [isAuthenticated, currentUser, currentModule, fetchUserProgress]); 
+    }, [isAuthenticated, currentUser, currentCourseId, fetchUserProgress]); 
 
 
     const value = useMemo(() => ({
@@ -185,6 +248,9 @@ export const LearnPageProvider = ({ children }) => {
         getVideoProgress,
         isModuleUnlocked,
         enrollmentStatus,
+        userProgress,
+        lastPlayed: userProgress?.lastPlayed ?? null,
+        contentType,
         // Computed values (placeholders)
         completionPercentage: 25, 
         timeSpent: 1200, 
@@ -192,7 +258,7 @@ export const LearnPageProvider = ({ children }) => {
         courseContent, currentModule, loadingContent, contentError, 
         userProgress, loadingProgress, enrollmentStatus, isModuleUnlocked, 
         fetchCourseContent, setCurrentModule, markVideoWatched, markModuleCompleted,
-        getModuleProgress, getVideoProgress
+        getModuleProgress, getVideoProgress, contentType
     ]);
 
     return (

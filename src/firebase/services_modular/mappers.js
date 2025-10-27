@@ -24,18 +24,41 @@ export const mapUserToV2 = (raw) => {
 export const mapCourseToV2 = (raw) => {
   if (!raw) return null;
   const modules = Array.isArray(raw.modules) ? raw.modules : [];
-  const normalizedModules = modules.map((m, idx) => ({
-    moduleKey: m.moduleKey ?? m.id ?? `M${idx + 1}`,
-    moduleTitle: m.moduleTitle ?? m.title ?? `Module ${idx + 1}`,
-    title: m.title ?? m.moduleTitle ?? `Module ${idx + 1}`,
-    videos: Array.isArray(m.videos)
+  const normalizedModules = modules.map((m, idx) => {
+    const lessons = Array.isArray(m.lessons)
+      ? m.lessons.map((l, lIdx) => ({
+          id: l.id ?? l.lessonId ?? `L${lIdx + 1}`,
+          title: l.title ?? `Lesson ${lIdx + 1}`,
+          duration: l.duration ?? l.duration_min ?? '',
+          type: l.type ?? 'video',
+          content: l.content ?? l.url ?? '',
+          resources: Array.isArray(l.resources) ? l.resources : [],
+          order: l.order ?? l.position ?? l.index ?? lIdx,
+        }))
+      : undefined;
+
+    const videos = Array.isArray(m.videos)
       ? m.videos.map((v, vIdx) => ({
           videoId: v.videoId ?? v.id ?? `V${vIdx + 1}`,
-          videoKey: v.videoKey ?? v.url ?? "",
+          videoKey: v.videoKey ?? v.url ?? '',
           title: v.title ?? `Video ${vIdx + 1}`,
+          duration: v.duration ?? v.duration_min ?? undefined,
+          url: v.url ?? undefined,
+          order: v.order ?? v.position ?? v.index ?? vIdx,
         }))
-      : [],
-  }));
+      : [];
+
+    return {
+      moduleKey: m.moduleKey ?? m.id ?? `M${idx + 1}`,
+      moduleTitle: m.moduleTitle ?? m.title ?? `Module ${idx + 1}`,
+      title: m.title ?? m.moduleTitle ?? `Module ${idx + 1}`,
+      description: m.description ?? '',
+      duration: m.duration ?? undefined,
+      order: m.order ?? m.position ?? m.index ?? idx,
+      lessons,
+      videos,
+    };
+  });
 
   return {
     courseId: raw.courseId ?? raw.id,
@@ -47,6 +70,7 @@ export const mapCourseToV2 = (raw) => {
       (typeof raw.price === "number" ? raw.price : undefined),
     coursePrice: raw.coursePrice ?? raw.price ?? 0,
     isPublished: Boolean(raw.isPublished),
+    contentType: raw.contentType ?? 'modules',
     modules: normalizedModules,
   };
 };

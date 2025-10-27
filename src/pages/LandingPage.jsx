@@ -3,7 +3,7 @@ import Hero from "../components/LandingPage/Hero/Hero";
 import About from "../components/LandingPage/About/About";
 import Contact from "../components/LandingPage/Contact/Contact";
 import Skills from "../components/LandingPage/Skills/Skills";
-import Faq from "../components/LandingPage/Faq/FaqSection.jsx";
+import Faq from "../components/LandingPage/Faq/FAQSection.jsx";
 import JoinCommunity from "../components/LandingPage/JoinCommunity/JoinCommunity";
 import Testimonial from "../components/LandingPage/Testimonial/Testimonial";
 import { useRealtime } from "../contexts/RealtimeContext";

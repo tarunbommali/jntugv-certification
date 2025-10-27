@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, Settings, Download } from 'lucide-react';
+/* eslint-disable no-unused-vars */
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Play, Pause, Volume2, VolumeX, Maximize, RotateCcw, Download } from 'lucide-react';
 
 /**
  * VideoPlayer Component
@@ -27,16 +28,12 @@ const VideoPlayer = ({
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [selectedQuality, setSelectedQuality] = useState('auto');
-  const [selectedSubtitle, setSelectedSubtitle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const videoRef = useRef(null);
   const containerRef = useRef(null);
-  const progressIntervalRef = useRef(null);
 
   // Extract video ID and type from URL
   const getVideoInfo = useCallback((url) => {
@@ -47,6 +44,10 @@ const VideoPlayer = ({
     const youtubeMatch = url.match(youtubeRegex);
     if (youtubeMatch) {
       return { type: 'youtube', id: youtubeMatch[1] };
+    }
+    // YouTube bare ID (fallbackData may provide just the ID)
+    if (/^[a-zA-Z0-9_-]{6,15}$/.test(url)) {
+      return { type: 'youtube', id: url };
     }
     
     // Vimeo
@@ -94,6 +95,7 @@ const VideoPlayer = ({
   const handleVideoError = useCallback((e) => {
     setIsLoading(false);
     setError('Failed to load video. Please check your internet connection.');
+    // eslint-disable-next-line no-console
     console.error('Video error:', e);
   }, []);
 
@@ -165,10 +167,8 @@ const VideoPlayer = ({
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       containerRef.current?.requestFullscreen();
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   }, []);
 
@@ -331,6 +331,19 @@ const VideoPlayer = ({
         )}
         
         {renderVideo()}
+
+        {/* Resources quick access (always visible when resources exist) */}
+        {Array.isArray(video?.resources) && video.resources.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowSettings((s) => !s)}
+            className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-xs hover:bg-black/80"
+            title="Resources"
+          >
+            <Download className="w-4 h-4" />
+            Resources
+          </button>
+        )}
       </div>
 
       {/* Custom Controls */}

@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { cn } from '../../utils/cn';
+import { formatINR, toNumber } from '../../utils/currency';
 
 const CourseCard = ({
   course,
@@ -15,8 +16,8 @@ const CourseCard = ({
   ...props
 }) => {
   // Price formatting
-  const price = Number(course.price) || 0;
-  const originalPrice = Number(course.originalPrice) || (price + 2000);
+  const price = toNumber(course.price, 0);
+  const originalPrice = toNumber(course.originalPrice, price + 2000);
 
   // Status color mapping for admin view
   const getStatusVariant = (status) => {
@@ -107,9 +108,9 @@ const CourseCard = ({
         {/* Pricing */}
         <div className="mt-4">
           <div className="text-xl font-bold text-high">
-            ₹{price.toFixed(0)}
+            {formatINR(price)}
             <span className="text-sm text-low line-through ml-2 font-normal">
-              ₹{originalPrice.toFixed(0)}
+              {formatINR(originalPrice)}
             </span>
           </div>
         </div>
@@ -130,7 +131,7 @@ const CourseCard = ({
             <Button asChild variant="success" className="w-full">
               <Link to={`/learn/${course.id}`}>
                 <CheckCircle size={16} className="mr-2" />
-                Start Learning
+                Continue Learning
               </Link>
             </Button>
           ) : (

@@ -81,8 +81,31 @@ const ProfileForm = ({
           <Field label="Phone Number" name="phone" value={form.phone} onChange={onChange("phone")} icon={Phone} type="tel" />
           <Field label="Date of Birth" name="dateOfBirth" value={form.dateOfBirth} onChange={onChange("dateOfBirth")} icon={Calendar} type="date" />
 
-          <Field label="Gender" name="gender" value={form.gender} onChange={onChange("gender")} icon={Text} />
-          <Field label="College/University" name="college" value={form.college} onChange={onChange("college")} icon={Home} />
+          {/* Gender as select */}
+          <div>
+            <label htmlFor="gender" className="block text-sm font-semibold text-gray-700 mb-1">
+              Gender
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <Text className="h-5 w-5 text-gray-400" aria-hidden="true" />
+              </div>
+              <select
+                id="gender"
+                name="gender"
+                value={form.gender || ""}
+                onChange={onChange("gender")}
+                className={`block w-full rounded-lg border-gray-300 pl-10 pr-4 py-2.5 focus:border-indigo-500 focus:ring-indigo-500 border text-gray-900 placeholder-gray-400 sm:text-sm transition-colors duration-150`}
+              >
+                <option value="" disabled>Choose gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          {/* University */}
+          <Field label="University" name="college" value={form.college} onChange={onChange("college")} icon={Home} />
 
           {/* --- Bio and Skills --- */}
           <div className="sm:col-span-2 lg:col-span-3 pt-6 pb-4 border-b border-gray-100">

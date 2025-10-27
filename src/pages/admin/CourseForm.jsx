@@ -257,6 +257,8 @@ const CourseForm = () => {
         deleteLesson={deleteLesson}
         totalLessons={totalLessons}
         totalDuration={totalDuration}
+        contentType={course?.contentType || 'modules'}
+        onContentTypeChange={(val) => updateField('contentType', val)}
       />
     ),
     media: <MediaTab course={course} handleCourseChange={updateField} />,
@@ -266,6 +268,7 @@ const CourseForm = () => {
         modules={modules}
         totalLessons={totalLessons}
         totalDuration={totalDuration}
+        contentType={course?.contentType || 'modules'}
       />
     ),
   };

@@ -11,7 +11,6 @@ import {
   Edit,
   Trash2,
   Percent,
-  DollarSign,
   Users,
   AlertCircle,
   X,

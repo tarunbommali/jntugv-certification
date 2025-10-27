@@ -2,6 +2,7 @@
 // src/pages/AdminPage.jsx
 
 import "react";
+import { useMemo } from "react";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import { Navigate, Link } from "react-router-dom";
 import { global_classnames } from "../../utils/classnames.js";
@@ -16,6 +17,8 @@ import {
   CreditCard,
   FileText,
 } from "lucide-react";
+import { useRealtimeAdminUsers, useRealtimeAdminEnrollments, useRealtimeAdminPayments, useRealtimeCourses } from "../../hooks/useRealtimeFirebase.js";
+import { formatINR } from "../../utils/currency.js";
 
 const items = [{ label: "Admin", link: "/admin" }];
 const AdminPage = () => {
@@ -24,6 +27,36 @@ const AdminPage = () => {
   if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
+
+  // Realtime data
+  const { data: users = [], loading: usersLoading } = useRealtimeAdminUsers({ enabled: true });
+  const { data: enrollments = [], loading: enrollmentsLoading } = useRealtimeAdminEnrollments({ enabled: true });
+  const { data: payments = [], loading: paymentsLoading } = useRealtimeAdminPayments({ enabled: true });
+  const { data: courses = [], loading: coursesLoading } = useRealtimeCourses({ publishedOnly: true, featuredOnly: false, limitCount: 200 });
+
+  // Derived stats (resilient to missing fields)
+  const stats = useMemo(() => {
+    const totalUsers = Array.isArray(users) ? users.length : 0;
+    const activeCourses = Array.isArray(courses) ? courses.filter((c) => c && (c.isPublished ?? true)).length : 0;
+    const totalEnrollments = Array.isArray(enrollments) ? enrollments.length : 0;
+
+    // Revenue from enrollments (preferred)
+    const revenueFromEnrollments = (Array.isArray(enrollments) ? enrollments : []).reduce((sum, e) => {
+      const val = Number(e.paidAmount ?? e.amount ?? 0);
+      return Number.isFinite(val) ? sum + val : sum;
+    }, 0);
+    // Fallback: revenue from payments with captured/success statuses
+    const revenueFromPayments = (Array.isArray(payments) ? payments : []).reduce((sum, p) => {
+      const ok = (p.status || "").toLowerCase();
+      const eligible = ok.includes("captured") || ok.includes("success");
+      const val = Number(p.amount ?? p.paidAmount ?? 0);
+      return eligible && Number.isFinite(val) ? sum + val : sum;
+    }, 0);
+
+    const revenue = revenueFromEnrollments > 0 ? revenueFromEnrollments : revenueFromPayments;
+
+    return { totalUsers, activeCourses, totalEnrollments, revenue };
+  }, [users, courses, enrollments, payments]);
 
   return (
     <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
@@ -36,19 +69,19 @@ const AdminPage = () => {
       <div className="mt-12 bg-white rounded-xl shadow-md p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">1,247</div>
+            <div className="text-2xl font-bold text-blue-600">{usersLoading ? '…' : stats.totalUsers}</div>
             <div className="text-sm text-gray-600">Total Users</div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">23</div>
+            <div className="text-2xl font-bold text-green-600">{coursesLoading ? '…' : stats.activeCourses}</div>
             <div className="text-sm text-gray-600">Active Courses</div>
           </div>
           <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">3,456</div>
+            <div className="text-2xl font-bold text-purple-600">{enrollmentsLoading ? '…' : stats.totalEnrollments}</div>
             <div className="text-sm text-gray-600">Enrollments</div>
           </div>
           <div className="text-center p-4 bg-orange-50 rounded-lg">
-            <div className="text-2xl font-bold text-orange-600">₹12.5L</div>
+            <div className="text-2xl font-bold text-orange-600">{paymentsLoading && enrollmentsLoading ? '…' : formatINR(stats.revenue || 0)}</div>
             <div className="text-sm text-gray-600">Revenue</div>
           </div>
         </div>

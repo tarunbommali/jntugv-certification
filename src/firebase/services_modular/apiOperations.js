@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-console */
 import { auth } from '../../firebase';
 import { createErrorResponse } from '../../utils/errorHandling';
 
@@ -236,6 +234,42 @@ export const getCoursesViaAPI = async () => {
   return await apiCall('/admin/courses');
 };
 
+/**
+ * Get a single course via admin API
+ */
+export const getCourseByIdViaAPI = async (courseId) => {
+  return await apiCall(`/admin/courses/${courseId}`);
+};
+
+/**
+ * Create a new course via admin API
+ */
+export const createCourseViaAPI = async (courseData) => {
+  return await apiCall('/admin/courses', {
+    method: 'POST',
+    body: JSON.stringify(courseData),
+  });
+};
+
+/**
+ * Update a course via admin API
+ */
+export const updateCourseViaAPI = async (courseId, updateData) => {
+  return await apiCall(`/admin/courses/${courseId}`, {
+    method: 'PUT',
+    body: JSON.stringify(updateData),
+  });
+};
+
+/**
+ * Delete a course via admin API
+ */
+export const deleteCourseViaAPI = async (courseId) => {
+  return await apiCall(`/admin/courses/${courseId}`, {
+    method: 'DELETE',
+  });
+};
+
 export default {
   // User operations
   createUserViaAPI,
@@ -252,4 +286,8 @@ export default {
   
   // Course operations
   getCoursesViaAPI,
+  getCourseByIdViaAPI,
+  createCourseViaAPI,
+  updateCourseViaAPI,
+  deleteCourseViaAPI,
 };

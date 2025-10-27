@@ -59,13 +59,24 @@ export const createEnrollment = async (enrollmentData) => {
     
     // Create V2 enrollment with explicit enrollmentId
     const enrollmentId = enrollmentData.enrollmentId ?? uuidv4();
+    const basePrice = Number(enrollmentData.originalPrice ?? enrollmentData.coursePrice ?? 0) || 0;
+    const couponCode = enrollmentData.paymentData?.couponCode || enrollmentData.couponDetails?.code || null;
+    const couponDiscount = Number(enrollmentData.paymentData?.couponDiscount ?? enrollmentData.couponDiscount ?? 0) || 0;
+    const finalAmount = Number(enrollmentData.paymentData?.amount ?? enrollmentData.coursePrice ?? 0) || Math.max(0, basePrice - couponDiscount);
+
     const enrollmentPayload = {
       enrollmentId,
       userId: enrollmentData.userId,
       courseId: enrollmentData.courseId,
       courseTitle: enrollmentData.courseTitle,
       status: enrollmentData.status ?? "SUCCESS",
-      paidAmount: enrollmentData.paymentData?.amount ?? enrollmentData.coursePrice ?? 0,
+      paidAmount: finalAmount,
+      originalPrice: basePrice,
+      finalPrice: finalAmount,
+      couponApplied: !!couponCode,
+      couponCode: couponCode,
+      couponDiscount: couponDiscount,
+      couponDetails: enrollmentData.couponDetails || null,
       enrolledAt: serverTimestamp(),
       enrolledBy: enrollmentData.enrolledBy || "user",
       paymentDetails: {

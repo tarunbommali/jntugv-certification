@@ -6,6 +6,11 @@ import {
   deleteCourse as deleteCourseService,
 } from "../firebase/services_modular/courseOperations";
 import {
+  createCourseViaAPI,
+  updateCourseViaAPI,
+  deleteCourseViaAPI,
+} from "../firebase/services_modular/apiOperations";
+import {
   useRealtimeCourses,
   useRealtimeCourseMutations,
 } from "../hooks/useRealtimeFirebase";
@@ -63,6 +68,11 @@ const useCourseOperations = () => {
   const addCourse = async (courseData) => {
     setError(null);
     try {
+      // Try admin API first (ensures server-side validation and consistent defaults)
+      const apiRes = await createCourseViaAPI(courseData);
+      if (apiRes?.success) return apiRes.data;
+    } catch (e) { /* fall back to Firestore mutation */ }
+    try {
       const result = await createCourseMut(courseData);
       if (result?.success) return result.data || { id: result.data?.id };
       setError(result?.error || "Failed to create course");
@@ -80,6 +90,11 @@ const useCourseOperations = () => {
     }
     setError(null);
     try {
+      // Try admin API first
+      const apiRes = await updateCourseViaAPI(courseId, updateData);
+      if (apiRes?.success) return true;
+    } catch (e) { /* fall back to Firestore mutation */ }
+    try {
       const result = await updateCourseMut(courseId, updateData);
       if (result?.success) return true;
       setError(result?.error || "Failed to update course");
@@ -96,6 +111,11 @@ const useCourseOperations = () => {
       throw new Error("Course ID is required");
     }
     setError(null);
+    try {
+      // Try admin API first
+      const apiRes = await deleteCourseViaAPI(courseId);
+      if (apiRes?.success) return true;
+    } catch (e) { /* fall back to Firestore delete */ }
     try {
       const result = await deleteCourseService(courseId);
       if (result.success) return true;

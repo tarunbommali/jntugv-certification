@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 import { useCallback } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import {

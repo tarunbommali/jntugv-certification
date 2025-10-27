@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate, useParams, Link } from "react-router-dom";
 import { doc, addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase"; // Assuming you have a correct firebase config
-import { Lock, DollarSign, CheckCircle, GraduationCap, X } from "lucide-react";
+import { Lock, CheckCircle, GraduationCap, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext.jsx"; // Assuming this is correct
 import { usePayment } from "../contexts/PaymentContext.jsx"; // Assuming this is correct
 import useRazorpay from "../hooks/useRazorpay"; // Assuming this is correct
