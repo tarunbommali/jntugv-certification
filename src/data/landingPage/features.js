@@ -3,7 +3,7 @@ export const features = [
   {
     icon: 'GraduationCap',
     title: "Industry-Recognized Certificates",
-    description: "Get certified by JNTU-GV with credentials recognized by top companies worldwide.",
+    description: "Get certified by Aikya I/O with credentials recognized by top companies worldwide.",
     gradient: "from-blue-500 to-cyan-500",
   },
   {

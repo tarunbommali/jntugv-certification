@@ -26,8 +26,8 @@ const CourseManagement = () => {
   const { isAdmin, currentUser } = useAuth();
   const { 
     courses, 
-    coursesLoading, 
-    coursesError, 
+    loading: coursesLoading, 
+    error: coursesError, 
     deleteCourse,
     getCourseStats 
   } = useCourseContext();
@@ -123,12 +123,24 @@ const CourseManagement = () => {
     };
   }) || [];
 
-  const filteredCourses = transformedCourses.filter(
-    (course) =>
-      course.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.instructor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCourses = transformedCourses.filter((course) => {
+    if (searchTerm === "status:published") {
+      return course.isPublished;
+    }
+    if (searchTerm === "status:draft") {
+      return !course.isPublished;
+    }
+    if (!searchTerm) {
+      return true;
+    }
+    
+    const term = searchTerm.toLowerCase();
+    return (
+      course.title?.toLowerCase().includes(term) ||
+      course.instructor?.toLowerCase().includes(term) ||
+      course.category?.toLowerCase().includes(term)
+    );
+  });
 
   const handleEditCourse = (course) => {
     // Navigation is handled by the Link in CourseCard
@@ -172,7 +184,7 @@ const CourseManagement = () => {
   return (
     <PageContainer
       items={breadcrumbItems}
-      className="min-h-screen bg-gray-50 py-8"
+      className="min-h-screen bg-background py-8"
     >
       <ToastNotification
         show={toast.show}
@@ -190,13 +202,13 @@ const CourseManagement = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex-1 max-w-md">
           <div className="relative">
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <Search className="w-5 h-5 text-muted absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search courses by title, instructor, or category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
@@ -212,44 +224,44 @@ const CourseManagement = () => {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-          <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-          <div className="text-sm text-gray-600">Total Courses</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-2xl font-bold text-foreground">{stats.total}</div>
+          <div className="text-sm text-muted">Total Courses</div>
+          <div className="text-xs text-muted mt-1">
             ({stats.published} published + {stats.drafts} drafts)
           </div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <Eye className="w-8 h-8 text-green-600 mx-auto mb-2" />
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-foreground">
             {stats.published}
           </div>
-          <div className="text-sm text-gray-600">Published</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm text-muted">Published</div>
+          <div className="text-xs text-muted mt-1">
             Live on platform
           </div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <EyeOff className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-foreground">
             {stats.drafts}
           </div>
-          <div className="text-sm text-gray-600">Drafts</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm text-muted">Drafts</div>
+          <div className="text-xs text-muted mt-1">
             Not published yet
           </div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <Users className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-foreground">
             {stats.totalEnrollments}
           </div>
-          <div className="text-sm text-gray-600">Total Students</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm text-muted">Total Students</div>
+          <div className="text-xs text-muted mt-1">
             Across all courses
           </div>
         </div>
@@ -262,7 +274,7 @@ const CourseManagement = () => {
           className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
             searchTerm === "" 
               ? "bg-blue-600 text-white" 
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              : "bg-surface-elevated text-muted hover:bg-gray-300"
           }`}
         >
           All Courses ({stats.total})
@@ -272,7 +284,7 @@ const CourseManagement = () => {
           className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
             searchTerm === "status:published" 
               ? "bg-green-600 text-white" 
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              : "bg-surface-elevated text-muted hover:bg-gray-300"
           }`}
         >
           Published ({stats.published})
@@ -282,7 +294,7 @@ const CourseManagement = () => {
           className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
             searchTerm === "status:draft" 
               ? "bg-yellow-600 text-white" 
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              : "bg-surface-elevated text-muted hover:bg-gray-300"
           }`}
         >
           Drafts ({stats.drafts})
@@ -327,12 +339,12 @@ const CourseManagement = () => {
 
       {/* No Courses State */}
       {!coursesLoading && !coursesError && filteredCourses.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-          <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="text-center py-12 bg-surface rounded-lg border border-border">
+          <BookOpen className="w-16 h-16 text-muted mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">
             {searchTerm ? "No courses found" : "No courses yet"}
           </h3>
-          <p className="text-gray-600 mb-4 max-w-md mx-auto">
+          <p className="text-muted mb-4 max-w-md mx-auto">
             {searchTerm
               ? `No courses match "${searchTerm}". Try adjusting your search terms.`
               : "Get started by creating your first course."}

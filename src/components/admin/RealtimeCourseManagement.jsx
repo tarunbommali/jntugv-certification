@@ -444,11 +444,16 @@ const RealtimeCourseManagement = () => {
                   error={errors.category}
                 >
                   <option value="">Select category</option>
-                  <option value="ai-ml">AI & Machine Learning</option>
-                  <option value="web-development">Web Development</option>
-                  <option value="cybersecurity">Cybersecurity</option>
+                  <option value="development">Development</option>
+                  <option value="ai-machine-learning">AI / Machine Learning</option>
                   <option value="data-science">Data Science</option>
-                  <option value="mobile-development">Mobile Development</option>
+                  <option value="design">Design</option>
+                  <option value="business">Business</option>
+                  <option value="marketing">Marketing</option>
+                  <option value="cybersecurity">Cybersecurity</option>
+                  <option value="cloud-devops">Cloud / DevOps</option>
+                  <option value="interview-prep">Interview Prep</option>
+                  <option value="productivity">Productivity</option>
                 </FormField>
                 <FormField
                   label="Difficulty"

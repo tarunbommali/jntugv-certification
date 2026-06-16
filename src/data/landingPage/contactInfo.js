@@ -10,15 +10,15 @@ export const contactInfo = [
   {
     icon: 'Mail',
     title: "Email",
-    details: "support@jntugv.edu.in",
+    details: "support@aikya.io",
     description: "We respond within 24 hours",
     gradient: "from-green-500 to-emerald-500",
   },
   {
     icon: 'MapPin',
     title: "Address",
-    details: "JNTU-GV, Vizianagaram",
-    description: "Andhra Pradesh, India",
+    details: "Aikya I/O Headquarters",
+    description: "Vizianagaram, Andhra Pradesh, India",
     gradient: "from-purple-500 to-pink-500",
   },
   {

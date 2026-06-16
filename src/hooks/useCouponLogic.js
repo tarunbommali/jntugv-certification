@@ -209,7 +209,7 @@ export const useCouponLogic = () => {
         const validFrom = coupon.validFrom?.toDate ? coupon.validFrom.toDate() : new Date(coupon.validFrom);
         const validUntil = coupon.validUntil?.toDate ? coupon.validUntil.toDate() : new Date(coupon.validUntil);
         
-        if (!coupon.isActive) return { status: 'inactive', color: 'text-gray-500', icon: 'EyeOff' };
+        if (!coupon.isActive) return { status: 'inactive', color: 'text-muted', icon: 'EyeOff' };
         if (validFrom && now < validFrom) return { status: 'upcoming', color: 'text-blue-600', icon: 'Clock' };
         if (validUntil && now > validUntil) return { status: 'expired', color: 'text-red-600', icon: 'AlertCircle' };
         if (coupon.usageLimit > 0 && coupon.usedCount >= coupon.usageLimit) return { status: 'limit-reached', color: 'text-orange-600', icon: 'AlertCircle' };

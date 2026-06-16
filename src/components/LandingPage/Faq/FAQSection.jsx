@@ -67,7 +67,7 @@ const FaqSection = () => {
                     className="border-primary text-primary hover:bg-primary hover:text-white"
                     asChild
                   >
-                    <a href="mailto:support@jntugv.edu.in">
+                    <a href="mailto:support@aikya.io">
                       <Mail className="h-4 w-4 mr-2" />
                       Contact Support
                     </a>

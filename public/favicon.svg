@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#0A66C2"/>
+  <text
+    x="50%"
+    y="50%"
+    dominant-baseline="central"
+    text-anchor="middle"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="36"
+    font-weight="800"
+    fill="white"
+    letter-spacing="-1"
+  >A</text>
+  <circle cx="48" cy="18" r="5" fill="#FFD700"/>
+</svg>

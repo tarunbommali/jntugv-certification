@@ -35,23 +35,7 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            // Vendor chunks
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            // Admin chunks
-            admin: [
-              './src/pages/admin/AdminPage.jsx',
-              './src/pages/admin/Analytics.jsx',
-              './src/pages/admin/CourseForm.jsx',
-              './src/pages/admin/UsersManagement.jsx',
-              './src/pages/admin/AdminCoupons.jsx',
-              './src/pages/admin/CourseManagement.jsx'
-            ],
-            // UI components
-            ui: [
-              './src/components/Header.jsx',
-              './src/components/Footer.jsx',
-              './src/components/Course/CourseCard.jsx'
-            ]
+            vendor: ['react', 'react-dom', 'react-router-dom']
           }
         }
       },

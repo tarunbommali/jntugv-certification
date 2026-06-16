@@ -103,8 +103,8 @@ const ManualCertificationForm = ({
   }, [courseTaskSummaries, form.courseId, setForm]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-background bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-surface rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <h3 className="text-lg font-semibold mb-4">Create Manual Certification</h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -119,7 +119,7 @@ const ManualCertificationForm = ({
             <option value="">Select a user</option>
             {users.map((user) => (
               <option key={user.uid} value={user.uid}>
-                {user.displayName || user.email} ({user.email})
+                {user.username || user.email} ({user.email})
               </option>
             ))}
           </FormField>
@@ -141,7 +141,7 @@ const ManualCertificationForm = ({
           </FormField>
 
           {selectedCourseSummary?.totalTasks > 0 && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted">
               Detected course tasks: {selectedCourseSummary.totalTasks} (lessons: {selectedCourseSummary.lessonTaskCount}, resources: {selectedCourseSummary.resourceTaskCount})
             </div>
           )}
@@ -190,8 +190,8 @@ const ManualCertificationForm = ({
             />
           </div>
 
-          <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-            <div className="text-sm text-gray-700">
+          <div className="p-3 bg-background border border-border rounded-lg">
+            <div className="text-sm text-muted">
               <div>Completion: {form.completionPercentage}%</div>
               <div>Tasks: {form.completedTasks} / {form.totalTasks}</div>
             </div>
@@ -201,7 +201,7 @@ const ManualCertificationForm = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-muted border border-border rounded-lg hover:bg-background transition-colors"
             >
               Cancel
             </button>

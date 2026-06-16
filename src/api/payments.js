@@ -15,6 +15,16 @@ export const createPaymentRecord = (payload) => apiRequest('/payments', {
   body: payload,
 });
 
+export const createRazorpayOrder = (payload) => apiRequest('/payments/order', {
+  method: 'POST',
+  body: payload,
+});
+
+export const verifyRazorpayPayment = (payload) => apiRequest('/payments/verify', {
+  method: 'POST',
+  body: payload,
+});
+
 export const updatePaymentStatus = (paymentId, updates) => apiRequest(`/payments/${paymentId}`, {
   method: 'PUT',
   body: updates,
@@ -26,6 +36,8 @@ export const getAllPayments = (params) => apiRequest(`/payments${buildQuery(para
 
 export default {
   createPaymentRecord,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
   updatePaymentStatus,
   getMyPayments,
   getAllPayments,

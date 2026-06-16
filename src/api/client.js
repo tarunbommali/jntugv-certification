@@ -1,4 +1,4 @@
-const AUTH_TOKEN_KEY = 'jntugv_auth_token';
+const AUTH_TOKEN_KEY = 'aikya_auth_token';
 
 class ApiError extends Error {
   constructor(message, status, payload) {

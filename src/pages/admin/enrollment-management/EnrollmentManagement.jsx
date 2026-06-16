@@ -266,7 +266,7 @@ const EnrollmentManagement = () => {
         });
 
         showToast(
-          `Successfully enrolled ${selectedUser?.displayName || selectedUser?.email || "user"} in ${selectedCourse?.title || "course"}`,
+          `Successfully enrolled ${selectedUser?.username || selectedUser?.email || "user"} in ${selectedCourse?.title || "course"}`,
           "success"
         );
       } else {
@@ -315,10 +315,10 @@ const EnrollmentManagement = () => {
   const error = enrollError || usersError || coursesError;
   if (loading && (rtEnrollments?.length || 0) === 0) {
     return (
-      <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
+      <PageContainer items={items} className="min-h-screen bg-background py-8">
         <div className="p-8 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-600 mt-4">Loading enrollments...</p>
+          <p className="text-muted mt-4">Loading enrollments...</p>
         </div>
       </PageContainer>
     );
@@ -328,7 +328,7 @@ const EnrollmentManagement = () => {
   // Render
   // -------------------------
   return (
-    <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
+    <PageContainer items={items} className="min-h-screen bg-background py-8">
       <PageTitle
         title="Enrollment Management"
         description="Manage all course enrollments across the platform"
@@ -384,7 +384,7 @@ const EnrollmentManagement = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 mb-6">
+      <div className="bg-surface p-6 rounded-xl shadow-md border border-border mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             label="Status"
@@ -411,7 +411,7 @@ const EnrollmentManagement = () => {
             <option value="ALL">All Users</option>
             {users.map((user) => (
               <option key={user.uid} value={user.uid}>
-                {user.displayName || user.email}
+                {user.username || user.email}
               </option>
             ))}
           </FormField>
@@ -434,9 +434,9 @@ const EnrollmentManagement = () => {
       </div>
 
       {/* Enrollments table */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+      <div className="bg-surface rounded-xl shadow-md border border-border overflow-hidden">
         {filteredEnrollments.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-muted">
             <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>No enrollments found matching your criteria.</p>
             {cleanEnrollments.length === 0 && (
@@ -447,33 +447,33 @@ const EnrollmentManagement = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-background">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Course
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Payment
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-surface divide-y divide-border">
                 {filteredEnrollments.map((enrollment) => (
                   <EnrollmentRow
                     key={enrollment.id}
@@ -536,17 +536,17 @@ const EnrollmentRow = ({
   formatDate,
 }) => {
   return (
-    <tr key={enrollment.id} className="hover:bg-gray-50">
+    <tr key={enrollment.id} className="hover:bg-background">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
             <User className="w-5 h-5 text-blue-600" />
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900">
-              {enrollment.user?.displayName || "Unknown User"}
+            <div className="text-sm font-medium text-foreground">
+              {enrollment.user?.username || "Unknown User"}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted">
               {enrollment.user?.email || "No email"}
             </div>
           </div>
@@ -555,13 +555,13 @@ const EnrollmentRow = ({
       <td className="px-6 py-4 whitespace-nowrap">
         {(
           (enrollment.course?.title || enrollment.course?.courseTitle) && (
-            <div className="text-sm font-medium text-gray-900">
+            <div className="text-sm font-medium text-foreground">
               {enrollment.course?.title || enrollment.course?.courseTitle}
             </div>
           )
         )}
         {enrollment.course?.category && (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted">
             {enrollment.course.category}
           </div>
         )}
@@ -576,23 +576,23 @@ const EnrollmentRow = ({
           <span className="ml-1">{enrollment.status}</span>
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
         <div className="flex items-center">
           <IndianRupee className="w-4 h-4 mr-1" />
           {enrollment.paidAmount || 0}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
         <div className="capitalize">
           {enrollment.paymentDetails?.method || "Not specified"}
         </div>
         {enrollment.paymentDetails?.reference && (
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-muted">
             {enrollment.paymentDetails.reference}
           </div>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
         <div className="flex items-center">
           <Calendar className="w-4 h-4 mr-1" />
           {formatDate(enrollment.enrolledAt)}
@@ -622,25 +622,25 @@ const EnrollmentRow = ({
 
 const StatsSection = ({ stats }) => (
   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-    <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+    <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
       <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-      <div className="text-sm text-gray-600">Total Enrollments</div>
+      <div className="text-sm text-muted">Total Enrollments</div>
     </div>
-    <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+    <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
       <div className="text-2xl font-bold text-green-600">
         {stats.successful}
       </div>
-      <div className="text-sm text-gray-600">Successful</div>
+      <div className="text-sm text-muted">Successful</div>
     </div>
-    <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+    <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
       <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-      <div className="text-sm text-gray-600">Pending</div>
+      <div className="text-sm text-muted">Pending</div>
     </div>
-    <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+    <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
       <div className="text-2xl font-bold text-purple-600">
         ₹{stats.totalRevenue}
       </div>
-      <div className="text-sm text-gray-600">Total Revenue</div>
+      <div className="text-sm text-muted">Total Revenue</div>
     </div>
   </div>
 );
@@ -655,8 +655,8 @@ const EditEnrollmentModal = ({
   config,
 }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-background bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-surface rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <h3 className="text-lg font-semibold mb-4">Edit Enrollment</h3>
 
         <div className="space-y-4">
@@ -710,7 +710,7 @@ const EditEnrollmentModal = ({
         <div className="flex justify-end space-x-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-muted border border-border rounded-lg hover:bg-background transition-colors"
           >
             Cancel
           </button>

@@ -47,7 +47,7 @@ export const getCertificationStatusColor = (status) => {
     case 'EXPIRED':
       return 'bg-orange-100 text-orange-800';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-surface-elevated text-foreground';
   }
 };
 
@@ -64,7 +64,7 @@ export const filterCertifications = (certifications, filters) => {
     // Search term filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      const userMatch = certification.user?.displayName?.toLowerCase().includes(searchLower) ||
+      const userMatch = certification.user?.username?.toLowerCase().includes(searchLower) ||
                        certification.user?.email?.toLowerCase().includes(searchLower);
       const courseMatch = certification.course?.title?.toLowerCase().includes(searchLower) ||
                          certification.course?.category?.toLowerCase().includes(searchLower);

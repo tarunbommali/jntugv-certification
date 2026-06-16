@@ -37,7 +37,7 @@ export const validateUserData = (data) => {
  */
 export const generateDefaultUserData = (user) => {
     const emailParts = user.email ? user.email.split('@') : [];
-    const defaultName = user.displayName || emailParts[0] || 'New User';
+    const defaultName = user.username || emailParts[0] || 'New User';
 
     return {
         uid: user.uid || user.id,

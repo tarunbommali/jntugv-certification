@@ -5,7 +5,6 @@ import { useAuth } from "../../../contexts/AuthContext";
 import PageContainer from "../../layout/PageContainer.jsx";
 import { BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
-import { courses as fallbackCourses } from "../../../data/landingPage/coursesData.js";
 import AnimatedSectionHeader from "../ui/AnimatedSectionHeader.jsx";
 import CourseList from "../../Course/CourseList";
 
@@ -21,7 +20,7 @@ const FeaturedCourses = ({ courses }) => {
         ? courses
         : Array.isArray(contextCourses) && contextCourses.length > 0
           ? contextCourses
-          : fallbackCourses;
+          : [];
 
     return rawList
       .map((c, index) => {

@@ -13,7 +13,6 @@ import {
   Shield,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/logo.jpg";
 import useCountdownTimer from "../hooks/useCountdownTimer";
 import OfferModal from "./ui/modal/OfferModal.jsx";
 import Contact from "./ui/modal/Contact.jsx";
@@ -25,10 +24,9 @@ import TopOfferBar from "./TopOfferBar.jsx";
 import MobileNavigationDrawer from "./MobileNavigationDrawer.jsx";
 
 // --- Local Storage Keys ---
-const OFFER_DISMISSED_KEY = "nxtgen_offer_dismissed";
-const ADMIN_MODE_KEY = "nxtgen_admin_mode";
+const OFFER_DISMISSED_KEY = "aikya_offer_dismissed";
 
-const NavigationMenu = ({ isAdminMode, isAdminUser }) => {
+const NavigationMenu = ({ isAdminUser }) => {
   const location = useLocation();
 
   // Standard user navigation
@@ -45,7 +43,7 @@ const NavigationMenu = ({ isAdminMode, isAdminUser }) => {
     {id:"certifications", name:"Certifications", link:"/admin/certifications"},
   ];
 
-  const navMenu = isAdminMode ? adminNavMenu : userNavMenu;
+  const navMenu = isAdminUser ? adminNavMenu : userNavMenu;
   const BORDER_COLOR = "border-blue-600";
 
   // Function to check if a nav item is active based on current path
@@ -102,7 +100,6 @@ const Header = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [isOfferBarVisible, setIsOfferBarVisible] = useState(true);
-  const [isAdminMode, setIsAdminMode] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const formattedTime = useCountdownTimer(9 * 3600 + 17 * 60 + 10);
@@ -110,78 +107,21 @@ const Header = () => {
   // Determine if the user is an admin
   const isAdminUser = isUserAdmin;
 
-  // Load admin mode from localStorage on component mount
   useEffect(() => {
-    const savedAdminMode = localStorage.getItem(ADMIN_MODE_KEY);
-    if (savedAdminMode !== null) {
-      setIsAdminMode(savedAdminMode === "true");
-    }
-
     const dismissed = localStorage.getItem(OFFER_DISMISSED_KEY);
     if (dismissed === "true") {
       setIsOfferBarVisible(false);
     }
   }, []);
-
-  // Save admin mode to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem(ADMIN_MODE_KEY, isAdminMode.toString());
-  }, [isAdminMode]);
-
-  // Reset admin mode when user logs out
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setIsAdminMode(false);
-      localStorage.setItem(ADMIN_MODE_KEY, "false");
-    }
-  }, [isAuthenticated]);
-
-  // Auto-manage admin mode based on current route (except profile route)
-  useEffect(() => {
-    const isAdminRoute = location.pathname.startsWith("/admin");
-    const isProfileRoute = location.pathname === "/profile";
-
-    // Don't change admin mode when navigating to profile
-    if (isProfileRoute) {
-      return;
-    }
-
-    // Auto-disable admin mode if not on admin routes
-    if (!isAdminRoute && isAdminMode) {
-      setIsAdminMode(false);
-    }
-
-    // Auto-enable admin mode if on admin routes
-    if (isAdminRoute && !isAdminMode && isAdminUser) {
-      setIsAdminMode(true);
-    }
-  }, [location.pathname, isAdminMode, isAdminUser]);
-
   // Handler: Dismiss the offer bar and save the preference
   const handleDismissOffer = () => {
     setIsOfferBarVisible(false);
     localStorage.setItem(OFFER_DISMISSED_KEY, "true");
   };
 
-  // Handle admin mode toggle
-  const handleAdminModeToggle = () => {
-    const newMode = !isAdminMode;
-    setIsAdminMode(newMode);
-
-    if (newMode) {
-      // If turning on admin mode, redirect to admin dashboard
-      navigate("/admin");
-    } else {
-      // If turning off admin mode, redirect to home page
-      navigate("/");
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await logout();
-      setIsAdminMode(false);
-      localStorage.setItem(ADMIN_MODE_KEY, "false");
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -221,73 +161,21 @@ const Header = () => {
         >
           <div className="flex h-20 items-center justify-between">
             {/* Logo and Branding */}
-            <Link to="/" className="flex items-center space-x-2 outline-none border-none">
+            <Link to="/" className="flex items-center outline-none border-none">
               <img
-                src={logo}
-                alt="NxtGen Logo"
-                className="w-12 h-12 mr-2 md:w-14 md:h-14"
+                src={isDark ? "/logo-dark.svg" : "/logo-light.svg"}
+                alt="Aikya I/O"
+                className="h-10 md:h-12 w-auto"
+                style={{ maxWidth: '200px' }}
               />
-              <div className="flex flex-col leading-tight">
-                <span className="text-xl md:text-2xl font-bold text-primary">
-                  NxtGen Certification
-                </span>
-                <span className="text-xs md:text-sm text-low hidden sm:flex">
-                  <span className="font-semibold italic">
-                    Powered by JNTU GV{" "}
-                  </span>
-                </span>
-              </div>
             </Link>
 
             {/* Desktop Navigation & Auth Toggle */}
             <div className="hidden md:flex items-center gap-4">
-              {/* Navigation Menu (Changes based on admin mode) */}
+              {/* Navigation Menu (Changes based on admin status) */}
               <NavigationMenu
-                isAdminMode={isAdminMode}
                 isAdminUser={isAdminUser}
               />
-
-              {/* Admin Mode Toggle */}
-              {isAdminUser && (
-                <div
-                  className={`flex items-center gap-2 border-r pr-4 mr-2 transition-colors duration-300 
-    ${isDark ? "border-[#2E3338]" : "border-[#E0E0E0]"}`}
-                >
-                  <Shield
-                    className={`w-4 h-4 transition-colors duration-300 ${
-                      isDark ? "text-[#A3A6AA]" : "text-[#666666]"
-                    }`}
-                  />
-                  <span
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDark ? "text-[#F3F6F8]" : "text-[#191919]"
-                    }`}
-                  >
-                    Admin
-                  </span>
-
-                  {/* Admin Mode Toggle Button */}
-                  <button
-                    onClick={handleAdminModeToggle}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-300 
-      ${
-        isAdminMode
-          ? isDark
-            ? "bg-[#378FE9]" // Lighter blue in dark mode
-            : "bg-[#0A66C2]" // LinkedIn blue in light mode
-          : isDark
-          ? "bg-[#444B52]" // Gray background in dark mode
-          : "bg-[#D1D5DB]" // Light gray in light mode
-      }`}
-                  >
-                    <span
-                      className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
-                        isAdminMode ? "translate-x-5" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-              )}
 
               {/* Theme toggle (desktop) */}
               <button
@@ -295,8 +183,8 @@ const Header = () => {
                 aria-label="Toggle theme"
                 className={`transition-all duration-300 rounded-full  ${
                   isDark
-                    ? "bg-black text-white border-[var(--color-primary)] "
-                    : "bg-white text-black border-[var(--color-primary)] ]"
+                    ? "bg-background text-white border-[var(--color-primary)] "
+                    : "bg-surface text-foreground border-[var(--color-primary)] ]"
                 }`}
               >
                 {isDark ? (
@@ -361,9 +249,7 @@ const Header = () => {
             currentUser={currentUser}
             handleLogout={handleLogout}
             setIsContactModalOpen={setIsContactModalOpen}
-            isAdminUser={isAdminUser}
-            isAdminMode={isAdminMode}
-            setIsAdminMode={handleAdminModeToggle}
+            isAdmin={isAdminUser}
           />
         )}
       </header>

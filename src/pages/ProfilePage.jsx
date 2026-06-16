@@ -11,8 +11,6 @@ import {
   PencilLine,
   AlertTriangle,
   Phone,
-  Linkedin,
-  Github,
   Calendar,
   Download,
   CheckCircle,
@@ -38,12 +36,12 @@ const Shimmer = () => (
       className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}
     >
       {/* Header Shimmer */}
-      <div className="bg-white p-8 rounded-2xl shadow-xl flex items-center gap-6">
-        <div className="w-24 h-24 rounded-full bg-gray-200"></div>
+      <div className="bg-surface p-8 rounded-2xl shadow-xl flex items-center gap-6">
+        <div className="w-24 h-24 rounded-full bg-surface-elevated"></div>
         <div className="flex-1 space-y-3">
-          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/5"></div>
+          <div className="h-6 bg-surface-elevated rounded w-3/4"></div>
+          <div className="h-4 bg-surface-elevated rounded w-1/2"></div>
+          <div className="h-4 bg-surface-elevated rounded w-2/5"></div>
         </div>
         <div className="h-10 w-32 bg-gray-300 rounded-full"></div>
       </div>
@@ -52,8 +50,8 @@ const Shimmer = () => (
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column Shimmer (Skills) */}
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+          <div className="bg-surface p-6 rounded-xl shadow-md space-y-4">
+            <div className="h-6 bg-surface-elevated rounded w-1/3"></div>
             <div className="flex flex-wrap gap-2">
               <div className="h-8 w-16 bg-blue-100 rounded-full"></div>
               <div className="h-8 w-24 bg-blue-100 rounded-full"></div>
@@ -65,10 +63,10 @@ const Shimmer = () => (
         {/* Right Column Shimmer (Courses) */}
         <div className="lg:col-span-2 space-y-8">
           {/* Enrolled Courses Shimmer */}
-          <div className="bg-white p-6 rounded-xl shadow-md space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-2/5"></div>
-            <div className="h-16 bg-gray-100 border rounded-lg"></div>
-            <div className="h-16 bg-gray-100 border rounded-lg"></div>
+          <div className="bg-surface p-6 rounded-xl shadow-md space-y-4">
+            <div className="h-6 bg-surface-elevated rounded w-2/5"></div>
+            <div className="h-16 bg-surface-elevated border rounded-lg"></div>
+            <div className="h-16 bg-surface-elevated border rounded-lg"></div>
           </div>
         </div>
       </div>
@@ -91,7 +89,6 @@ const ProfilePage = () => {
     currentUser,
     userProfile,
     logout,
-    isAuthenticated,
     loading: authLoading,
   } = useAuth();
   const navigate = useNavigate();
@@ -142,7 +139,7 @@ const ProfilePage = () => {
   }, [logout, navigate]);
 
   const normalizedEnrollments = useMemo(
-    () => enrollments.map((enrollment) => getCleanEnrollmentData(enrollment)),
+    () => (enrollments || []).map((enrollment) => getCleanEnrollmentData(enrollment)),
     [enrollments]
   );
 
@@ -159,7 +156,7 @@ const ProfilePage = () => {
       };
 
       // Find matching API certification
-      const apiCert = apiCertifications.find(c => c.courseId === enrollment.courseId || c.enrollmentId === enrollment.id);
+      const apiCert = (apiCertifications || []).find(c => c.courseId === enrollment.courseId || c.enrollmentId === enrollment.id);
 
       const taskProgress = enrollment.taskProgress || {
         totalTasks: 0,
@@ -246,7 +243,7 @@ const ProfilePage = () => {
 
   // Profile data
   const profileData = {
-    fullName: userProfile?.name || currentUser?.displayName || "N/A",
+    fullName: userProfile?.name || currentUser?.username || "N/A",
     email: currentUser?.email || "N/A",
     phone: userProfile?.phone || "N/A",
     college: userProfile?.college || "",
@@ -256,7 +253,7 @@ const ProfilePage = () => {
     socialLinks: userProfile?.socialLinks || {},
     dateOfBirth: userProfile?.dateOfBirth || null,
     studentId: currentUser?.uid?.substring(0, 8) || "N/A",
-    initials: getInitials(userProfile?.name || currentUser?.displayName),
+    initials: getInitials(userProfile?.name || currentUser?.username),
   };
 
   const buildCertificateTemplateData = useCallback((certification) => {
@@ -292,8 +289,8 @@ const ProfilePage = () => {
       certificateId: certification.certificateId,
       issueDate,
       completionDate,
-      institution: "JNTU-GV NxtGen Certification",
-      instructor: "JNTU-GV Faculty",
+      institution: "Aikya I/O",
+      instructor: "Aikya I/O Instructor",
       duration: "Self-paced",
       grade: "Excellent",
       mode: "Online",
@@ -332,27 +329,15 @@ const ProfilePage = () => {
 
     if (platform === "x") {
       // Preset message for X (Twitter) - optimized for character limits
-      const xMessage = `🎓 Excited to share that I've completed "${courseTitle}" via @JNTUGV NxtGen Certification!
-
-📜 Certificate ID: ${shortCertId}
-
-#JNTUGV #Certification #Learning #Achievement`;
+      const xMessage = `🎓 Excited to share that I've completed "${courseTitle}" via @AikyaIO!\n\n📜 Certificate ID: ${shortCertId}\n\n#AikyaIO #Certification #Learning #Achievement`;
       targetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(xMessage)}&url=${encodeURIComponent(shareUrl)}`;
     } else if (platform === "linkedin") {
       // LinkedIn sharing - using their newer share API
       // LinkedIn's sharing popup works best with just URL, they auto-generate preview
-      const linkedInText = `I'm excited to share that I, ${studentName}, have successfully completed the course "${courseTitle}" via JNTU-GV NxtGen Certification Program!
-
-This certification demonstrates my commitment to continuous learning and professional development.
-
-🎓 Certificate ID: ${shortCertId}
-
-Verify my achievement: ${shareUrl}
-
-#ProfessionalDevelopment #JNTUGV #Certification #LifelongLearning #Education`;
+      const linkedInText = `I'm excited to share that I, ${studentName}, have successfully completed the course "${courseTitle}" via Aikya I/O!\n\nThis certification demonstrates my commitment to continuous learning and professional development.\n\n🎓 Certificate ID: ${shortCertId}\n\nVerify my achievement: ${shareUrl}\n\n#ProfessionalDevelopment #AikyaIO #Certification #LifelongLearning #Education`;
 
       // LinkedIn uses different parameters - we'll use shareArticle for the best experience
-      targetUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`🎓 Completed: ${courseTitle}`)}&summary=${encodeURIComponent(linkedInText)}&source=${encodeURIComponent('JNTU-GV NxtGen Certification')}`;
+      targetUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`🎓 Completed: ${courseTitle}`)}&summary=${encodeURIComponent(linkedInText)}&source=${encodeURIComponent('Aikya I/O')}`;
     } else if (platform === "copy") {
       // Copy link to clipboard
       navigator.clipboard.writeText(shareUrl).then(() => {
@@ -447,12 +432,12 @@ Verify my achievement: ${shareUrl}
     return Math.min(100, Math.max(0, certification.progressPercent || 0));
   };
 
-  if (!isAuthenticated && !authLoading) {
-    return <Navigate to="/auth/signin" replace />;
-  }
-
   if (authLoading || loadingEnrollments) {
     return <Shimmer />;
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/auth/signin" replace />;
   }
 
   const combinedError = enrollmentsError;
@@ -483,7 +468,7 @@ Verify my achievement: ${shareUrl}
 
           {/* Title and Summary */}
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl font-semibold text-gray-800">
+            <h1 className="text-3xl font-semibold text-foreground">
               {profileData.fullName}
             </h1>
             <p className="text-sm text-muted mt-1 flex items-center justify-center md:justify-start gap-1">
@@ -524,31 +509,31 @@ Verify my achievement: ${shareUrl}
         <div className="lg:col-span-1 space-y-6">
           {/* Profile Details Card */}
           <div className="p-6 rounded-xl shadow-md card">
-            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">Profile Details</h2>
-            <div className="space-y-3 text-sm text-gray-700">
+            <h2 className="text-xl font-bold text-foreground border-b pb-3 mb-4">Profile Details</h2>
+            <div className="space-y-3 text-sm text-muted">
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-gray-500" />
+                <Phone className="w-4 h-4 text-muted" />
                 <span className="font-medium">{profileData.phone || "N/A"}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span>{profileData.dateOfBirth ? profileData.dateOfBirth : "Date of birth not set"}</span>
+                <Calendar className="w-4 h-4 text-muted" />
+                <span>{profileData.dateOfBirth ? formatDate(profileData.dateOfBirth) : "Date of birth not set"}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <UserCircle className="w-4 h-4 text-gray-500" />
+                <UserCircle className="w-4 h-4 text-muted" />
                 <span>{profileData.gender}</span>
               </div>
 
               {profileData.bio ? (
                 <div>
                   <h3 className="mt-2 text-sm font-semibold">About</h3>
-                  <p className="text-sm text-gray-600">{profileData.bio}</p>
+                  <p className="text-sm text-muted">{profileData.bio}</p>
                 </div>
               ) : null}
 
-              <div className="mt-2 flex items-center gap-3">
+              {/* <div className="mt-2 flex items-center gap-3">
                 {profileData.socialLinks?.linkedin && (
                   <a href={profileData.socialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-indigo-600 hover:underline">
                     <Linkedin className="w-4 h-4" /> LinkedIn
@@ -556,30 +541,29 @@ Verify my achievement: ${shareUrl}
                 )}
 
                 {profileData.socialLinks?.github && (
-                  <a href={profileData.socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-gray-800 hover:underline">
-                    <Github className="w-4 h-4" /> GitHub
+                  <a href={profileData.socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm text-foreground hover:underline">
+                    <Code className="w-4 h-4" /> GitHub
                   </a>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
 
           {/* Skills Section */}
           <div className="p-6 rounded-xl shadow-md card">
-            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">Current Skills</h2>
+            <h2 className="text-xl font-bold text-foreground border-b pb-3 mb-4">Current Skills</h2>
             <div className="flex flex-wrap gap-2">
               {profileData.skills && profileData.skills.length > 0 ? (
                 profileData.skills.map((skill, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 rounded-full text-sm font-medium"
-                    style={{ background: "#e0f2fe", color: "#0369a1" }}
+                    className="px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary"
                   >
                     {skill}
                   </span>
                 ))
               ) : (
-                <span className="text-sm text-gray-500">No skills added</span>
+                <span className="text-sm text-muted">No skills added</span>
               )}
             </div>
           </div>
@@ -589,17 +573,17 @@ Verify my achievement: ${shareUrl}
         <div className="lg:col-span-2 space-y-8">
           {/* Enrolled Courses */}
           <div className="p-6 rounded-xl shadow-md card">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4 flex items-center gap-3">
-              <BookOpen className="w-6 h-6" style={{ color: PRIMARY_BLUE }} />
+            <h2 className="text-2xl font-bold text-foreground border-b pb-3 mb-4 flex items-center gap-3">
+              <BookOpen className="w-6 h-6" style={{ color: "var(--theme-primary)" }} />
               <span>Enrolled Courses</span>
-              <span className="ml-2 inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+              <span className="ml-2 inline-flex items-center justify-center px-3 py-1 rounded-full bg-surface-elevated text-sm font-medium text-muted">
                 {loadingEnrollments ? '...' : (enrollments?.length || 0)}
               </span>
             </h2>
 
-            {enrollments.length > 0 ? (
+            {enrollments && enrollments.length > 0 ? (
               <ul className="space-y-4">
-                {enrollments.map((course, index) => (
+                {(enrollments || []).map((course, index) => (
                   <li
                     key={index}
                     className="p-4 rounded-lg flex justify-between items-center"
@@ -624,7 +608,7 @@ Verify my achievement: ${shareUrl}
             ) : (
               <div
                 className="text-center py-6 border-2 border-dashed rounded-lg"
-                style={{ borderColor: "var(--color-border)" }}
+                style={{ borderColor: "var(--theme-border)" }}
               >
                 <p className="text-muted">
                   You are not currently enrolled in any courses. Time to start
@@ -643,17 +627,17 @@ Verify my achievement: ${shareUrl}
 
           {/* Certifications Section */}
           <div className="p-6 rounded-xl shadow-md card">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4 flex items-center gap-3">
-              <CheckCircle className="w-6 h-6" style={{ color: PRIMARY_BLUE }} />
+            <h2 className="text-2xl font-bold text-foreground border-b pb-3 mb-4 flex items-center gap-3">
+              <CheckCircle className="w-6 h-6" style={{ color: "var(--theme-primary)" }} />
               <span>My Certifications</span>
-              <span className="ml-2 inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+              <span className="ml-2 inline-flex items-center justify-center px-3 py-1 rounded-full bg-surface-elevated text-sm font-medium text-muted">
                 {certificationData.filter(cert => cert.certificateUnlocked || cert.certificatePending).length}
               </span>
             </h2>
 
-            {certificationData.length > 0 ? (
+            {certificationData && certificationData.length > 0 ? (
               <div className="space-y-4">
-                {certificationData.map((certification, index) => {
+                {(certificationData || []).map((certification, index) => {
                   const isGeneratingThisCertificate =
                     generatingCertificateId === certification.certificateId;
 
@@ -668,26 +652,26 @@ Verify my achievement: ${shareUrl}
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-lg text-gray-800">
+                          <h3 className="font-semibold text-lg text-foreground">
                             {certification.courseTitle}
                           </h3>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-muted mt-1">
                             Enrolled on {formatDate(certification.enrolledDate)}
                           </p>
 
                           {/* Progress Bar */}
                           <div className="mt-3">
-                            <div className="flex justify-between text-sm text-gray-600 mb-1">
+                            <div className="flex justify-between text-sm text-muted mb-1">
                               <span>Progress</span>
                               <span>{getProgressPercentage(certification)}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="w-full bg-surface-elevated rounded-full h-2">
                               <div
                                 className="bg-green-600 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${getProgressPercentage(certification)}%` }}
                               ></div>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-muted mt-1">
                               {certification.completedLessons} of {certification.totalLessons} lessons completed
                             </p>
                           </div>
@@ -716,7 +700,7 @@ Verify my achievement: ${shareUrl}
                                 <button
                                   type="button"
                                   onClick={() => handleShareCertificate("x", certification)}
-                                  className="flex items-center justify-center gap-2 px-3 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition-colors"
+                                  className="flex items-center justify-center gap-2 px-3 py-2 bg-background text-white rounded-lg text-sm hover:bg-surface-elevated transition-colors"
                                 >
                                   <Share2 className="w-4 h-4" />
                                   Share on X
@@ -732,12 +716,12 @@ Verify my achievement: ${shareUrl}
                                 <button
                                   type="button"
                                   onClick={() => handleShareCertificate("copy", certification)}
-                                  className="flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                  className="flex items-center justify-center gap-2 px-3 py-2 border border-border rounded-lg text-sm text-muted hover:bg-surface-elevated transition-colors"
                                 >
                                   📋 Copy Link
                                 </button>
                               </div>
-                              <p className="text-xs text-gray-500 text-center">
+                              <p className="text-xs text-muted text-center">
                                 ID: {certification.certificateId && certification.certificateId.length > 8 ? certification.certificateId.substring(0, 8) + '...' : certification.certificateId}
                               </p>
                             </>
@@ -755,8 +739,8 @@ Verify my achievement: ${shareUrl}
                                 {certification.certificatePending ? <Clock className="w-4 h-4" /> : <Download className="w-4 h-4" />}
                                 {certification.certificatePending ? 'Awaiting Review' : 'Complete Course'}
                               </button>
-                              <div className="text-xs text-gray-500 text-left space-y-1">
-                                {certification.requirements.map((req) => (
+                              <div className="text-xs text-muted text-left space-y-1">
+                                {(certification.requirements || []).map((req) => (
                                   <p key={req.key}>
                                     {req.satisfied ? '[x]' : '[ ]'} {req.label}
                                     {!req.satisfied && req.pending ? ' (awaiting review)' : ''}
@@ -768,10 +752,10 @@ Verify my achievement: ${shareUrl}
                         </div>
                       </div>
                       {!certification.certificateUnlocked && (
-                        <div className="mt-3 pt-3 border-t text-xs text-gray-600">
+                        <div className="mt-3 pt-3 border-t text-xs text-muted">
                           <p className="font-medium mb-1">Requirements:</p>
                           <ul className="space-y-1">
-                            {certification.requirements.map((req) => (
+                            {(certification.requirements || []).map((req) => (
                               <li key={req.key} className="flex items-start gap-2">
                                 {req.satisfied ? (
                                   <CheckCircle className="w-4 h-4 text-green-500 mt-[2px]" />
@@ -780,7 +764,7 @@ Verify my achievement: ${shareUrl}
                                 )}
                                 <span>
                                   <span className="font-medium">{req.label}</span>
-                                  <span className="block text-gray-500">{req.detail}</span>
+                                  <span className="block text-muted">{req.detail}</span>
                                   {!req.satisfied && req.pending && (
                                     <span className="block text-orange-600">Awaiting admin validation</span>
                                   )}
@@ -797,13 +781,13 @@ Verify my achievement: ${shareUrl}
             ) : (
               <div
                 className="text-center py-6 border-2 border-dashed rounded-lg"
-                style={{ borderColor: "var(--color-border)" }}
+                style={{ borderColor: "var(--theme-border)" }}
               >
-                <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <CheckCircle className="w-12 h-12 text-muted mx-auto mb-3" />
                 <p className="text-muted mb-2">
                   No certifications yet
                 </p>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-muted mb-4">
                   Complete your enrolled courses to earn certifications
                 </p>
                 <button

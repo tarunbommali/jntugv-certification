@@ -16,7 +16,7 @@ export const getStatusIcon = (status) => {
     case "FAILED":
       return <XCircle className="w-4 h-4 text-red-500" />;
     default:
-      return <AlertCircle className="w-4 h-4 text-gray-500" />;
+      return <AlertCircle className="w-4 h-4 text-muted" />;
   }
 };
 
@@ -29,7 +29,7 @@ export const getStatusColor = (status) => {
     case "FAILED":
       return "bg-red-100 text-red-800";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-surface-elevated text-foreground";
   }
 };
 
@@ -46,7 +46,7 @@ export const filterEnrollments = (enrollments, filters) => {
   const { searchTerm, statusFilter, userFilter, courseFilter } = filters;
 
   return enrollments.filter((enrollment) => {
-    const userDisplayName = enrollment.user?.displayName || "";
+    const userDisplayName = enrollment.user?.username || "";
     const userEmail = enrollment.user?.email || "";
     const courseTitle = enrollment.course?.title || "";
 
@@ -191,7 +191,7 @@ export const getCleanEnrollmentData = (enrollment) => {
     // User data (if available)
     user: enrollment.user
       ? {
-          displayName: enrollment.user.displayName || "Unknown User",
+          username: enrollment.user.username || "Unknown User",
           email: enrollment.user.email || "No email",
           uid: enrollment.user.uid,
         }

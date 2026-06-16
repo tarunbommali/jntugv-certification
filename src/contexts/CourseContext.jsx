@@ -16,6 +16,7 @@ const normalizeCourse = (course) => {
     isFeatured: Boolean(course.isFeatured),
     isBestseller: Boolean(course.isBestseller),
     contentType: course.contentType || 'modules',
+    imageUrl: course.thumbnail || course.imageUrl || null,
   };
 };
 
@@ -52,7 +53,9 @@ export const CourseProvider = ({ children }) => {
   }, [isAdmin]);
 
   useEffect(() => {
-    fetchCourses();
+    // When isAdmin changes (e.g., after auth loads), force a refresh 
+    // so we don't skip fetching if it was already loading public courses.
+    fetchCourses({ forceRefresh: true });
   }, [fetchCourses]);
 
   const fetchCourseById = useCallback(async (courseId) => {
@@ -151,8 +154,8 @@ export const CourseProvider = ({ children }) => {
     getCoursesByInstructor: (instructor) => courses.filter((course) => course.instructor?.toLowerCase().includes(instructor.toLowerCase())),
     getCourseStats: () => ({
       total: courses.length,
-      published: courses.filter((course) => course.isPublished).length,
-      drafts: courses.filter((course) => !course.isPublished).length,
+      published: courses.filter((course) => course.status === 'published').length,
+      drafts: courses.filter((course) => course.status === 'draft').length,
       featured: courses.filter((course) => course.isFeatured).length,
       totalEnrollments: courses.reduce((sum, course) => sum + (course.totalEnrollments || 0), 0),
     }),

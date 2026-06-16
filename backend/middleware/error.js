@@ -1,21 +1,26 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-console */
+import { logger } from '../shared/logger.js';
 
 export const notFound = (req, res, next) => {
-    const error = new Error(`Not Found - ${req.originalUrl}`);
-    res.status(404);
-    next(error);
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  res.status(404);
+  next(error);
 };
 
 export const errorHandler = (err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode);
+  void next;
+  const statusCode = err.statusCode || (res.statusCode === 200 ? 500 : res.statusCode);
+  res.status(statusCode);
 
-    console.error('SERVER ERROR:', err.message, err.stack);
-
-    res.json({
-        message: err.message,
-        stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack,
-        error: process.env.NODE_ENV === 'production' ? null : err
+  if (process.env.NODE_ENV !== 'test') {
+    logger.error(`${req.method} ${req.originalUrl} >> ${err.message}`, err, {
+      path: req.originalUrl,
+      method: req.method,
     });
+  }
+
+  res.json({
+    success: false,
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
+  });
 };

@@ -7,9 +7,10 @@ import CourseList from "../components/Course/CourseList";
 import { Alert, AlertDescription, AlertIcon } from "../components/ui/Alert";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import PageTitle from "../components/ui/PageTitle";
+import useSEO from "../hooks/useSEO.js";
 
 const CoursePage = () => {
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
   const {
     courses,
     coursesLoading,
@@ -20,6 +21,12 @@ const CoursePage = () => {
   } = useRealtime();
   const [enrollmentStatus, setEnrollmentStatus] = useState({});
   const [filteredCourses, setFilteredCourses] = useState([]);
+
+  useSEO({
+    title: 'Explore Courses',
+    description: 'Browse all AI-powered courses on Aikya I/O. Learn, practice, and earn certifications in AI, ML, Cybersecurity, IoT, and more.',
+    canonical: 'https://aikya.io/courses',
+  });
 
   const breadcrumbItems = [
     { label: "Home", link: "/" },
@@ -110,7 +117,7 @@ const CoursePage = () => {
 
   // Calculate enrollment status
   useEffect(() => {
-    if (!isAuthenticated || !currentUser || !filteredCourses.length) {
+    if (authLoading || !currentUser || !filteredCourses.length) {
       setEnrollmentStatus({});
       return;
     }
@@ -121,7 +128,7 @@ const CoursePage = () => {
     }, {});
 
     setEnrollmentStatus(status);
-  }, [filteredCourses, enrollments, isAuthenticated, currentUser, isEnrolled]);
+  }, [filteredCourses, enrollments, authLoading, currentUser, isEnrolled]);
 
   // Show loading state
   if (coursesLoading || enrollmentsLoading) {
@@ -153,9 +160,9 @@ const CoursePage = () => {
       {!coursesLoading && filteredCourses.length === 0 && (
         <div className="text-center py-12">
           <div className="max-w-md mx-auto">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-24 h-24 bg-surface-elevated rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
-                className="w-12 h-12 text-gray-400"
+                className="w-12 h-12 text-muted"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -168,10 +175,10 @@ const CoursePage = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-foreground mb-2">
               No courses available
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted mb-4">
               There are no published courses at the moment. Please check back
               later.
             </p>

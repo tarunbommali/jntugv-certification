@@ -36,7 +36,7 @@ const OfferModal = ({ onClose }) => {
       ></div>
 
       {/* Modal Content */}
-      <div className="relative bg-white text-[#192f60] rounded-lg shadow-lg max-w-md w-full p-6 z-10 transition-transform transform animate-scale-in">
+      <div className="relative bg-surface text-[#192f60] rounded-lg shadow-lg max-w-md w-full p-6 z-10 transition-transform transform animate-scale-in">
         <h2 className="text-xl font-bold mb-4">Avail Offer</h2>
 
         <p className="mb-4">
@@ -100,7 +100,7 @@ const OfferModal = ({ onClose }) => {
         )}
 
         <button
-          className="absolute top-2 right-2 text-gray-600 hover:text-black text-lg"
+          className="absolute top-2 right-2 text-muted hover:text-foreground text-lg"
           onClick={onClose}
         >
           &times;

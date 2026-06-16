@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <!-- Icon: stylized A -->
+  <rect width="48" height="48" rx="10" fill="#0A66C2"/>
+  <text
+    x="24"
+    y="34"
+    text-anchor="middle"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="30"
+    font-weight="800"
+    fill="white"
+  >A</text>
+  <circle cx="39" cy="9" r="4" fill="#FFD700"/>
+
+  <!-- Wordmark: Aikya I/O -->
+  <text
+    x="60"
+    y="20"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="16"
+    font-weight="800"
+    fill="#0A66C2"
+  >Aikya I/O</text>
+  <text
+    x="60"
+    y="36"
+    font-family="'Segoe UI', Arial, sans-serif"
+    font-size="9"
+    fill="#555"
+    letter-spacing="0.5"
+  >Learn. Practice. Build. Prove.</text>
+</svg>

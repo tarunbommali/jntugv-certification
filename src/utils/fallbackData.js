@@ -6,7 +6,7 @@ export const FALLBACK_V2 = {
             name: "Tarun Bommali",
             email: "btaruntej143@gmail.com",
             role: "admin",
-            university: "Jntugv",
+            university: "Aikya I/O",
             skills: ["html", "react", "quantum", "AI/ML Basics"],
             totalCoursesEnrolled: 1,
             lastLoginAt: "2025-10-02T10:00:00Z",

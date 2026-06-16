@@ -1,60 +1,41 @@
 /* eslint-disable no-unused-vars */
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
-import {
-  containerVariants,
-  itemVariants,
-  floatVariants,
-} from "../../../data/landingPage/animationVariants.js";
-import { CheckCircle, TrendingUp, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { CheckCircle, PlayCircle, Award, BookOpen, Clock, Search, ArrowDown } from "lucide-react";
+import Button from "../../ui/Button";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-const heroIconMap = {
-  TrendingUp,
-  Zap,
-  CheckCircle,
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
 };
 
-// Custom Tooltip Components
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-background/95 backdrop-blur-sm p-3 border border-border rounded-xl shadow-2xl text-sm">
-        <p className="font-semibold text-primary">{data.name}</p>
-        <p>{`${data.value}%`}</p>
-      </div>
-    );
-  }
-  return null;
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-const JobsTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    const value = payload[0].value;
-    return (
-      <div className="bg-background/95 backdrop-blur-sm p-3 border border-border rounded-xl shadow-2xl text-sm">
-        <p className="font-semibold text-primary">Projected Jobs</p>
-        <p>{`${(value * 100000).toLocaleString()} New Jobs`}</p>
-      </div>
-    );
-  }
-  return null;
-};
+const HeroContent = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-const HeroContent = ({ stats, pieData }) => {
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/courses?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  const handleTagClick = (tag) => {
+    navigate(`/courses?category=${encodeURIComponent(tag)}`);
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 relative z-10">
-      {/* LEFT SECTION: VALUE PROPOSITION & TECH LIST */}
+    <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-10 relative ">
+      {/* LEFT SECTION: VALUE PROPOSITION & CTAS */}
       <motion.div
         initial="hidden"
         animate="visible"
@@ -62,176 +43,121 @@ const HeroContent = ({ stats, pieData }) => {
         className="w-full lg:w-1/2 space-y-8"
       >
         <motion.div variants={itemVariants}>
-          <h3 className="text-lg md:text-xl font-bold text-foreground mb-6">
-            Transform Your Career with{" "}
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
+            Input Knowledge.<br />
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-secondary">
-              Industry-Relevant Skills
+              Output Mastery.
             </span>
-          </h3>
+          </h1>
 
           <motion.p
             variants={itemVariants}
-            className="text-xl text-muted-foreground leading-relaxed"
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg"
           >
-            Earn industry-recognized certification from JNTU-GV by completing
-            intensive, real-world projects. Boost your practical skills and job
-            readiness in the most demanded emerging tech domains.
+            Structured courses, assessments, learning notes, and verified certificates designed for real-world skill development.
           </motion.p>
         </motion.div>
 
-        {/* Tech List Grid */}
-        <motion.ul
-          variants={containerVariants}
-          className=" grid-cols-1 md:grid-cols-2 gap-4 pt-4 hidden md:grid"
-        >
-          {[
-            "Artificial Intelligence (AI)",
-            "Machine Learning (ML)",
-            "Cybersecurity",
-            "Internet of Things (IoT)",
-            "Blockchain Technology",
-            "Quantum Computing",
-          ].map((tech, idx) => (
-            <motion.li
-              key={idx}
-              variants={itemVariants}
-              whileHover={{ scale: 1.02, x: 8 }}
-              className="flex items-center gap-3 bg-gradient-to-r from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/20 border border-primary/20 text-foreground font-medium px-4 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
-            >
-              <motion.div
-                whileHover={{ scale: 1.2, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <CheckCircle className="h-5 w-5 text-primary min-w-5" />
-              </motion.div>
-              <span className="text-sm md:text-base group-hover:text-primary transition-colors">
-                {tech}
-              </span>
-            </motion.li>
-          ))}
-        </motion.ul>
+        {/* CTAs */}
+        <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-4">
+          <Button size="lg" className="px-8 text-white text-base shadow-lg" asChild>
+            <Link to="/courses">Explore Courses</Link>
+          </Button>
+          <Button size="lg" variant="outline" className="px-8 text-base border-primary text-primary hover:bg-primary/5" asChild>
+            <Link to="/certificates">View Certifications</Link>
+          </Button>
+        </motion.div>
       </motion.div>
 
-      {/* RIGHT SECTION: MARKET INSIGHTS & STATS */}
+      {/* RIGHT SECTION: LEARNING JOURNEY VISUAL */}
       <motion.div
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="w-full lg:w-1/2 grid gap-6"
+        className="w-full lg:w-1/2 relative flex justify-center lg:justify-end"
       >
-        <motion.h3
-          variants={floatVariants}
-          animate="float"
-          className="text-lg md:text-xl font-bold text-foreground mb-6"
-        >
-          Why Certify Now? Market Insights
-        </motion.h3>
+        <div className="relative w-full max-w-md py-10">
+          {/* Connecting Vertical Line */}
+          <div className="absolute left-8 top-16 bottom-16 w-1 bg-gradient-to-b from-primary/30 via-primary/50 to-primary/30 rounded-full" />
 
-        {/* Stats Cards */}
-        {stats.map((stat, index) => {
-          const IconComponent =
-            typeof stat.icon === "string" ? heroIconMap[stat.icon] : stat.icon;
-          const ResolvedIcon = IconComponent ?? CheckCircle;
-
-          return (
+          <div className="space-y-6 relative z-10">
+            {/* Step 1: Course */}
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-              whileHover={{ y: -5, scale: 1.02 }}
-              className={`bg-gradient-to-br ${stat.color} p-6 rounded-2xl shadow-2xl text-white relative overflow-hidden group`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-card backdrop-blur-md p-4 rounded-2xl shadow-xl border border-border/80 flex items-center gap-4 relative ml-4 hover:border-primary/50 transition-colors"
             >
-              {/* Animated Background Pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-white rounded-full blur-xl" />
-                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white rounded-full blur-xl" />
+              <div className="p-3 bg-blue-500/10 rounded-xl relative z-10 shadow-sm border border-blue-500/20">
+                <PlayCircle className="h-6 w-6 text-blue-500" />
               </div>
-
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <ResolvedIcon className="h-5 w-5" />
-                  </div>
-                  <p className="font-semibold text-white/90 text-sm leading-tight">
-                    {stat.text}
-                  </p>
+              <div className="flex-1">
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Step 1</p>
+                <h4 className="font-semibold text-sm text-foreground">Course Progress</h4>
+                <div className="mt-2 h-1.5 w-full bg-secondary/30 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: '100%' }}></div>
                 </div>
-
-                {index === 0 && (
-                  <ResponsiveContainer width="100%" height={80}>
-                    <BarChart
-                      layout="vertical"
-                      data={[
-                        {
-                          name: "Jobs (in Lakhs)",
-                          value: stat.value / 100000,
-                        },
-                      ]}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <Tooltip content={<JobsTooltip />} />
-                      <YAxis
-                        dataKey="name"
-                        type="category"
-                        stroke="transparent"
-                      />
-                      <XAxis
-                        type="number"
-                        tickFormatter={(v) => `${v} Lakhs`}
-                        stroke="rgba(255,255,255,0.7)"
-                      />
-                      <Bar
-                        dataKey="value"
-                        fill="rgba(255,255,255,0.9)"
-                        radius={[4, 4, 0, 0]}
-                        animationBegin={1000}
-                        animationDuration={2000}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-
-                {index === 1 && (
-                  <div className="flex items-center justify-between">
-                    <ResponsiveContainer width="60%" height={120}>
-                      <PieChart>
-                        <Pie
-                          data={pieData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={30}
-                          outerRadius={45}
-                          fill="var(--color-primary)"
-                          paddingAngle={2}
-                          dataKey="value"
-                          animationBegin={1000}
-                          animationDuration={2000}
-                        >
-                          {pieData.map((_, idx) => (
-                            <Cell
-                              key={`cell-${idx}`}
-                              fill={
-                                idx === 0
-                                  ? "rgba(255,255,255,0.9)"
-                                  : "rgba(255,255,255,0.3)"
-                              }
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold">{stat.value}%</div>
-                      <div className="text-white/70 text-sm">Adoption Rate</div>
-                    </div>
-                  </div>
-                )}
               </div>
             </motion.div>
-          );
-        })}
+
+            {/* Step 2: Assessment */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8 }}
+              className="bg-card backdrop-blur-md p-4 rounded-2xl shadow-xl border border-border/80 flex items-center gap-4 relative ml-12 hover:border-green-500/50 transition-colors"
+            >
+              <div className="p-3 bg-green-500/10 rounded-xl relative z-10 shadow-sm border border-green-500/20">
+                <Clock className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Step 2</p>
+                <h4 className="font-semibold text-sm text-foreground">Assessment Passed</h4>
+                <p className="text-xs text-green-600 font-bold mt-0.5">Score: 92%</p>
+              </div>
+            </motion.div>
+
+            {/* Step 3: Notes */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.0 }}
+              className="bg-card backdrop-blur-md p-4 rounded-2xl shadow-xl border border-border/80 flex items-center gap-4 relative ml-16 hover:border-amber-500/50 transition-colors"
+            >
+              <div className="p-3 bg-amber-500/10 rounded-xl relative z-10 shadow-sm border border-amber-500/20">
+                <BookOpen className="h-6 w-6 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Step 3</p>
+                <h4 className="font-semibold text-sm text-foreground">Notes Reviewed</h4>
+                <p className="text-xs text-muted-foreground mt-0.5">Summary Available</p>
+              </div>
+            </motion.div>
+
+            {/* Step 4: Certificate */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.2 }}
+              className="bg-card backdrop-blur-md p-5 rounded-2xl shadow-xl border border-border/80 flex items-center gap-4 relative ml-8 hover:border-yellow-500/50 transition-colors bg-gradient-to-r from-card to-yellow-500/5"
+            >
+              <div className="p-3 bg-yellow-500/10 rounded-full relative z-10 shadow-sm border border-yellow-500/20">
+                <Award className="h-8 w-8 text-yellow-500" />
+              </div>
+              <div>
+                <p className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider mb-1">Goal Achieved</p>
+                <h4 className="font-bold text-sm text-foreground">Certificate Earned</h4>
+                <div className="mt-1 flex items-center gap-1 text-xs text-green-600 font-semibold bg-green-500/10 w-fit px-2 py-0.5 rounded-full">
+                  <CheckCircle className="h-3 w-3" />
+                  Verified
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Background Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-80 md:h-80 bg-gradient-to-tr from-primary/10 to-primary/20 rounded-full blur-3xl z-0 pointer-events-none" />
+        </div>
       </motion.div>
     </div>
   );

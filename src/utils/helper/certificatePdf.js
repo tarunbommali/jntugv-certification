@@ -53,7 +53,7 @@ export const buildCertificateTemplateData = (certification = {}) => {
     || certification.metadata?.courseTitle
     || "Course Title";
 
-  const studentName = certification.user?.displayName
+  const studentName = certification.user?.username
     || certification.user?.fullName
     || certification.user?.email
     || certification.recipientName
@@ -73,8 +73,8 @@ export const buildCertificateTemplateData = (certification = {}) => {
     certificateId,
     issueDate: formatLongDate(issueDate),
     completionDate: formatLongDate(completionDate),
-    institution: certification.institution || "JNTU-GV NxtGen Certification",
-    instructor: certification.course?.instructor || certification.instructor || "JNTU-GV Faculty",
+    institution: certification.institution || "Aikya I/O",
+    instructor: certification.course?.instructor || certification.instructor || "Aikya I/O Instructor",
     duration: certification.course?.duration
       ? `${certification.course.duration} hours`
       : certification.duration || "Self-paced",

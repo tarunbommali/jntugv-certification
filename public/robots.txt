@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Disallow private/administrative areas
+Disallow: /admin
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /api
+Disallow: /api/
+Disallow: /auth/
+Disallow: /profile
+Disallow: /profile/
+Disallow: /learn/
+Disallow: /checkout/
+
+# Allow public course pages
+Allow: /courses
+Allow: /course/
+
+# Crawl delay (optional, for politeness)
+Crawl-delay: 10
+
+# Sitemap
+Sitemap: https://aikya.io/sitemap.xml

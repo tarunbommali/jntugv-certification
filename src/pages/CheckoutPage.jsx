@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback } from "react";
-import { useLocation, useNavigate, useParams, Link } from "react-router-dom";
+import { useLocation, useNavigate, useParams, Link, Navigate } from "react-router-dom";
 import { Lock, CheckCircle, GraduationCap, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext.jsx"; // Assuming this is correct
 import { usePayment } from "../contexts/PaymentContext.jsx"; // Assuming this is correct
@@ -8,7 +8,6 @@ import useRazorpay from "../hooks/useRazorpay"; // Assuming this is correct
 import { global_classnames } from "../utils/classnames.js";
 import { useCourseContext } from "../contexts/CourseContext.jsx"; // Assuming this is correct
 import PageContainer from "../components/layout/PageContainer.jsx";
-import { createEnrollment } from "../services/index.js";
 
 // Define core colors based on established style
 const PRIMARY_BLUE = "#004080";
@@ -20,7 +19,7 @@ const ACCENT_GREEN = "#28a745";
 // ----------------------------------------------------------------------
 
 const CheckoutShimmer = () => {
-  const baseShimmer = "h-4 bg-gray-200 rounded";
+  const baseShimmer = "h-4 bg-surface-elevated rounded";
   const PRIMARY_BLUE = "#004080";
 
   const SummaryRowShimmer = ({ width = "w-3/4" }) => (
@@ -31,13 +30,13 @@ const CheckoutShimmer = () => {
   );
 
   return (
-    <section className="py-16 bg-gray-50 min-h-screen animate-pulse">
+    <section className="py-16 bg-background min-h-screen animate-pulse">
       <div
         className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* LEFT COLUMN: Billing Information Shimmer */}
-          <div className="lg:col-span-2 space-y-8 p-8 bg-white rounded-2xl shadow-xl border border-blue-100">
+          <div className="lg:col-span-2 space-y-8 p-8 bg-surface rounded-2xl shadow-xl border border-blue-100">
             <div className="h-8 bg-gray-300 rounded w-2/3 mb-6"></div>
 
             {/* Course Title Shimmer */}
@@ -50,15 +49,15 @@ const CheckoutShimmer = () => {
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="space-y-2">
                   <div className={`${baseShimmer} w-1/3`}></div>
-                  <div className="h-12 bg-gray-100 rounded-lg border"></div>
+                  <div className="h-12 bg-surface-elevated rounded-lg border"></div>
                 </div>
               ))}
             </div>
 
             {/* Terms Shimmer */}
-            <div className="pt-6 border-t border-gray-200 space-y-4">
+            <div className="pt-6 border-t border-border space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="h-5 w-5 bg-gray-200 rounded-sm"></div>
+                <div className="h-5 w-5 bg-surface-elevated rounded-sm"></div>
                 <div className={`${baseShimmer} w-1/2`}></div>
               </div>
             </div>
@@ -66,7 +65,7 @@ const CheckoutShimmer = () => {
 
           {/* RIGHT COLUMN: Order Summary Shimmer */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-2xl shadow-xl border border-blue-100 sticky top-28">
+            <div className="bg-surface p-6 rounded-2xl shadow-xl border border-blue-100 sticky top-28">
               <div className="h-6 bg-gray-300 rounded w-1/2 mb-6 border-b pb-2"></div>
 
               {/* Detailed Pricing Shimmer */}
@@ -78,7 +77,7 @@ const CheckoutShimmer = () => {
 
               {/* Coupon Shimmer */}
               <div className="grid grid-cols-3 gap-4 items-end my-4">
-                <div className="col-span-2 h-12 bg-gray-100 rounded-lg"></div>
+                <div className="col-span-2 h-12 bg-surface-elevated rounded-lg"></div>
                 <div className="h-12 bg-gray-300 rounded-lg"></div>
               </div>
               <SummaryRowShimmer width="w-1/2" />
@@ -111,13 +110,13 @@ const CheckoutPage = () => {
   const { courseId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
-  const { getCourseById } = useCourseContext();
+  const { currentUser, loading: authLoading } = useAuth();
+  const { getCourseById, fetchCourseById } = useCourseContext();
   const { validateCoupon, couponValidation, calculateDiscount } = usePayment();
 
   const [course, setCourse] = useState(null);
   const [billingInfo, setBillingInfo] = useState({
-    name: currentUser?.displayName || "",
+    name: currentUser?.username || "",
     email: currentUser?.email || "",
     phone: "",
     country: "India",
@@ -126,7 +125,6 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(true);
   const [paymentError, setPaymentError] = useState(null);
   const [couponCode, setCouponCode] = useState("");
-  const [useTestPayment, setUseTestPayment] = useState(false);
 
   const handlePaymentSuccess = useCallback(
     (enrollmentId, courseId) => {
@@ -158,6 +156,8 @@ const CheckoutPage = () => {
         const ctxCourse = passedCourse || getCourseById(courseId);
         if (ctxCourse) {
           foundCourse = ctxCourse;
+        } else {
+          foundCourse = await fetchCourseById(courseId);
         }
 
         // 3. Final normalization for pricing fields
@@ -192,7 +192,7 @@ const CheckoutPage = () => {
           setBillingInfo((prev) => ({
             ...prev,
             email: currentUser.email,
-            name: currentUser.displayName || prev.name || "",
+            name: currentUser.username || prev.name || "",
           }));
         }
         // Add a slight delay to let the shimmer be seen
@@ -200,26 +200,29 @@ const CheckoutPage = () => {
       }
     };
     load();
-  }, [courseId, currentUser, location.state?.course, getCourseById]);
+  }, [courseId, currentUser, location.state?.course, getCourseById, fetchCourseById]);
 
   // Check if course data loaded before calculating prices and rendering form
-  if (!course || loading) return <CheckoutShimmer />;
+  if (authLoading || !course || loading) return <CheckoutShimmer />;
+  if (!currentUser) return <Navigate to="/login" replace />;
 
   // --- Calculation Logic ---
   const courseAmount = Number(course.price || 0);
   const platformDiscount = Number(course.platformDiscount || 0);
   const subtotal = courseAmount; // Assuming course.price already accounts for platform discount
   const taxRate = Number(course.taxRate || 0.18);
-  const tax = subtotal * taxRate;
 
   const couponDiscount = couponValidation.isValid
     ? calculateDiscount(couponValidation, subtotal)
     : 0;
+  const taxableAmount = Math.max(0, subtotal - couponDiscount);
+  const tax = taxableAmount * taxRate;
 
-  const amountBeforeTaxAndCoupon = courseAmount + platformDiscount;
-  const totalAmount = Math.max(0, subtotal - couponDiscount + tax);
-  const totalSaved =
-    Number(course.originalPrice || 0) - totalAmount + couponDiscount;
+  const totalAmount = Math.max(0, taxableAmount + tax);
+  const totalSaved = Math.max(
+    0,
+    Number(course.originalPrice || course.price || 0) - totalAmount
+  );
 
   // --- Handlers ---
   const handleInputChange = (e) => {
@@ -235,7 +238,7 @@ const CheckoutPage = () => {
     e.preventDefault();
     const trimmed = couponCode.trim().toUpperCase();
     if (!trimmed) return;
-    await validateCoupon(trimmed, course.id); // Use course.id
+    await validateCoupon(trimmed, course.id, subtotal);
   };
 
   const handleConfirmAndPay = async (e) => {
@@ -257,74 +260,12 @@ const CheckoutPage = () => {
       return;
     }
 
-    // 🚨 CRITICAL: Check if totalAmount is zero or negative after all discounts
-    if (totalAmount <= 0) {
-      try {
-        const result = await createEnrollment({
-          courseId: course.id,
-          courseTitle: course.title,
-          status: "SUCCESS",
-          paymentData: {
-            method: "free",
-            paymentId: `FREE_ENROLLMENT_${Math.random().toString(36).slice(2)}`,
-            amount: 0,
-            amountPaid: 0,
-            couponCode: couponValidation.isValid ? couponCode : null,
-            couponDiscount: subtotal + tax,
-            billingInfo,
-          },
-        });
-
-        if (!result.success) {
-          throw new Error(result.error || "Failed to record free enrollment.");
-        }
-
-        handlePaymentSuccess(result.data?.id, course.id);
-      } catch (err) {
-        setPaymentError(err?.message || "Failed to record free enrollment.");
-      }
-      return;
-    }
-
-    // 1. Test payment path (For courses loaded from fallbackData)
-    if (useTestPayment) {
-      try {
-        const result = await createEnrollment({
-          courseId: course.id,
-          courseTitle: course.title,
-          status: "SUCCESS",
-          paymentData: {
-            method: "test",
-            paymentId: `TEST_PAYMENT_${Math.random().toString(36).slice(2)}`,
-            amount: totalAmount,
-            amountPaid: totalAmount,
-            couponCode: couponValidation.isValid ? couponCode : null,
-            couponDiscount,
-            billingInfo,
-          },
-        });
-
-        if (!result.success) {
-          throw new Error(result.error || "Failed to record test enrollment.");
-        }
-
-        handlePaymentSuccess(result.data?.id, course.id);
-        return;
-      } catch (err) {
-        setPaymentError(err?.message || "Failed to record test enrollment.");
-        return;
-      }
-    }
-
-    // 2. 🚀 EXECUTE RAZORPAY PAYMENT 🚀
+    // The server computes the final amount and creates the Razorpay order.
     const success = await initializePayment({
-      amount: totalAmount,
-      currency: "INR",
       courseId: course.id,
       courseTitle: course.title,
       billingInfo: billingInfo,
       coupon: couponValidation.isValid ? couponCode : null,
-      couponDiscount,
     });
 
     if (!success && paymentGatewayError) {
@@ -353,8 +294,8 @@ const CheckoutPage = () => {
           isDiscount
             ? "text-red-500"
             : isTax
-            ? "text-gray-700"
-            : "text-gray-700"
+            ? "text-muted"
+            : "text-muted"
         }`}
       >
         {label}
@@ -362,7 +303,7 @@ const CheckoutPage = () => {
 
       <span
         className={`${
-          isDiscount ? "text-red-500" : isTotal ? "text-2xl" : "text-gray-900"
+          isDiscount ? "text-red-500" : isTotal ? "text-2xl" : "text-foreground"
         } font-semibold`}
       >
         {isDiscount ? "- " : ""}₹{Math.abs(value).toFixed(2)}
@@ -371,17 +312,17 @@ const CheckoutPage = () => {
   );
 
   const baseInputClasses =
-    "w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600 transition";
+    "w-full p-3 border border-border rounded-lg focus:ring-blue-600 focus:border-blue-600 transition";
 
   return (
-    <PageContainer className="py-4 bg-gray-50 min-h-screen">
+    <PageContainer className="py-4 bg-background min-h-screen">
       <form
         onSubmit={handleConfirmAndPay}
         className="grid grid-cols-1 lg:grid-cols-3 gap-10"
       >
         {/* LEFT COLUMN: Billing Information Form */}
-        <div className="lg:col-span-2 space-y-8 p-8 bg-white rounded-2xl shadow-xl border border-blue-100">
-          <h2 className="text-2xl font-bold border-b-2 border-yellow-500 pb-3 text-gray-800 flex items-center gap-3">
+        <div className="lg:col-span-2 space-y-8 p-8 bg-surface rounded-2xl shadow-xl border border-blue-100">
+          <h2 className="text-2xl font-bold border-b-2 border-yellow-500 pb-3 text-foreground flex items-center gap-3">
             <GraduationCap
               className="w-6 h-6"
               style={{ color: PRIMARY_BLUE }}
@@ -394,18 +335,12 @@ const CheckoutPage = () => {
             <p className="font-semibold text-blue-800 text-lg">
               Enrolling in: {course.title}
             </p>
-            {useTestPayment && (
-              <p className="text-sm text-red-600 mt-1 font-medium">
-                ⚠️ Test Mode: Using local course data. Payment will be
-                simulated.
-              </p>
-            )}
           </div>
 
           {/* Form Inputs */}
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
+              <label className="block text-sm font-semibold text-foreground mb-1">
                 Full Name *
               </label>
               <input
@@ -419,7 +354,7 @@ const CheckoutPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
+              <label className="block text-sm font-semibold text-foreground mb-1">
                 Email Address
               </label>
               <input
@@ -428,11 +363,11 @@ const CheckoutPage = () => {
                 value={billingInfo.email}
                 readOnly
                 disabled
-                className={`${baseInputClasses} text-gray-900 bg-gray-100 cursor-not-allowed`}
+                className={`${baseInputClasses} text-foreground bg-surface-elevated cursor-not-allowed`}
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
+              <label className="block text-sm font-semibold text-foreground mb-1">
                 Phone Number *
               </label>
               <input
@@ -446,7 +381,7 @@ const CheckoutPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">
+              <label className="block text-sm font-semibold text-foreground mb-1">
                 Country
               </label>
               <input
@@ -461,7 +396,7 @@ const CheckoutPage = () => {
           </div>
 
           {/* Terms Checkbox (Added) */}
-          <div className="pt-6 border-t border-gray-200 space-y-4">
+          <div className="pt-6 border-t border-border space-y-4">
             <div className="flex items-start space-x-3">
               <input
                 type="checkbox"
@@ -469,11 +404,11 @@ const CheckoutPage = () => {
                 checked={billingInfo.agreeTerms}
                 onChange={handleInputChange}
                 id="agreeTerms"
-                className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-5 h-5 text-blue-600 border-border rounded focus:ring-blue-500"
               />
               <label
                 htmlFor="agreeTerms"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-muted"
               >
                 I agree to the{" "}
                 <Link
@@ -504,8 +439,8 @@ const CheckoutPage = () => {
 
         {/* RIGHT COLUMN: Order Summary (1/3 width) */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white p-6 rounded-2xl shadow-xl border border-blue-100 sticky top-28">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
+          <div className="bg-surface p-6 rounded-2xl shadow-xl border border-blue-100 sticky top-28">
+            <h2 className="text-xl font-bold mb-4 text-foreground border-b pb-2">
               Order Summary
             </h2>
 
@@ -522,7 +457,7 @@ const CheckoutPage = () => {
               {/* Coupon entry */}
               <div className="grid sm:grid-cols-3 gap-4 items-end mb-4 pt-2 border-t mt-2">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-muted mb-1">
                     Have a coupon?
                   </label>
                   <input

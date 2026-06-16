@@ -9,7 +9,7 @@ export const cardList = [
 
 export const DISCORD_SERVER_URL = "https://discord.gg/E9dckgdNKw";
 
-export const website = "http://nxtgencertificationbyjntugv.com";
+export const website = "https://aikya.io";
 
 export const capstoneProjects = [
   {
@@ -79,7 +79,7 @@ export const testimonials = [
     name: "Priya Reddy",
     image:
       "https://img.freepik.com/premium-photo/young-smiling-indian-female-student_776674-1120363.jpg",
-    text: "The Emerging Technologies course by JNTU-GV is amazing! It helped me understand AI, IoT, and Cybersecurity in a simple and practical way. Highly recommended for beginners.",
+    text: "The Emerging Technologies course on Aikya I/O is amazing! It helped me understand AI, IoT, and Cybersecurity in a simple and practical way. Highly recommended for beginners.",
   },
   {
     name: "Tarun Bommali",

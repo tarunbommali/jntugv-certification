@@ -10,7 +10,7 @@ const ensureUserShape = (user) => {
   return {
     ...normalized,
     email: normalized.email || '',
-    displayName: normalized.displayName || normalized.firstName || '',
+    username: normalized.username || normalized.firstName || '',
   };
 };
 
@@ -268,6 +268,8 @@ export const AuthProvider = ({ children }) => {
   const value = useMemo(() => ({
     currentUser,
     userProfile,
+    isAuthenticated: !!currentUser,
+    isAdmin: currentUser?.role === 'admin' || currentUser?.isAdmin,
     loading,
     signup,
     signin,

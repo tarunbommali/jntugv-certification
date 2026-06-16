@@ -53,7 +53,7 @@ const LegalPage = () => {
       className={`${global_classnames.width.container} min-h-screen p-6`}
     >
       <PageTitle title={content.title} description={content.description} />
-      <p className="text-gray-600 mb-2">Last updated: {content.lastUpdated}</p>
+      <p className="text-muted mb-2">Last updated: {content.lastUpdated}</p>
       <div
         className="prose max-w-none"
         dangerouslySetInnerHTML={{ __html: content.body }}

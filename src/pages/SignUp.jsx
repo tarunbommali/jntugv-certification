@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import logo from "../assets/logo.jpg";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import useSEO from "../hooks/useSEO.js";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +15,8 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const { signup, signinWithGoogle, currentUser } = useAuth();
+
+  useSEO({ title: 'Create Account', description: 'Join Aikya I/O — the AI-powered learning marketplace. Sign up to start learning, practicing, and earning certifications.' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,22 +70,19 @@ const SignUp = () => {
   if (currentUser) return <Navigate to="/" replace />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-lg bg-white shadow-2xl rounded-xl p-8 sm:p-10 border border-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-lg bg-surface shadow-2xl rounded-xl p-8 sm:p-10 border border-border">
         {/* Logo and Branding */}
         <div className="text-center mb-8">
           <Link
             to="/"
             className="inline-flex items-center justify-center space-x-2"
           >
-            <img src={logo} alt="JNTU-GV Logo" className="w-16 h-16" />
-            <span className="text-2xl font-extrabold text-[var(--color-primary)]">
-              NxtGen Certification
-            </span>
+            <img src="/logo-light.svg" alt="Aikya I/O" className="h-12 w-auto" />
           </Link>
         </div>
 
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+        <h2 className="text-3xl font-bold text-foreground mb-6">
           Create Your Account
         </h2>
 
@@ -98,11 +97,11 @@ const SignUp = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-muted mb-1">
               Email Address
             </label>
             <input
-              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
+              className="w-full border border-border p-3 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -113,12 +112,12 @@ const SignUp = () => {
 
           {/* Password Input with Eye Toggle */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-muted mb-1">
               Password
             </label>
             <div className="relative">
               <input
-                className="w-full border border-gray-300 p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
+                className="w-full border border-border p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -129,7 +128,7 @@ const SignUp = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-muted focus:outline-none"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -139,17 +138,17 @@ const SignUp = () => {
                 )}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+            <p className="text-xs text-muted mt-1">Must be at least 8 characters</p>
           </div>
 
           {/* Confirm Password Input with Eye Toggle */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-muted mb-1">
               Confirm Password
             </label>
             <div className="relative">
               <input
-                className="w-full border border-gray-300 p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
+                className="w-full border border-border p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -159,7 +158,7 @@ const SignUp = () => {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-muted focus:outline-none"
                 tabIndex={-1}
               >
                 {showConfirmPassword ? (
@@ -190,9 +189,9 @@ const SignUp = () => {
 
         {/* Separator */}
         <div className="flex items-center my-6">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
-          <div className="flex-grow border-t border-gray-300"></div>
+          <div className="flex-grow border-t border-border"></div>
+          <span className="flex-shrink mx-4 text-muted text-sm">OR</span>
+          <div className="flex-grow border-t border-border"></div>
         </div>
 
         {/* Google Sign Up Button */}
@@ -200,9 +199,9 @@ const SignUp = () => {
           <button
             onClick={handleGoogle}
             disabled={loading || googleLoading}
-            className={`w-full bg-white border py-3 rounded-lg font-medium shadow-sm transition-colors flex items-center justify-center gap-3 ${loading || googleLoading
-              ? "bg-gray-100 cursor-not-allowed"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+            className={`w-full bg-surface border py-3 rounded-lg font-medium shadow-sm transition-colors flex items-center justify-center gap-3 ${loading || googleLoading
+              ? "bg-surface-elevated cursor-not-allowed"
+              : "border-border text-muted hover:bg-background"
               }`}
           >
             {googleLoading ? (
@@ -219,7 +218,7 @@ const SignUp = () => {
         </div>
 
         {/* Link to Sign In */}
-        <p className="mt-6 text-sm text-center text-gray-600">
+        <p className="mt-6 text-sm text-center text-muted">
           Already have an account?{" "}
           <Link
             to="/auth/signin"

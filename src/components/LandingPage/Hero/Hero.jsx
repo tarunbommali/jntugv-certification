@@ -1,16 +1,8 @@
-/* eslint-disable no-unused-vars */
-import { Rocket } from "lucide-react";
 import { motion } from "framer-motion";
-import AnimatedSectionHeader from "../ui/AnimatedSectionHeader.jsx";
 import HeroContent from "./HeroContent.jsx";
 import PageContainer from "../../layout/PageContainer.jsx";
-import { heroStats } from "../../../data/landingPage/heroData.js";
 
 const Hero = () => {
-  const pieData = [
-    { name: "AI Adoption", value: 80 },
-    { name: "Not Adopted", value: 20 },
-  ];
 
   return (
     <section className="pt-20 px-2 pb-16 relative overflow-hidden">
@@ -40,18 +32,7 @@ const Hero = () => {
       />
 
       <PageContainer>
-        {/* Main Title */}
-
-        <AnimatedSectionHeader
-          badge={{
-            icon: Rocket,
-            text: "Future-Ready Education",
-          }}
-          title="Jawaharlal Nehru Technological University-Gurajada, Vizianagaram"
-          description="State University Certification in Advanced Technologies."
-        />
-
-        <HeroContent stats={heroStats} pieData={pieData} />
+        <HeroContent />
       </PageContainer>
     </section>
   );

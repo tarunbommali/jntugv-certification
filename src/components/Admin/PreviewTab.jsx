@@ -56,7 +56,7 @@ const PreviewTab = ({
       case 'assignment':
         return <FileText className="w-4 h-4 text-orange-600" />;
       default:
-        return <Play className="w-4 h-4 text-gray-600" />;
+        return <Play className="w-4 h-4 text-muted" />;
     }
   };
 
@@ -72,8 +72,8 @@ const PreviewTab = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Course Preview</h2>
+    <div className="bg-surface rounded-xl shadow-md border border-border p-6">
+      <h2 className="text-xl font-bold text-foreground mb-6">Course Preview</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Course card-like preview */}
@@ -88,8 +88,8 @@ const PreviewTab = ({
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <Image className="w-12 h-12 text-gray-400" />
+                <div className="w-full h-full bg-surface-elevated flex items-center justify-center">
+                  <Image className="w-12 h-12 text-muted" />
                 </div>
               )}
             </div>
@@ -182,8 +182,8 @@ const PreviewTab = ({
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
-                  <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <div className="text-center py-8 text-muted border-2 border-dashed border-border rounded-lg">
+                  <FileText className="w-12 h-12 text-muted mx-auto mb-3" />
                   <p>No {contentType === 'modules' ? 'modules' : 'series'} added yet</p>
                   <p className="text-sm mt-1">Add {contentType === 'modules' ? 'modules and lessons' : 'video series'} in the Course Content tab</p>
                 </div>

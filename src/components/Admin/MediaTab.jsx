@@ -22,14 +22,14 @@ const MediaTab = ({ course, handleCourseChange }) => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Media & Assets</h2>
+        <div className="bg-surface rounded-xl shadow-md border border-border p-6">
+            <h2 className="text-xl font-bold text-foreground mb-6">Media & Assets</h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Course Image URL with File Upload */}
                 <div>
                     <div className="flex items-center justify-between mb-2">
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-muted">
                             Course Image
                         </label>
                         <input
@@ -128,14 +128,14 @@ const MediaTab = ({ course, handleCourseChange }) => {
             {/* Media Preview Section */}
             {(course.imageUrl || course.videoUrl) && (
                 <div className="mt-6 border-t pt-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Media Previews</h3>
+                    <h3 className="text-lg font-medium text-foreground mb-4">Media Previews</h3>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Image Preview */}
                         {course.imageUrl && (
                             <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-2">Course Image Preview</h4>
-                                <div className="border rounded-lg p-4 bg-gray-50">
+                                <h4 className="text-sm font-medium text-muted mb-2">Course Image Preview</h4>
+                                <div className="border rounded-lg p-4 bg-background">
                                     <img 
                                         src={course.imageUrl} 
                                         alt="Course preview" 
@@ -151,13 +151,13 @@ const MediaTab = ({ course, handleCourseChange }) => {
                         {/* Video Preview */}
                         {course.videoUrl && (
                             <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-2">Promo Video Preview</h4>
-                                <div className="border rounded-lg p-4 bg-gray-50">
-                                    <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <h4 className="text-sm font-medium text-muted mb-2">Promo Video Preview</h4>
+                                <div className="border rounded-lg p-4 bg-background">
+                                    <div className="w-full h-48 bg-surface-elevated rounded-lg flex items-center justify-center">
                                         <div className="text-center">
-                                            <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                                            <p className="text-sm text-gray-600">Video URL: {course.videoUrl}</p>
-                                            <p className="text-xs text-gray-500 mt-1">Video will be embedded on course page</p>
+                                            <ImageIcon className="w-12 h-12 text-muted mx-auto mb-2" />
+                                            <p className="text-sm text-muted">Video URL: {course.videoUrl}</p>
+                                            <p className="text-xs text-muted mt-1">Video will be embedded on course page</p>
                                         </div>
                                     </div>
                                 </div>

@@ -67,7 +67,7 @@ const About = () => {
             text: "About Us",
           }}
           title="Empowering the Next Generation of Tech Professionals"
-          description="JNTU-GV Certification Platform is designed to bridge the gap between academic learning and industry requirements, providing students with practical skills and recognized credentials for successful careers in technology."
+          description="Aikya I/O is an AI-powered learning marketplace designed to bridge the gap between knowledge and industry, providing learners with practical skills, interactive courses, and recognized credentials for successful careers in technology."
         />
 
         {/* Stats Section */}

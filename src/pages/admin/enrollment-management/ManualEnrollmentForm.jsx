@@ -273,7 +273,7 @@ const ManualEnrollmentForm = () => {
 
       const result = await createEnrollment(apiAlignedPayload);
       if (result.success) {
-        showToast("success", `Successfully enrolled ${selectedUser?.displayName || selectedUser?.email} in ${getTitle(selectedCourse)}`, "Enrollment Success");
+        showToast("success", `Successfully enrolled ${selectedUser?.username || selectedUser?.email} in ${getTitle(selectedCourse)}`, "Enrollment Success");
         
         // Reset form
         setForm({
@@ -317,7 +317,7 @@ const ManualEnrollmentForm = () => {
     );
 
   return (
-    <PageContainer items={breadcrumbItems} className="min-h-screen bg-gray-50 py-8">
+    <PageContainer items={breadcrumbItems} className="min-h-screen bg-background py-8">
       <PageTitle
         title="Manual Enrollment"
         description="Manually enroll a user in a course"
@@ -335,7 +335,7 @@ const ManualEnrollmentForm = () => {
       />
 
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+        <div className="bg-surface rounded-xl shadow-md border border-border p-6">
           <div className="space-y-6">
             {/* User Selection */}
             <div>
@@ -351,7 +351,7 @@ const ManualEnrollmentForm = () => {
                   const value = String(user.uid ?? user.id ?? "");
                   return (
                     <option key={value} value={value}>
-                      {user.displayName || user.email} ({user.email})
+                      {user.username || user.email} ({user.email})
                     </option>
                   );
                 })}
@@ -359,7 +359,7 @@ const ManualEnrollmentForm = () => {
               {form.userId && getSelectedUser() && (
                 <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="text-sm text-blue-800">
-                    <strong>Selected User:</strong> {getSelectedUser().displayName || getSelectedUser().email}
+                    <strong>Selected User:</strong> {getSelectedUser().username || getSelectedUser().email}
                   </div>
                   <div className="text-xs text-blue-600 mt-1">
                     Email: {getSelectedUser().email} | 
@@ -379,16 +379,16 @@ const ManualEnrollmentForm = () => {
                     type="checkbox"
                     checked={includeDrafts}
                     onChange={(e) => setIncludeDrafts(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-border text-blue-600 focus:ring-blue-500"
                   />
-                  <label htmlFor="toggle-drafts" className="text-sm text-gray-700">
+                  <label htmlFor="toggle-drafts" className="text-sm text-muted">
                     Include draft courses
                   </label>
                 </div>
 
                 {/* Search Course */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-muted mb-1">
                     Search Courses
                   </label>
                   <input
@@ -396,19 +396,19 @@ const ManualEnrollmentForm = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search by course title..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
                 </div>
 
                 {/* Category Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-muted mb-1">
                     Filter by Category
                   </label>
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   >
                     <option value="">All categories</option>
                     {categories.map(cat => (
@@ -443,7 +443,7 @@ const ManualEnrollmentForm = () => {
 
               {/* Course Selection Info */}
               <div className="flex flex-col gap-2">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted">
                   {includeDrafts ? 'Showing all courses (published and drafts)' : 'Showing only published courses'}
                   {searchTerm && ` • Filtered by: "${searchTerm}"`}
                   {categoryFilter && ` • Category: ${categoryFilter}`}
@@ -488,7 +488,7 @@ const ManualEnrollmentForm = () => {
                   <select
                     value={selectedCouponId}
                     onChange={(e) => handleCouponChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm bg-white"
+                    className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm bg-surface"
                   >
                     <option value="">No coupon</option>
                     {coupons.map((c) => {
@@ -507,7 +507,7 @@ const ManualEnrollmentForm = () => {
                     value={couponCodeInput}
                     onChange={(e) => setCouponCodeInput(e.target.value)}
                     placeholder="Enter coupon code"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm bg-white ${couponError ? 'border-red-400' : 'border-yellow-300'}`}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm bg-surface ${couponError ? 'border-red-400' : 'border-yellow-300'}`}
                   />
                   {couponError && (
                     <p className="text-xs text-red-600 mt-1">{couponError}</p>
@@ -602,19 +602,19 @@ const ManualEnrollmentForm = () => {
 
             {/* Enrollment Summary */}
             {(form.userId && form.courseId) && (
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h4 className="font-semibold text-gray-800 mb-3">Enrollment Summary</h4>
+              <div className="bg-background p-4 rounded-lg border border-border">
+                <h4 className="font-semibold text-foreground mb-3">Enrollment Summary</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">User:</span>
-                    <span className="font-medium">{getSelectedUser()?.displayName || getSelectedUser()?.email}</span>
+                    <span className="text-muted">User:</span>
+                    <span className="font-medium">{getSelectedUser()?.username || getSelectedUser()?.email}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Course:</span>
+                    <span className="text-muted">Course:</span>
                     <span className="font-medium">{getTitle(getSelectedCourse())}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Course Status:</span>
+                    <span className="text-muted">Course Status:</span>
                     <span className="font-medium">
                       {isPublishedLike(getSelectedCourse()) ? 'Published' : 'Draft'}
                     </span>
@@ -628,35 +628,35 @@ const ManualEnrollmentForm = () => {
                     return (
                       <>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Original Price:</span>
+                          <span className="text-muted">Original Price:</span>
                           <span className="font-medium">{formatINR(base)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Coupon:</span>
+                          <span className="text-muted">Coupon:</span>
                           <span className="font-medium">{coupon ? `${coupon.code} (${String(coupon.type).toLowerCase()==='percent'? coupon.value + '%': formatINR(coupon.value)})` : '—'}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Discount:</span>
+                          <span className="text-muted">Discount:</span>
                           <span className="font-medium">-{formatINR(disc)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Amount Paid:</span>
+                          <span className="text-muted">Amount Paid:</span>
                           <span className="font-medium">{formatINR(final)}</span>
                         </div>
                       </>
                     );
                   })()}
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Enrollment Status:</span>
+                    <span className="text-muted">Enrollment Status:</span>
                     <span className="font-medium">{form.status}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Payment Method:</span>
+                    <span className="text-muted">Payment Method:</span>
                     <span className="font-medium capitalize">{form.paymentMethod}</span>
                   </div>
                   {form.paymentReference && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Payment Reference:</span>
+                      <span className="text-muted">Payment Reference:</span>
                       <span className="font-medium">{form.paymentReference}</span>
                     </div>
                   )}
@@ -665,11 +665,11 @@ const ManualEnrollmentForm = () => {
             )}
           </div>
 
-          <div className="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 mt-8 pt-6 border-t border-border">
             <button
               onClick={handleBack}
               disabled={processing}
-              className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="px-6 py-2 text-muted border border-border rounded-lg hover:bg-background disabled:opacity-50 transition-colors"
             >
               Cancel
             </button>

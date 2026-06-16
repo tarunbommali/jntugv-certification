@@ -82,7 +82,7 @@ const WhatsAppChat = () => {
     )?.label;
 
     // Crafting a professional, formatted message
-    const message = `Hi JNTU-GV Team, I'm interested in the Certification in Emerging Technologies course and have a query.\n\n*Name:* ${formData.name}\n*Qualification:* ${selectedQualification}\n*Query Type:* ${selectedQuery}\n\nPlease help me with further information.`;
+    const message = `Hi Aikya I/O Team, I'm interested in a course and have a query.\n\n*Name:* ${formData.name}\n*Qualification:* ${selectedQualification}\n*Query Type:* ${selectedQuery}\n\nPlease help me with further information.`;
 
     const encodedMessage = encodeURIComponent(message);
     // Hardcoding number (7780351078) as provided in the original code
@@ -109,7 +109,7 @@ const WhatsAppChat = () => {
   };
 
   const baseInputClasses = `
-    flex h-10 w-full rounded-lg border bg-gray-50 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400
+    flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted
     disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200
     focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] mt-1
   `;
@@ -135,12 +135,12 @@ const WhatsAppChat = () => {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[950]"
+            className="fixed inset-0 bg-background/50 backdrop-blur-sm z-[950]"
             onClick={() => setIsOpen(false)}
           />
 
           <div
-            className="fixed bottom-0 right-0 m-0 sm:m-6 w-full sm:w-96 bg-white rounded-t-xl sm:rounded-xl shadow-2xl z-[960] transition-transform duration-300 transform translate-y-0 sm:translate-y-0"
+            className="fixed bottom-0 right-0 m-0 sm:m-6 w-full sm:w-96 bg-surface rounded-t-xl sm:rounded-xl shadow-2xl z-[960] transition-transform duration-300 transform translate-y-0 sm:translate-y-0"
             // Use custom CSS for the size and animation on the root modal element
           >
             {/* Header */}
@@ -151,7 +151,7 @@ const WhatsAppChat = () => {
               <div className="flex items-center space-x-3">
                 <FaWhatsapp className="h-6 w-6 text-green-300" />
                 <div className="flex flex-col">
-                  <h3 className="font-bold text-lg">Chat with JNTU-GV Team</h3>
+                  <h3 className="font-bold text-lg">Chat with Aikya I/O Team</h3>
                   <p className="text-xs text-gray-200">
                     We'd love to hear from you - Online Now
                   </p>
@@ -159,7 +159,7 @@ const WhatsAppChat = () => {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                className="p-1 hover:bg-surface/20 rounded-full transition-colors"
                 aria-label="Close chat window"
               >
                 <X className="h-5 w-5" />
@@ -170,13 +170,13 @@ const WhatsAppChat = () => {
             <form onSubmit={handleSubmit}>
               <div className="p-5 max-h-[70vh] sm:max-h-[400px] overflow-y-auto space-y-4">
                 
-                <p className="text-sm text-gray-600 border-l-4 border-blue-400 pl-3 py-1 bg-blue-50/50 rounded-sm">
+                <p className="text-sm text-muted border-l-4 border-blue-400 pl-3 py-1 bg-blue-50/50 rounded-sm">
                     Fill out the form so we can quickly assist you on WhatsApp.
                 </p>
 
                 {/* Name */}
                 <div>
-                  <label className="text-sm font-semibold text-gray-700">
+                  <label className="text-sm font-semibold text-muted">
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -196,7 +196,7 @@ const WhatsAppChat = () => {
 
                 {/* Highest Qualification Dropdown */}
                 <div>
-                  <label className="text-sm font-semibold text-gray-700">
+                  <label className="text-sm font-semibold text-muted">
                     Highest Qualification <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -224,7 +224,7 @@ const WhatsAppChat = () => {
 
                 {/* Query Type Dropdown */}
                 <div>
-                  <label className="text-sm font-semibold text-gray-700">
+                  <label className="text-sm font-semibold text-muted">
                     Query Type <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -251,7 +251,7 @@ const WhatsAppChat = () => {
 
               {/* Footer / Submit Button */}
                 <div
-                className="p-4 bg-gray-50 rounded-b-xl"
+                className="p-4 bg-background rounded-b-xl"
                 style={{
                   borderTop: `1px solid var(--color-border)`,
                 }}

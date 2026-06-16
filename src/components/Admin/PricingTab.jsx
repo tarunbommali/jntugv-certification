@@ -12,8 +12,8 @@ const PricingTab = ({ course, handleCourseChange, errors }) => {
       : 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">
+    <div className="bg-surface rounded-xl shadow-md border border-border p-6">
+      <h2 className="text-xl font-bold text-foreground mb-6">
         Pricing & Discounts
       </h2>
 

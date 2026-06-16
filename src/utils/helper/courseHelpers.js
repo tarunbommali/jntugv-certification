@@ -194,6 +194,16 @@ export const mapCourseDataToForm = (courseData, currentUser) => {
     createdBy: courseData.createdBy || currentUser?.uid || currentUser?.id || "",
     // Add content type field
     contentType: courseData.contentType || "modules", // Default to modules
+    passingRules: courseData.passingRules || {
+      completionPercentage: 80,
+      practiceQuizRequired: false,
+      moduleAssessmentRequired: true,
+      moduleAssessmentPassScore: 70,
+      assignmentRequired: false,
+      assignmentPassScore: 60,
+      finalAssessmentRequired: false,
+      certificateScore: 75
+    }
   };
 };
 
@@ -232,6 +242,16 @@ export const createEmptyCourse = (currentUser) => ({
   updatedAt: new Date().toISOString(),
   createdBy: currentUser?.uid || "",
   contentType: "modules", // Default content type
+  passingRules: {
+    completionPercentage: 80,
+    practiceQuizRequired: false,
+    moduleAssessmentRequired: true,
+    moduleAssessmentPassScore: 70,
+    assignmentRequired: false,
+    assignmentPassScore: 60,
+    finalAssessmentRequired: false,
+    certificateScore: 75
+  }
 });
 
 /**
@@ -279,6 +299,7 @@ export const prepareCoursePayload = (
     status: course.isPublished ? "published" : "draft",
     updatedAt: now,
     modules: sanitizedModules,
+    passingRules: course.passingRules || undefined,
     contentType: course.contentType || "modules",
     totalEnrollments: toNumberOr(course.totalEnrollments, 0),
     averageRating: toNumberOr(course.averageRating, 0),

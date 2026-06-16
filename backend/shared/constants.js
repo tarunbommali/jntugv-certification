@@ -1,0 +1,24 @@
+export const ENROLLMENT_STATUS = /** @type {const} */ ({
+  PENDING: 'PENDING',
+  PAYMENT_PENDING: 'PAYMENT_PENDING',
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED',
+});
+
+export const PAYMENT_STATUS = /** @type {const} */ ({
+  CREATED: 'CREATED',
+  PENDING: 'PENDING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED',
+  CANCELLED: 'CANCELLED',
+});
+
+export const CERT_STATUS = /** @type {const} */ ({
+  PENDING: 'PENDING',
+  ISSUED: 'ISSUED',
+  REVOKED: 'REVOKED',
+});

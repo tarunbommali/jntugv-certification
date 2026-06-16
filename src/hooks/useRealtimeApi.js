@@ -15,6 +15,7 @@ import {
 	createEnrollment as createEnrollmentService,
 	updateEnrollmentProgress as updateEnrollmentProgressService,
 	getAllCertifications,
+	getAdminDashboardData,
 } from '../services/index.js';
 
 const useAsyncData = (fetcher, { enabled = true, initialValue } = {}) => {
@@ -49,7 +50,7 @@ const useAsyncData = (fetcher, { enabled = true, initialValue } = {}) => {
 	}, [enabled, fetcher]);
 
 	useEffect(() => {
-		refresh();
+		refresh().catch(() => {});
 	}, [refresh]);
 
 	return { data, loading, error, refresh, setData };
@@ -269,6 +270,25 @@ export const useRealtimeAdminPayments = (options = {}) => {
 	return { data: data ?? [], loading, error, refresh };
 };
 
+export const useAdminDashboard = (options = {}) => {
+	const { enabled = true } = options;
+
+	const fetcher = useCallback(async () => {
+		const response = await getAdminDashboardData();
+		if (!response?.success) {
+			throw new Error(response?.error || 'Failed to fetch admin dashboard data');
+		}
+		return response.data || { courses: [], enrollments: [], users: [], payments: [], coupons: [], stats: {} };
+	}, []);
+
+	const { data, loading, error, refresh } = useAsyncData(fetcher, {
+		enabled,
+		initialValue: { courses: [], enrollments: [], users: [], payments: [], coupons: [], stats: {} },
+	});
+
+	return { data, loading, error, refresh };
+};
+
 export const useRealtimeUserProgress = (userId, courseId, options = {}) => {
 	const { enabled = true } = options;
 
@@ -442,6 +462,7 @@ export default {
 	useRealtimeAdminPayments,
 	useRealtimeUserProgress,
 	useRealtimeCoupons,
+	useAdminDashboard,
 	useRealtimeCourseMutations,
 	useRealtimeEnrollmentMutations,
 };

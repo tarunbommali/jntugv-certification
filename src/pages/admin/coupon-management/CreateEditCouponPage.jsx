@@ -60,7 +60,7 @@ const CreateEditCouponPage = () => {
     // ... full component JSX
     <PageContainer
       items={breadcrumbItems}
-      className="min-h-screen bg-gray-50 py-8"
+      className="min-h-screen bg-background py-8"
     >
       <PageTitle
         title={isEditing ? "Edit Coupon" : "Create New Coupon"}
@@ -76,7 +76,7 @@ const CreateEditCouponPage = () => {
       )}
 
       {/* Coupon Form */}
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+      <div className="bg-surface rounded-xl shadow-lg border border-border p-6">
         <form
           onSubmit={async (e) => {
             e.preventDefault();
@@ -90,7 +90,7 @@ const CreateEditCouponPage = () => {
             <div>
               <label
                 htmlFor="code"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Coupon Code *
               </label>
@@ -103,7 +103,7 @@ const CreateEditCouponPage = () => {
                 required
                 readOnly={isEditing}
                 className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  isEditing ? "bg-gray-100 text-gray-500" : "bg-white"
+                  isEditing ? "bg-surface-elevated text-muted" : "bg-surface"
                 }`}
                 placeholder="e.g., WELCOME10"
               />
@@ -111,7 +111,7 @@ const CreateEditCouponPage = () => {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Coupon Name *
               </label>
@@ -122,7 +122,7 @@ const CreateEditCouponPage = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., Welcome Discount"
               />
             </div>
@@ -132,7 +132,7 @@ const CreateEditCouponPage = () => {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-muted mb-1"
             >
               Description
             </label>
@@ -142,12 +142,12 @@ const CreateEditCouponPage = () => {
               value={formData.description}
               onChange={handleInputChange}
               rows={2}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Describe the coupon purpose..."
             />
           </div>
 
-          <div className="text-lg font-semibold text-gray-800 border-b pb-1 mt-6">
+          <div className="text-lg font-semibold text-foreground border-b pb-1 mt-6">
             Discount Details
           </div>
 
@@ -156,7 +156,7 @@ const CreateEditCouponPage = () => {
             <div>
               <label
                 htmlFor="type"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Discount Type *
               </label>
@@ -167,12 +167,12 @@ const CreateEditCouponPage = () => {
                   value={formData.type}
                   onChange={handleInputChange}
                   required
-                  className="appearance-none w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                  className="appearance-none w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                 >
                   <option value="percent">Percentage (%)</option>
                   <option value="flat">Fixed Amount (₹)</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted">
                   {formData.type === "percent" ? (
                     <Percent className="w-5 h-5" />
                   ) : (
@@ -184,7 +184,7 @@ const CreateEditCouponPage = () => {
             <div>
               <label
                 htmlFor="value"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Discount Value *
               </label>
@@ -197,14 +197,14 @@ const CreateEditCouponPage = () => {
                 required
                 min="0"
                 step={formData.type === "percent" ? "1" : "0.01"}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder={formData.type === "percent" ? "10" : "500"}
               />
             </div>
             <div>
               <label
                 htmlFor="maxDiscountAmount"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Max Discount Amount (₹)
               </label>
@@ -216,7 +216,7 @@ const CreateEditCouponPage = () => {
                 onChange={handleInputChange}
                 min="0"
                 step="0.01"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0 (Unlimited)"
               />
             </div>
@@ -227,7 +227,7 @@ const CreateEditCouponPage = () => {
             <div>
               <label
                 htmlFor="validFrom"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Valid From
               </label>
@@ -237,13 +237,13 @@ const CreateEditCouponPage = () => {
                 name="validFrom"
                 value={formData.validFrom}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
               <label
                 htmlFor="validUntil"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Valid Until
               </label>
@@ -253,12 +253,12 @@ const CreateEditCouponPage = () => {
                 name="validUntil"
                 value={formData.validUntil}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
 
-          <div className="text-lg font-semibold text-gray-800 border-b pb-1 mt-6">
+          <div className="text-lg font-semibold text-foreground border-b pb-1 mt-6">
             Usage Restrictions
           </div>
 
@@ -266,7 +266,7 @@ const CreateEditCouponPage = () => {
           <div>
             <label
               htmlFor="minOrderAmount"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-muted mb-1"
             >
               Min Order Amount (₹)
             </label>
@@ -278,7 +278,7 @@ const CreateEditCouponPage = () => {
               onChange={handleInputChange}
               min="0"
               step="0.01"
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="0 (No Minimum)"
             />
           </div>
@@ -288,7 +288,7 @@ const CreateEditCouponPage = () => {
             <div>
               <label
                 htmlFor="usageLimit"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Usage Limit (Total)
               </label>
@@ -300,14 +300,14 @@ const CreateEditCouponPage = () => {
                 onChange={handleInputChange}
                 min="0"
                 step="1"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0 (Unlimited)"
               />
             </div>
             <div>
               <label
                 htmlFor="usageLimitPerUser"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-muted mb-1"
               >
                 Usage Limit Per User
               </label>
@@ -319,7 +319,7 @@ const CreateEditCouponPage = () => {
                 onChange={handleInputChange}
                 min="0"
                 step="1"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0 (Unlimited)"
               />
             </div>
@@ -333,22 +333,22 @@ const CreateEditCouponPage = () => {
               name="isActive"
               checked={formData.isActive}
               onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-border rounded"
             />
             <label
               htmlFor="isActive"
-              className="ml-2 block text-sm font-medium text-gray-900"
+              className="ml-2 block text-sm font-medium text-foreground"
             >
               Coupon is Active
             </label>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={() => navigate("/admin/coupons")}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 text-muted bg-surface-elevated rounded-md hover:bg-gray-300 transition-colors"
             >
               Cancel
             </button>

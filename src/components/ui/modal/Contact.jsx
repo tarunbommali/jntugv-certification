@@ -12,13 +12,13 @@ const Contact = ({ onClose }) => {
       ></div>
 
       {/* Modal Content */}
-      <div className="relative text-[#42526e] bg-white rounded-lg shadow-lg max-w-md w-full p-6 z-10">
+      <div className="relative text-[#42526e] bg-surface rounded-lg shadow-lg max-w-md w-full p-6 z-10">
 
         <FcCustomerSupport className="text-4xl mb-4 " />
         <h2 className="text-xl text-[#192f60]  font-bold mb-4">Contact  24x7</h2>
 
         <p className="mb-2">
-          JNTUGV Certification course counsellors and learner support agents are available 24x7 to help with your learning needs.
+          Aikya I/O course counsellors and learner support agents are available 24x7 to help with your learning needs.
         </p>
 
         <div className="mb-2 rounded-2xl p-4 border border-[#d4d7de]">
@@ -32,7 +32,7 @@ const Contact = ({ onClose }) => {
         </div>
 
         <button
-          className="absolute top-2 right-2 text-gray-600 hover:text-black text-lg"
+          className="absolute top-2 right-2 text-muted hover:text-foreground text-lg"
           onClick={onClose}
         >
           &times;

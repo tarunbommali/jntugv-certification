@@ -22,7 +22,7 @@ const MobileNavigationDrawer = ({
         <>
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                className="fixed inset-0 bg-background/50 backdrop-blur-sm z-40"
                 onClick={() => setIsMenuOpen(false)}
             />
             {/* Drawer Content */}
@@ -40,13 +40,13 @@ const MobileNavigationDrawer = ({
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="flex flex-col space-y-4 border-b border-gray-200 pb-6">
+                <nav className="flex flex-col space-y-4 border-b border-border pb-6">
                     
                     {/* Admin Link (Mobile) */}
                     {isAdmin && (
                         <button
                             onClick={() => handleMobileLinkClick("/admin")}
-                            className="text-xl font-semibold text-amber-600 hover:text-amber-800 transition-colors py-2 border-b border-gray-100 text-left flex items-center gap-2"
+                            className="text-xl font-semibold text-amber-600 hover:text-amber-800 transition-colors py-2 border-b border-border text-left flex items-center gap-2"
                         >
                             <Briefcase className="w-6 h-6" />
                             Admin Dashboard
@@ -57,7 +57,7 @@ const MobileNavigationDrawer = ({
                     {isAuthenticated && (
                         <button
                             onClick={() => handleMobileLinkClick("/profile")}
-                            className="text-xl font-semibold text-blue-600 hover:text-blue-800 transition-colors py-2 border-b border-gray-100 text-left flex items-center gap-2"
+                            className="text-xl font-semibold text-blue-600 hover:text-blue-800 transition-colors py-2 border-b border-border text-left flex items-center gap-2"
                         >
                             <UserCircle className="w-6 h-6" />
                             Profile
@@ -79,7 +79,7 @@ const MobileNavigationDrawer = ({
                             setIsMenuOpen(false);
                             setIsContactModalOpen(true);
                         }}
-                        className="text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors py-2 border-b border-gray-100 text-left"
+                        className="text-xl font-semibold text-foreground hover:text-blue-600 transition-colors py-2 border-b border-border text-left"
                     >
                         Contact
                     </button>

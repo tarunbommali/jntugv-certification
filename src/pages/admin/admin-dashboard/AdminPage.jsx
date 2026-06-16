@@ -17,7 +17,7 @@ import {
   CreditCard,
   FileText,
 } from "lucide-react";
-import { useRealtimeAdminUsers, useRealtimeAdminEnrollments, useRealtimeAdminPayments, useRealtimeCourses } from "../../../hooks/useRealtimeApi.js";
+import { useAdminDashboard } from "../../../hooks/useRealtimeApi.js";
 import { formatINR } from "../../../utils/currency.js";
 
 const items = [{ label: "Admin", link: "/admin" }];
@@ -28,11 +28,9 @@ const AdminPage = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Realtime data
-  const { data: users = [], loading: usersLoading } = useRealtimeAdminUsers({ enabled: true });
-  const { data: enrollments = [], loading: enrollmentsLoading } = useRealtimeAdminEnrollments({ enabled: true });
-  const { data: payments = [], loading: paymentsLoading } = useRealtimeAdminPayments({ enabled: true });
-  const { data: courses = [], loading: coursesLoading } = useRealtimeCourses({ publishedOnly: true, featuredOnly: false, limitCount: 200 });
+  // Realtime consolidated dashboard data
+  const { data: dashboardData, loading: dashboardLoading } = useAdminDashboard({ enabled: true });
+  const { users = [], enrollments = [], payments = [], courses = [] } = dashboardData || {};
 
   // Derived stats (resilient to missing fields)
   const stats = useMemo(() => {
@@ -59,30 +57,30 @@ const AdminPage = () => {
   }, [users, courses, enrollments, payments]);
 
   return (
-    <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
+    <PageContainer items={items} className="min-h-screen bg-background py-8">
       {/* Header */}
 
 
       <PageTitle title="Dashboard" description="Overview" />
 
       {/* Stats */}
-      <div className="mt-12 bg-white rounded-xl shadow-md p-6">
+      <div className="mt-12 bg-surface rounded-xl shadow-md p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{usersLoading ? '…' : stats.totalUsers}</div>
-            <div className="text-sm text-gray-600">Total Users</div>
+            <div className="text-2xl font-bold text-blue-600">{dashboardLoading ? '…' : stats.totalUsers}</div>
+            <div className="text-sm text-muted">Total Users</div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">{coursesLoading ? '…' : stats.activeCourses}</div>
-            <div className="text-sm text-gray-600">Active Courses</div>
+            <div className="text-2xl font-bold text-green-600">{dashboardLoading ? '…' : stats.activeCourses}</div>
+            <div className="text-sm text-muted">Active Courses</div>
           </div>
           <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">{enrollmentsLoading ? '…' : stats.totalEnrollments}</div>
-            <div className="text-sm text-gray-600">Enrollments</div>
+            <div className="text-2xl font-bold text-purple-600">{dashboardLoading ? '…' : stats.totalEnrollments}</div>
+            <div className="text-sm text-muted">Enrollments</div>
           </div>
           <div className="text-center p-4 bg-orange-50 rounded-lg">
-            <div className="text-2xl font-bold text-orange-600">{paymentsLoading && enrollmentsLoading ? '…' : formatINR(stats.revenue || 0)}</div>
-            <div className="text-sm text-gray-600">Revenue</div>
+            <div className="text-2xl font-bold text-orange-600">{dashboardLoading ? '…' : formatINR(stats.revenue || 0)}</div>
+            <div className="text-sm text-muted">Revenue</div>
           </div>
         </div>
       </div>
@@ -92,15 +90,15 @@ const AdminPage = () => {
         {/* User Management */}
         <Link
           to="/admin/users"
-          className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-200"
+          className="bg-surface rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-border"
         >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-blue-100 rounded-lg">
               <Users className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">User Management</h3>
-              <p className="text-sm text-gray-600">Manage users and their accounts</p>
+              <h3 className="text-lg font-semibold text-foreground">User Management</h3>
+              <p className="text-sm text-muted">Manage users and their accounts</p>
             </div>
           </div>
         </Link>
@@ -108,15 +106,15 @@ const AdminPage = () => {
         {/* Course Management */}
         <Link
           to="/admin/courses"
-          className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-200"
+          className="bg-surface rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-border"
         >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-green-100 rounded-lg">
               <BookOpen className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Course Management</h3>
-              <p className="text-sm text-gray-600">Create and manage courses</p>
+              <h3 className="text-lg font-semibold text-foreground">Course Management</h3>
+              <p className="text-sm text-muted">Create and manage courses</p>
             </div>
           </div>
         </Link>
@@ -124,15 +122,15 @@ const AdminPage = () => {
         {/* Enrollment Management */}
         <Link
           to="/admin/enrollments"
-          className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-200"
+          className="bg-surface rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-border"
         >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-purple-100 rounded-lg">
               <UserCheck className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Enrollment Management</h3>
-              <p className="text-sm text-gray-600">Manage course enrollments</p>
+              <h3 className="text-lg font-semibold text-foreground">Enrollment Management</h3>
+              <p className="text-sm text-muted">Manage course enrollments</p>
             </div>
           </div>
         </Link>
@@ -140,15 +138,15 @@ const AdminPage = () => {
         {/* Analytics */}
         <Link
           to="/admin/analytics"
-          className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-200"
+          className="bg-surface rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-border"
         >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-orange-100 rounded-lg">
               <BarChart3 className="w-6 h-6 text-orange-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Analytics</h3>
-              <p className="text-sm text-gray-600">View platform analytics</p>
+              <h3 className="text-lg font-semibold text-foreground">Analytics</h3>
+              <p className="text-sm text-muted">View platform analytics</p>
             </div>
           </div>
         </Link>
@@ -156,15 +154,15 @@ const AdminPage = () => {
         {/* Coupon Management */}
         <Link
           to="/admin/coupons"
-          className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-200"
+          className="bg-surface rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-border"
         >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-yellow-100 rounded-lg">
               <CreditCard className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Coupon Management</h3>
-              <p className="text-sm text-gray-600">Manage discount coupons</p>
+              <h3 className="text-lg font-semibold text-foreground">Coupon Management</h3>
+              <p className="text-sm text-muted">Manage discount coupons</p>
             </div>
           </div>
         </Link>
@@ -173,27 +171,27 @@ const AdminPage = () => {
         {/* Certification Management */}
         <Link
           to="/admin/certifications"
-          className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-gray-200"
+          className="bg-surface rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border border-border"
         >
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-red-100 rounded-lg">
               <FileText className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Certification Management</h3>
-              <p className="text-sm text-gray-600">Verify and issue certificates</p>
+              <h3 className="text-lg font-semibold text-foreground">Certification Management</h3>
+              <p className="text-sm text-muted">Verify and issue certificates</p>
             </div>
           </div>
         </Link>
 
-        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 opacity-50">
+        <div className="bg-surface rounded-xl shadow-md p-6 border border-border opacity-50">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gray-100 rounded-lg">
-              <Settings className="w-6 h-6 text-gray-600" />
+            <div className="p-3 bg-surface-elevated rounded-lg">
+              <Settings className="w-6 h-6 text-muted" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Settings</h3>
-              <p className="text-sm text-gray-600">Platform configuration</p>
+              <h3 className="text-lg font-semibold text-foreground">Settings</h3>
+              <p className="text-sm text-muted">Platform configuration</p>
             </div>
           </div>
         </div>

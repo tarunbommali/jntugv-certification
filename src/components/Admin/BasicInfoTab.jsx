@@ -4,8 +4,8 @@ import FormField from "../ui/FormField";
 
 const BasicInfoTab = ({ course, handleCourseChange, errors }) => {
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">
+    <div className="bg-surface rounded-xl shadow-md border border-border p-6">
+      <h2 className="text-xl font-bold text-foreground mb-6">
         Basic Information
       </h2>
 
@@ -29,11 +29,16 @@ const BasicInfoTab = ({ course, handleCourseChange, errors }) => {
           onChange={(value) => handleCourseChange("category", value)}
           required
         >
-          <option value="web-development">Web Development</option>
-          <option value="mobile-development">Mobile Development</option>
+          <option value="development">Development</option>
+          <option value="ai-machine-learning">AI / Machine Learning</option>
           <option value="data-science">Data Science</option>
           <option value="design">Design</option>
           <option value="business">Business</option>
+          <option value="marketing">Marketing</option>
+          <option value="cybersecurity">Cybersecurity</option>
+          <option value="cloud-devops">Cloud / DevOps</option>
+          <option value="interview-prep">Interview Prep</option>
+          <option value="productivity">Productivity</option>
         </FormField>
 
         {/* Short Description */}

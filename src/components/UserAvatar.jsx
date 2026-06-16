@@ -11,7 +11,7 @@ const getInitials = (name) => {
 };
 
 const UserAvatar = ({ currentUser, userProfile, navigate }) => {
-    const name = userProfile?.name || currentUser?.displayName || currentUser?.email?.split("@")[0];
+    const name = userProfile?.name || currentUser?.username || currentUser?.email?.split("@")[0];
     const initials = getInitials(name);
 
     return (

@@ -92,7 +92,7 @@ const CertificationManagement = () => {
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-elevated text-foreground">
             {status || 'Unknown'}
           </span>
         );
@@ -129,7 +129,7 @@ const CertificationManagement = () => {
 
   if (loading) {
     return (
-      <PageContainer items={breadcrumbItems} className="min-h-screen bg-gray-50 py-8">
+      <PageContainer items={breadcrumbItems} className="min-h-screen bg-background py-8">
         <div className="flex justify-center items-center p-16">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
         </div>
@@ -138,7 +138,7 @@ const CertificationManagement = () => {
   }
 
   return (
-    <PageContainer items={breadcrumbItems} className="min-h-screen bg-gray-50 py-8">
+    <PageContainer items={breadcrumbItems} className="min-h-screen bg-background py-8">
       <PageTitle
         title="Certification Management"
         description="Review and issue certificates to students who have completed their courses"
@@ -146,23 +146,23 @@ const CertificationManagement = () => {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <div className="text-3xl font-bold text-yellow-600">{pendingCertifications.length}</div>
-          <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
+          <div className="text-sm text-muted flex items-center justify-center gap-1">
             <Clock className="w-4 h-4" />
             Pending Review
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <div className="text-3xl font-bold text-green-600">{issuedCertifications.length}</div>
-          <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
+          <div className="text-sm text-muted flex items-center justify-center gap-1">
             <CheckCircle className="w-4 h-4" />
             Issued
           </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <div className="text-3xl font-bold text-blue-600">{pendingCertifications.length + issuedCertifications.length}</div>
-          <div className="text-sm text-gray-600 flex items-center justify-center gap-1">
+          <div className="text-sm text-muted flex items-center justify-center gap-1">
             <Award className="w-4 h-4" />
             Total Certificates
           </div>
@@ -173,23 +173,23 @@ const CertificationManagement = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div className="flex-1 max-w-md">
           <div className="relative">
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <Search className="w-5 h-5 text-muted absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search by user or course..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
 
-        <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+        <div className="flex rounded-lg border border-border overflow-hidden">
           <button
             onClick={() => setActiveTab('pending')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'pending'
                 ? 'bg-yellow-500 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-50'
+                : 'bg-surface text-muted hover:bg-background'
               }`}
           >
             <Clock className="w-4 h-4 inline mr-1" />
@@ -199,7 +199,7 @@ const CertificationManagement = () => {
             onClick={() => setActiveTab('issued')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'issued'
                 ? 'bg-green-500 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-50'
+                : 'bg-surface text-muted hover:bg-background'
               }`}
           >
             <CheckCircle className="w-4 h-4 inline mr-1" />
@@ -209,70 +209,70 @@ const CertificationManagement = () => {
       </div>
 
       {/* Certifications Table */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+      <div className="bg-surface rounded-xl shadow-md border border-border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-background">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                   Course
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                   Progress
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                   {activeTab === 'pending' ? 'Requested' : 'Issued Date'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                   Certificate ID
                 </th>
                 {activeTab === 'pending' && (
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                     Actions
                   </th>
                 )}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-surface divide-y divide-border">
               {currentCertifications.length > 0 ? (
                 currentCertifications.map((cert) => (
-                  <tr key={cert.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={cert.id} className="hover:bg-background transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                           <User className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-foreground">
                             {cert.metadata?.userName || 'Unknown User'}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-muted">
                             {cert.userId?.substring(0, 8)}...
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2 text-sm text-gray-900">
-                        <BookOpen className="w-4 h-4 text-gray-400" />
+                      <div className="flex items-center gap-2 text-sm text-foreground">
+                        <BookOpen className="w-4 h-4 text-muted" />
                         <span>{cert.metadata?.courseTitle || cert.courseId}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
+                        <div className="w-20 bg-surface-elevated rounded-full h-2">
                           <div
                             className="bg-green-500 h-2 rounded-full"
                             style={{ width: `${cert.completionPercentage || 0}%` }}
                           ></div>
                         </div>
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-sm font-medium text-muted">
                           {cert.completionPercentage || 0}%
                         </span>
                       </div>
@@ -280,11 +280,11 @@ const CertificationManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(cert.status)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
                       {formatDate(activeTab === 'pending' ? cert.createdAt : cert.issuedAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">
+                      <span className="text-xs font-mono bg-surface-elevated px-2 py-1 rounded text-muted">
                         {cert.id?.substring(0, 8)}...
                       </span>
                     </td>
@@ -310,13 +310,13 @@ const CertificationManagement = () => {
                 <tr>
                   <td colSpan={activeTab === 'pending' ? 7 : 6} className="px-6 py-12 text-center">
                     <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">
+                    <p className="text-muted">
                       {activeTab === 'pending'
                         ? 'No pending certifications found.'
                         : 'No issued certifications found.'}
                     </p>
                     {searchTerm && (
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-muted mt-1">
                         Try adjusting your search terms.
                       </p>
                     )}

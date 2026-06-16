@@ -22,7 +22,7 @@ const CourseDetails = ({
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
         {/* Preview + Pricing (Right Column on large screens, Top on small screens) */}
         <div className="order-1 lg:order-2 space-y-6">
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded mb-4 md:mb-6">
+          <div className="w-full h-48 bg-surface-elevated flex items-center justify-center rounded mb-4 md:mb-6">
             <img
               className="h-48 object-cover rounded"
               src="https://img.freepik.com/free-vector/video-design-abstract-concept-illustration_335657-2138.jpg"
@@ -30,7 +30,7 @@ const CourseDetails = ({
             />
           </div>
 
-          <div className="flex flex-wrap gap-4 text-gray-800 my-2">
+          <div className="flex flex-wrap gap-4 text-foreground my-2">
             {/* ... Course Stats ... */}
             <div className="flex items-center  gap-2">
               <FaLanguage className="text-primary" />
@@ -48,12 +48,12 @@ const CourseDetails = ({
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-4 shadow space-y-4">
-            <div className="text-2xl md:text-3xl font-bold text-gray-800">
+          <div className="bg-surface rounded-lg p-4 shadow space-y-4">
+            <div className="text-2xl md:text-3xl font-bold text-foreground">
               ₹{course.price} + GST
             </div>
             <div className="flex items-center space-x-2">
-              <span className="line-through text-gray-800 text-sm md:text-base">
+              <span className="line-through text-foreground text-sm md:text-base">
                 ₹{course.originalPrice}
               </span>
               <span className="text-green-600 font-semibold text-sm md:text-base">
@@ -63,7 +63,7 @@ const CourseDetails = ({
             <div className="text-lg font-semibold text-red-600">
               Special Discount: {course.specialDiscount}
             </div>
-            <div className="bg-gray-100 text-gray-900 text-center font-mono p-2 rounded text-sm">
+            <div className="bg-surface-elevated text-foreground text-center font-mono p-2 rounded text-sm">
               ⏱ {formattedTime}
             </div>
 
@@ -96,12 +96,12 @@ const CourseDetails = ({
         {/* Course Info + Modules (Left Column) */}
         <div className="order-2 lg:order-1 lg:col-span-2 space-y-6">
           {/* ... rest of the content remains the same ... */}
-          <h1 className="text-xl md:text-4xl font-semibold text-gray-800">
+          <h1 className="text-xl md:text-4xl font-semibold text-foreground">
             {course.title}
           </h1>
-          <p className="text-md md:text-lg text-gray-600">{course.subtitle}</p>
+          <p className="text-md md:text-lg text-muted">{course.subtitle}</p>
 
-          <ul className="list-disc pl-5 space-y-2 text-gray-700">
+          <ul className="list-disc pl-5 space-y-2 text-muted">
             {course.features.map((feature, idx) => (
               <li key={idx}>{feature}</li>
             ))}
@@ -114,7 +114,7 @@ const CourseDetails = ({
             >
               Our Mission
             </h2>
-            <p className="text-gray-800 mt-2">{course.mission}</p>
+            <p className="text-foreground mt-2">{course.mission}</p>
           </div>
 
           <div className="mt-4 md:mt-8   ">

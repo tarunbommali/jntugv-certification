@@ -8,10 +8,12 @@ import {
   mysqlTable,
   text,
   varchar,
+  unique,
+  decimal,
 } from 'drizzle-orm/mysql-core';
 
 const uuidPrimary = (name) =>
-  varchar(name, 36)
+  varchar(name, { length: 36 })
     .notNull()
     .default(sql`(UUID())`);
 
@@ -24,19 +26,19 @@ const withTimestamps = () => ({
 
 export const users = mysqlTable('users', {
   id: uuidPrimary('id').primaryKey(),
-  email: varchar('email', 191).notNull().unique(),
+  email: varchar('email', { length: 191 }).notNull().unique(),
   password: text('password'),
-  passwordResetToken: varchar('password_reset_token', 191),
+  passwordResetToken: varchar('password_reset_token', { length: 191 }),
   passwordResetExpires: datetime('password_reset_expires'),
-  googleId: varchar('google_id', 64).unique(),
-  authProvider: varchar('auth_provider', 32).notNull().default('password'),
-  displayName: varchar('display_name', 191),
+  googleId: varchar('google_id', { length: 64 }).unique(),
+  authProvider: varchar('auth_provider', { length: 32 }).notNull().default('password'),
+  username: varchar('username', { length: 191 }),
   photoURL: text('photo_url'),
-  firstName: varchar('first_name', 191),
-  lastName: varchar('last_name', 191),
-  phone: varchar('phone', 32),
-  college: varchar('college', 191),
-  gender: varchar('gender', 32),
+  firstName: varchar('first_name', { length: 191 }),
+  lastName: varchar('last_name', { length: 191 }),
+  phone: varchar('phone', { length: 32 }),
+  college: varchar('college', { length: 191 }),
+  gender: varchar('gender', { length: 32 }),
   dateOfBirth: datetime('date_of_birth'),
   skills: json('skills').default(sql`(JSON_ARRAY())`),
   interests: json('interests').default(sql`(JSON_ARRAY())`),
@@ -55,21 +57,21 @@ export const users = mysqlTable('users', {
 
 export const courses = mysqlTable('courses', {
   id: uuidPrimary('id').primaryKey(),
-  title: varchar('title', 255).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   shortDescription: text('short_description'),
-  instructor: varchar('instructor', 191),
+  instructor: varchar('instructor', { length: 191 }),
   instructorBio: text('instructor_bio'),
   thumbnail: text('thumbnail'),
   bannerImage: text('banner_image'),
   previewVideo: text('preview_video'),
   price: int('price').notNull(),
   originalPrice: int('original_price'),
-  currency: varchar('currency', 16).notNull().default('INR'),
-  duration: double('duration'),
-  difficulty: varchar('difficulty', 64).notNull().default('beginner'),
-  language: varchar('language', 64).notNull().default('English'),
-  category: varchar('category', 191),
+  currency: varchar('currency', { length: 16 }).notNull().default('INR'),
+  duration: varchar('duration', { length: 64 }),
+  difficulty: varchar('difficulty', { length: 64 }).notNull().default('beginner'),
+  language: varchar('language', { length: 64 }).notNull().default('English'),
+  category: varchar('category', { length: 191 }),
   modules: json('modules').default(sql`(JSON_ARRAY())`),
   requirements: json('requirements').default(sql`(JSON_ARRAY())`),
   whatYouLearn: json('what_you_learn').default(sql`(JSON_ARRAY())`),
@@ -81,32 +83,32 @@ export const courses = mysqlTable('courses', {
   isPublished: boolean('is_published').notNull().default(false),
   isFeatured: boolean('is_featured').notNull().default(false),
   isBestseller: boolean('is_bestseller').notNull().default(false),
-  status: varchar('status', 64).notNull().default('draft'),
-  contentType: varchar('content_type', 32).notNull().default('modules'),
+  status: varchar('status', { length: 64 }).notNull().default('draft'),
+  contentType: varchar('content_type', { length: 32 }).notNull().default('modules'),
   tags: json('tags').default(sql`(JSON_ARRAY())`),
   metaDescription: text('meta_description'),
-  slug: varchar('slug', 255),
+  slug: varchar('slug', { length: 255 }),
   publishedAt: datetime('published_at'),
-  createdBy: varchar('created_by', 36).references(() => users.id),
+  createdBy: varchar('created_by', { length: 36 }).references(() => users.id),
   ...withTimestamps(),
 });
 
 export const enrollments = mysqlTable('enrollments', {
   id: uuidPrimary('id').primaryKey(),
-  userId: varchar('user_id', 36)
+  userId: varchar('user_id', { length: 36 })
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  courseId: varchar('course_id', 36)
+  courseId: varchar('course_id', { length: 36 })
     .notNull()
     .references(() => courses.id, { onDelete: 'cascade' }),
-  courseTitle: varchar('course_title', 255),
-  status: varchar('status', 64).notNull().default('PENDING'),
+  courseTitle: varchar('course_title', { length: 255 }),
+  status: varchar('status', { length: 64 }).notNull().default('PENDING'),
   enrolledAt: datetime('enrolled_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   completedAt: datetime('completed_at'),
-  paymentId: varchar('payment_id', 191),
+  paymentId: varchar('payment_id', { length: 191 }),
   amount: int('amount'),
-  currency: varchar('currency', 16),
-  couponCode: varchar('coupon_code', 64),
+  currency: varchar('currency', { length: 16 }),
+  couponCode: varchar('coupon_code', { length: 64 }),
   couponDiscount: int('coupon_discount').notNull().default(0),
   billingInfo: json('billing_info'),
   progress: json('progress').default(
@@ -138,14 +140,14 @@ export const enrollments = mysqlTable('enrollments', {
 
 export const certifications = mysqlTable('certifications', {
   id: uuidPrimary('id').primaryKey(),
-  userId: varchar('user_id', 36)
+  userId: varchar('user_id', { length: 36 })
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  courseId: varchar('course_id', 36)
+  courseId: varchar('course_id', { length: 36 })
     .notNull()
     .references(() => courses.id, { onDelete: 'cascade' }),
-  enrollmentId: varchar('enrollment_id', 36).references(() => enrollments.id, { onDelete: 'set null' }),
-  status: varchar('status', 32).notNull().default('PENDING'),
+  enrollmentId: varchar('enrollment_id', { length: 36 }).references(() => enrollments.id, { onDelete: 'set null' }),
+  status: varchar('status', { length: 32 }).notNull().default('PENDING'),
   overallScore: double('overall_score').notNull().default(0),
   completionPercentage: double('completion_percentage').notNull().default(0),
   taskProgress: json('task_progress').default(sql`(JSON_OBJECT(
@@ -162,8 +164,8 @@ export const certifications = mysqlTable('certifications', {
   certificateUrl: text('certificate_url'),
   issuedAt: datetime('issued_at'),
   expiresAt: datetime('expires_at'),
-  issuedBy: varchar('issued_by', 191),
-  reviewedBy: varchar('reviewed_by', 191),
+  issuedBy: varchar('issued_by', { length: 191 }),
+  reviewedBy: varchar('reviewed_by', { length: 191 }),
   reviewedAt: datetime('reviewed_at'),
   metadata: json('metadata').default(sql`(JSON_OBJECT())`),
   ...withTimestamps(),
@@ -171,17 +173,17 @@ export const certifications = mysqlTable('certifications', {
 
 export const payments = mysqlTable('payments', {
   id: uuidPrimary('id').primaryKey(),
-  paymentId: varchar('payment_id', 191).notNull().unique(),
-  orderId: varchar('order_id', 191),
-  enrollmentId: varchar('enrollment_id', 36).references(() => enrollments.id),
-  userId: varchar('user_id', 36).notNull().references(() => users.id),
-  courseId: varchar('course_id', 36).notNull().references(() => courses.id),
-  courseTitle: varchar('course_title', 255),
+  paymentId: varchar('payment_id', { length: 191 }).notNull().unique(),
+  orderId: varchar('order_id', { length: 191 }),
+  enrollmentId: varchar('enrollment_id', { length: 36 }).references(() => enrollments.id),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id),
+  courseId: varchar('course_id', { length: 36 }).notNull().references(() => courses.id),
+  courseTitle: varchar('course_title', { length: 255 }),
   amount: int('amount').notNull(),
-  currency: varchar('currency', 16).notNull().default('INR'),
-  status: varchar('status', 64).notNull().default('created'),
+  currency: varchar('currency', { length: 16 }).notNull().default('INR'),
+  status: varchar('status', { length: 64 }).notNull().default('created'),
   razorpayData: json('razorpay_data'),
-  couponCode: varchar('coupon_code', 64),
+  couponCode: varchar('coupon_code', { length: 64 }),
   couponDiscount: int('coupon_discount').notNull().default(0),
   pricing: json('pricing'),
   capturedAt: datetime('captured_at'),
@@ -190,12 +192,20 @@ export const payments = mysqlTable('payments', {
   ...withTimestamps(),
 });
 
+export const paymentLogs = mysqlTable('payment_logs', {
+  id: uuidPrimary('id').primaryKey(),
+  paymentId: varchar('payment_id', { length: 191 }).notNull(),
+  event: varchar('event', { length: 64 }).notNull(),
+  payload: json('payload'),
+  ...withTimestamps(),
+});
+
 export const coupons = mysqlTable('coupons', {
   id: uuidPrimary('id').primaryKey(),
-  code: varchar('code', 64).notNull().unique(),
-  name: varchar('name', 191).notNull(),
+  code: varchar('code', { length: 64 }).notNull().unique(),
+  name: varchar('name', { length: 191 }).notNull(),
   description: text('description'),
-  type: varchar('type', 32).notNull(),
+  type: varchar('type', { length: 32 }).notNull(),
   value: int('value').notNull(),
   minOrderAmount: int('min_order_amount').notNull().default(0),
   maxDiscountAmount: int('max_discount_amount'),
@@ -207,8 +217,98 @@ export const coupons = mysqlTable('coupons', {
   isActive: boolean('is_active').notNull().default(true),
   applicableCourses: json('applicable_courses').default(sql`(JSON_ARRAY())`),
   applicableCategories: json('applicable_categories').default(sql`(JSON_ARRAY())`),
-  createdBy: varchar('created_by', 36).references(() => users.id),
+  createdBy: varchar('created_by', { length: 36 }).references(() => users.id),
   totalDiscountGiven: int('total_discount_given').notNull().default(0),
   totalOrders: int('total_orders').notNull().default(0),
+  ...withTimestamps(),
+});
+
+export const courseReviews = mysqlTable('course_reviews', {
+  id: uuidPrimary('id').primaryKey(),
+  courseId: varchar('course_id', { length: 36 })
+    .notNull()
+    .references(() => courses.id, { onDelete: 'cascade' }),
+  userId: varchar('user_id', { length: 36 })
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  rating: int('rating').notNull(),
+  review: text('review'),
+  ...withTimestamps(),
+}, (table) => ({
+  userCourseReviewUnq: unique('user_course_review_unq').on(table.userId, table.courseId),
+}));
+
+export const quizzes = mysqlTable('quizzes', {
+  id: uuidPrimary('id').primaryKey(),
+  courseId: varchar('course_id', { length: 36 }).notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  moduleId: varchar('module_id', { length: 64 }), // String ID pointing to JSON module
+  lessonId: varchar('lesson_id', { length: 64 }), // String ID pointing to JSON lesson
+  quizType: varchar('quiz_type', { length: 32 }).notNull().default('practice'), // practice, module_assessment, final_assessment
+  title: varchar('title', { length: 255 }),
+  description: text('description'),
+  passingPercentage: int('passing_percentage').default(70),
+  timeLimitMinutes: int('time_limit_minutes'),
+  attemptsAllowed: int('attempts_allowed').default(1),
+  ...withTimestamps(),
+});
+
+export const quizQuestions = mysqlTable('quiz_questions', {
+  id: uuidPrimary('id').primaryKey(),
+  quizId: varchar('quiz_id', { length: 36 }).notNull().references(() => quizzes.id, { onDelete: 'cascade' }),
+  questionJson: json('question_json').notNull(),
+  sortOrder: int('sort_order').default(1),
+  ...withTimestamps(),
+});
+
+export const assignments = mysqlTable('assignments', {
+  id: uuidPrimary('id').primaryKey(),
+  courseId: varchar('course_id', { length: 36 }).notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  moduleId: varchar('module_id', { length: 64 }),
+  lessonId: varchar('lesson_id', { length: 64 }),
+  title: varchar('title', { length: 255 }),
+  description: text('description'),
+  totalMarks: int('total_marks'),
+  passingMarks: int('passing_marks'),
+  submissionDays: int('submission_days').default(7),
+  allowLateSubmission: boolean('allow_late_submission').default(false),
+  ...withTimestamps(),
+});
+
+export const assignmentSubmissions = mysqlTable('assignment_submissions', {
+  id: uuidPrimary('id').primaryKey(),
+  assignmentId: varchar('assignment_id', { length: 36 }).notNull().references(() => assignments.id, { onDelete: 'cascade' }),
+  studentId: varchar('student_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  fileUrl: text('file_url'),
+  submittedAt: datetime('submitted_at').default(sql`CURRENT_TIMESTAMP`),
+  score: int('score'),
+  feedback: text('feedback'),
+  status: varchar('status', { length: 32 }).default('pending'), // pending, reviewed, passed, failed
+  ...withTimestamps(), // added for consistency
+});
+
+export const quizAttempts = mysqlTable('quiz_attempts', {
+  id: uuidPrimary('id').primaryKey(),
+  quizId: varchar('quiz_id', { length: 36 }).notNull().references(() => quizzes.id, { onDelete: 'cascade' }),
+  studentId: varchar('student_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  answersJson: json('answers_json'),
+  score: decimal('score', { precision: 5, scale: 2 }),
+  percentage: decimal('percentage', { precision: 5, scale: 2 }),
+  passed: boolean('passed'),
+  startedAt: datetime('started_at').default(sql`CURRENT_TIMESTAMP`),
+  completedAt: datetime('completed_at'),
+  ...withTimestamps(),
+});
+
+export const coursePassingRules = mysqlTable('course_passing_rules', {
+  id: uuidPrimary('id').primaryKey(),
+  courseId: varchar('course_id', { length: 36 }).notNull().unique().references(() => courses.id, { onDelete: 'cascade' }),
+  completionPercentage: int('completion_percentage').default(80),
+  practiceQuizRequired: boolean('practice_quiz_required').default(false),
+  moduleAssessmentRequired: boolean('module_assessment_required').default(true),
+  moduleAssessmentPassScore: int('module_assessment_pass_score').default(70),
+  assignmentRequired: boolean('assignment_required').default(false),
+  assignmentPassScore: int('assignment_pass_score').default(60),
+  finalAssessmentRequired: boolean('final_assessment_required').default(false),
+  certificateScore: int('certificate_score').default(75),
   ...withTimestamps(),
 });

@@ -9,6 +9,9 @@ import { useRealtimeEnrollmentStatus } from '../hooks/useRealtimeApi.js';
 import { updateUserProgress } from '../services/index.js';
 import VideoPlayer from '../components/Course/VideoPlayer.jsx';
 import CourseContentShimmer from '../components/Course/CourseContentShimmer.jsx';
+import QuizTaker from '../components/Course/QuizTaker.jsx';
+import AssignmentSubmitter from '../components/Course/AssignmentSubmitter.jsx';
+import { assessmentsApi } from '../api/index.js';
 import { global_classnames } from "../utils/classnames.js";
 import { PlayCircle, List, ArrowRight, Clock, CheckCircle, Lock, AlertTriangle, FileText, Link as LinkIcon, Image as ImageIcon, Download } from 'lucide-react';
 
@@ -252,9 +255,9 @@ const PRIMARY_BLUE = "#004080";
 
 const LearnPage = () => {
     const { courseId } = useParams();
-    const { currentUser, isAuthenticated } = useAuth();
+    const { currentUser, loading: authLoading } = useAuth();
     // Real-time enrollment status for access gating
-    const { isEnrolled, loading: enrollmentLoading } = useRealtimeEnrollmentStatus(currentUser?.uid, courseId);
+    const { isEnrolled, loading: enrollmentLoading } = useRealtimeEnrollmentStatus(currentUser?.uid, courseId, { enabled: !authLoading && Boolean(currentUser) });
     const {
         courseContent,
         currentModule,
@@ -274,6 +277,11 @@ const LearnPage = () => {
     // Expand/collapse state per module
     const [expandedModules, setExpandedModules] = useState({});
     const [videoCompletionMap, setVideoCompletionMap] = useState({});
+    
+    // Assessments state
+    const [quizzes, setQuizzes] = useState([]);
+    const [assignments, setAssignments] = useState([]);
+
     const syncSkipRef = useRef(true);
     const syncTimeoutRef = useRef(null);
 
@@ -282,12 +290,20 @@ const LearnPage = () => {
         currentUser?.uid && courseId ? `lastPlayed:${currentUser.uid}:${courseId}` : null
     ), [currentUser?.uid, courseId]);
 
-    // 1. Initialize course content and enrollment check
     useEffect(() => {
-        if (isAuthenticated && currentUser && courseId && isEnrolled) {
+        if (!authLoading && currentUser && courseId && isEnrolled && !loadingContent && !courseContent) {
             fetchCourseContent(courseId);
+            
+            // Fetch assessments
+            assessmentsApi.getQuizzes(courseId)
+                .then(res => setQuizzes(res.data?.data || []))
+                .catch(err => console.error("Failed to load quizzes", err));
+                
+            assessmentsApi.getAssignments(courseId)
+                .then(res => setAssignments(res.data?.data || []))
+                .catch(err => console.error("Failed to load assignments", err));
         }
-    }, [isAuthenticated, currentUser, courseId, isEnrolled, fetchCourseContent]);
+    }, [authLoading, currentUser, courseId, isEnrolled, fetchCourseContent, loadingContent, courseContent]);
 
     // Initialize selected video on module/content changes, using last played if available
     useEffect(() => {
@@ -493,6 +509,14 @@ const LearnPage = () => {
     }, []);
 
     // --- Conditional Rendering Guards ---
+    if (authLoading) {
+        return <CourseContentShimmer />;
+    }
+
+    if (!currentUser) {
+        return <Navigate to="/login" replace />;
+    }
+
     if (loadingContent || enrollmentLoading) {
         // RENDER SHIMMER LOADING UI
         return <CourseContentShimmer />;
@@ -504,6 +528,18 @@ const LearnPage = () => {
         return <Navigate to={`/course/${courseId}`} replace />;
     }
 
+    if (!courseContent || courseContent.length === 0) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-surface">
+                <div className="text-center">
+                    <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-high">No Content Available</h2>
+                    <p className="text-medium mt-2">This course does not have any content yet.</p>
+                </div>
+            </div>
+        );
+    }
+
     // --- Main Content Display ---
 
     return (
@@ -511,7 +547,7 @@ const LearnPage = () => {
             <div
                 className={`${global_classnames.width.container} mx-auto px-4 sm:px-6 lg:px-8`}>
 
-                {/* 🚨 NEW: Fallback/Error Banner (Shown when contentError is set by context) 🚨 */}
+                {/* NEW: Fallback/Error Banner (Shown when contentError is set by context) 🚨 */}
                 {contentError && (
                     <div className="p-4 mb-8 bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500 text-yellow-800 dark:text-yellow-200 rounded-lg flex items-center gap-3" role="alert">
                         <AlertTriangle className="w-5 h-5 flex-shrink-0" />
@@ -532,18 +568,44 @@ const LearnPage = () => {
                             </h2>
 
                             {activeVideoData ? (
-                                <VideoPlayer
-                                    video={activeVideoData}
-                                    onProgressUpdate={handleVideoProgress}
-                                    onVideoComplete={handleVideoComplete}
-                                    className="w-full"
-                                    showControls={true}
-                                    allowDownload={true}
-                                />
+                                activeVideoData.type === 'quiz' ? (() => {
+                                    const quiz = quizzes.find(q => q.moduleId === currentModule?.id && q.lessonId === activeVideoData.id);
+                                    return quiz ? (
+                                        <QuizTaker courseId={courseId} quizId={quiz.id} onComplete={handleVideoComplete} />
+                                    ) : (
+                                        <div className="p-8 text-center bg-surface rounded-xl shadow-md border border-border">
+                                            <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
+                                            <h3 className="text-lg font-bold text-foreground">Quiz Not Found</h3>
+                                            <p className="text-muted">The instructor has not published the quiz for this lesson yet.</p>
+                                            <button onClick={handleVideoComplete} className="mt-4 text-blue-600 font-medium hover:underline">Mark as complete anyway</button>
+                                        </div>
+                                    );
+                                })() : activeVideoData.type === 'assignment' ? (() => {
+                                    const assignment = assignments.find(a => a.moduleId === currentModule?.id && a.lessonId === activeVideoData.id);
+                                    return assignment ? (
+                                        <AssignmentSubmitter courseId={courseId} assignmentId={assignment.id} onComplete={handleVideoComplete} />
+                                    ) : (
+                                        <div className="p-8 text-center bg-surface rounded-xl shadow-md border border-border">
+                                            <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
+                                            <h3 className="text-lg font-bold text-foreground">Assignment Not Found</h3>
+                                            <p className="text-muted">The instructor has not published the assignment details yet.</p>
+                                            <button onClick={handleVideoComplete} className="mt-4 text-blue-600 font-medium hover:underline">Mark as complete anyway</button>
+                                        </div>
+                                    );
+                                })() : (
+                                    <VideoPlayer
+                                        video={activeVideoData}
+                                        onProgressUpdate={handleVideoProgress}
+                                        onVideoComplete={handleVideoComplete}
+                                        className="w-full"
+                                        showControls={true}
+                                        allowDownload={true}
+                                    />
+                                )
                             ) : (
-                                <div className="aspect-video bg-black/90 rounded-lg flex items-center justify-center text-white">
+                                <div className="aspect-video bg-background/90 rounded-lg flex items-center justify-center text-white">
                                     <div className="text-center">
-                                        <PlayCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                                        <PlayCircle className="w-16 h-16 mx-auto mb-4 text-muted" />
                                         <p className="text-lg">Select a module to start learning</p>
                                     </div>
                                 </div>
@@ -596,7 +658,7 @@ const LearnPage = () => {
                                     <span>Overall Progress</span>
                                     <span>{progressStats.completionPercentage}%</span>
                                 </div>
-                                <div className="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                                <div className="mt-2 h-2 rounded-full bg-surface-elevated dark:bg-gray-700">
                                     <div
                                         className="h-2 rounded-full bg-primary transition-all duration-300"
                                         style={{ width: `${progressStats.completionPercentage}%` }}
@@ -608,7 +670,7 @@ const LearnPage = () => {
                             </div>
                         )}
 
-                        <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+                        <ul className="divide-y divide-border dark:divide-border">
                             {courseContent.length > 0 ? (
                                 courseContent.map((module, index) => {
                                     const moduleProgress = moduleProgressMap[module.id];
@@ -620,10 +682,10 @@ const LearnPage = () => {
                                         <li
                                             key={module.id}
                                             className={`p-4 transition-colors ${isCurrent
-                                                    ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-primary'
-                                                    : isUnlocked
-                                                        ? 'hover:bg-hover cursor-pointer'
-                                                        : 'text-disabled cursor-not-allowed opacity-75'
+                                                ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-primary'
+                                                : isUnlocked
+                                                    ? 'hover:bg-hover cursor-pointer'
+                                                    : 'text-disabled cursor-not-allowed opacity-75'
                                                 }`}
                                         >
                                             <div
@@ -673,7 +735,7 @@ const LearnPage = () => {
                                             {/* Progress indicator */}
                                             {isUnlocked && moduleProgress && (
                                                 <div className="mt-2">
-                                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
+                                                    <div className="w-full bg-surface-elevated dark:bg-gray-700 rounded-full h-1">
                                                         <div
                                                             className="bg-success h-1 rounded-full transition-all duration-300"
                                                             style={{
@@ -696,8 +758,8 @@ const LearnPage = () => {
                                                                 key={vid.id || vIdx}
                                                                 onClick={() => { setCurrentModule(module); setSelectedVideo(vid); }}
                                                                 className={`p-2 rounded border transition-colors ${isActive
-                                                                        ? 'bg-blue-100 dark:bg-blue-900/40 border-primary'
-                                                                        : 'hover:bg-hover border-theme'
+                                                                    ? 'bg-blue-100 dark:bg-blue-900/40 border-primary'
+                                                                    : 'hover:bg-hover border-theme'
                                                                     } ${isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'}`}
                                                             >
                                                                 <div className="flex items-center justify-between gap-3">

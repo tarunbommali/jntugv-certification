@@ -24,8 +24,8 @@ const CertificateGenerator = ({
       certificateId,
       user: {
         ...(certification.user || {}),
-        displayName: studentProfile?.fullName
-          || certification.user?.displayName
+        username: studentProfile?.fullName
+          || certification.user?.username
           || certification.studentName
           || certification.user?.email
           || 'Student',
@@ -78,7 +78,7 @@ const CertificateGenerator = ({
       try {
         await navigator.share({
           title: `My Certificate - ${templateData.courseTitle}`,
-          text: `I completed ${templateData.courseTitle} from JNTU-GV NxtGen Certification!`,
+          text: `I completed ${templateData.courseTitle} from Aikya I/O!`,
           url: window.location.href,
         });
       } catch (error) {
@@ -92,13 +92,13 @@ const CertificateGenerator = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 bg-background bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-surface rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+        <div className="flex justify-between items-center p-6 border-b border-border">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Your Certificate</h2>
-            <p className="text-gray-600">Congratulations on completing {certification.courseTitle}</p>
+            <h2 className="text-2xl font-bold text-foreground">Your Certificate</h2>
+            <p className="text-muted">Congratulations on completing {certification.courseTitle}</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -132,15 +132,15 @@ const CertificateGenerator = ({
         </div>
 
         {/* Certificate Preview */}
-        <div className="p-6 bg-gray-100">
-          <div ref={certificateRef} className="bg-white shadow-lg">
+        <div className="p-6 bg-surface-elevated">
+          <div ref={certificateRef} className="bg-surface shadow-lg">
             <CertificateTemplate {...templateData} />
           </div>
         </div>
 
         {/* Verification Info */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <h3 className="font-semibold text-gray-800 mb-2">Certificate Verification</h3>
+        <div className="p-6 border-t border-border bg-background">
+          <h3 className="font-semibold text-foreground mb-2">Certificate Verification</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
               <p><strong>Certificate ID:</strong> {templateData.certificateId}</p>
@@ -150,7 +150,7 @@ const CertificateGenerator = ({
             <div>
               <p><strong>Verification URL:</strong></p>
               <p className="text-blue-600 break-all">
-                https://nxtgen.jntugv.ac.in/verify/{templateData.certificateId}
+                https://aikya.io/verify/{templateData.certificateId}
               </p>
             </div>
           </div>

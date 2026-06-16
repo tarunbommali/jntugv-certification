@@ -31,6 +31,7 @@ import BasicInfoTab from "../../../components/Admin/BasicInfoTab.jsx";
 import PricingTab from "../../../components/Admin/PricingTab.jsx";
 import ContentTab from "../../../components/Admin/ContentTab.jsx";
 import MediaTab from "../../../components/Admin/MediaTab.jsx";
+import PassingCriteriaTab from "../../../components/Admin/PassingCriteriaTab.jsx";
 import PreviewTab from "../../../components/Admin/PreviewTab.jsx";
 import PageContainer from "../../../components/layout/PageContainer.jsx";
 import PageTitle from "../../../components/ui/PageTitle.jsx";
@@ -341,6 +342,7 @@ const CourseCreateForm = () => {
     { id: "pricing", label: "Pricing", icon: CirclePercent },
     { id: "content", label: "Course Content", icon: Users },
     { id: "media", label: "Media", icon: Image },
+    { id: "passing_criteria", label: "Passing Criteria", icon: AlertCircle },
     { id: "preview", label: "Preview", icon: Eye },
   ];
 
@@ -374,9 +376,15 @@ const CourseCreateForm = () => {
         totalDuration={totalDuration}
         contentType={course?.contentType || 'modules'}
         onContentTypeChange={(val) => updateField('contentType', val)}
+        onOpenPracticeQuiz={() => showToast("Please save the course first to add assessments.", "info")}
+        onOpenAssignment={() => showToast("Please save the course first to add assignments.", "info")}
+        onOpenModuleAssessment={() => showToast("Please save the course first to add module assessments.", "info")}
       />
     ),
     media: <MediaTab course={course} handleCourseChange={updateField} />,
+    passing_criteria: (
+      <PassingCriteriaTab course={course} handleCourseChange={updateField} />
+    ),
     preview: (
       <PreviewTab
         course={course}
@@ -400,7 +408,7 @@ const CourseCreateForm = () => {
   ];
 
   return (
-    <PageContainer items={breadcrumbItems} className="min-h-screen bg-gray-50">
+    <PageContainer items={breadcrumbItems} className="min-h-screen bg-background">
       <ToastNotification
         show={toast.show}
         message={toast.message}
@@ -422,7 +430,7 @@ const CourseCreateForm = () => {
       >
         {/* Sidebar */}
         <div className="w-80 flex-shrink-0">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-8">
+          <div className="bg-surface rounded-lg shadow-sm border border-border p-6 sticky top-8">
             <nav className="space-y-2 mb-8">
               {tabs.map((tab) => (
                 <button
@@ -432,7 +440,7 @@ const CourseCreateForm = () => {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeTab === tab.id
                       ? "bg-blue-50 text-blue-700 border border-blue-200"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      : "text-muted hover:text-foreground hover:bg-background"
                   }`}
                 >
                   <tab.icon className="w-5 h-5 flex-shrink-0" />
@@ -441,12 +449,12 @@ const CourseCreateForm = () => {
               ))}
             </nav>
 
-            <div className="space-y-3 border-t border-gray-200 pt-6">
+            <div className="space-y-3 border-t border-border pt-6">
               <button
                 type="button"
                 onClick={() => navigate("/admin/courses")}
                 disabled={saving || savingAsDraft}
-                className="w-full px-4 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 text-muted bg-surface-elevated rounded-lg hover:bg-surface-elevated transition-colors font-medium text-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -485,7 +493,7 @@ const CourseCreateForm = () => {
 
         {/* Main Form Area */}
         <div className="flex-1 min-w-0">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-surface rounded-lg shadow-sm border border-border">
             <div className="p-8 max-h-[calc(100vh-200px)] overflow-y-auto">
               {tabComponents[activeTab]}
             </div>

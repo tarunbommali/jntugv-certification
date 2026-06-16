@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1781495090652,
+      "tag": "0000_luxuriant_ghost_rider",
+      "breakpoints": true
+    }
+  ]
+}

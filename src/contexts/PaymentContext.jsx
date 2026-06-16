@@ -85,7 +85,7 @@ export const PaymentProvider = ({ children }) => {
   };
 
   // Validate coupon code
-  const validateCoupon = async (couponCode, courseId) => {
+  const validateCoupon = async (couponCode, courseId, amount) => {
     if (!couponCode || !courseId) {
       setCouponValidation({
         isValid: false,
@@ -99,12 +99,12 @@ export const PaymentProvider = ({ children }) => {
     try {
       setCouponValidation(prev => ({ ...prev, loading: true, error: null }));
 
-      const result = await validateCouponCode(couponCode, courseId, currentUser?.uid);
+      const result = await validateCouponCode(couponCode, courseId, currentUser?.uid, amount);
       
       if (result.success) {
         setCouponValidation({
           isValid: true,
-          coupon: result.data,
+          coupon: result.data?.coupon,
           error: null,
           loading: false
         });
@@ -162,7 +162,7 @@ export const PaymentProvider = ({ children }) => {
     
     if (type === 'percent') {
       discount = Math.min(subtotal * (value / 100), maxDiscountAmount || subtotal);
-    } else if (type === 'flat') {
+    } else if (type === 'flat' || type === 'amount') {
       discount = Math.min(value, subtotal);
     }
     

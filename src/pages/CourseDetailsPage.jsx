@@ -7,7 +7,6 @@ import {
   useRealtimeEnrollmentStatus,
   useRealtimeEnrollmentMutations,
 } from "../hooks/useRealtimeApi.js";
-import useRazorpay from "../hooks/useRazorpay";
 import PageContainer from "../components/layout/PageContainer";
 import {
   Card,
@@ -31,11 +30,12 @@ import {
   Play,
 } from "lucide-react";
 import { formatINR, toNumber } from "../utils/currency";
+import useSEO from "../hooks/useSEO.js";
 
 const CourseDetailsPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
 
   const {
     course,
@@ -46,16 +46,31 @@ const CourseDetailsPage = () => {
     isEnrolled,
     enrollment,
     loading: enrollmentLoading,
-  } = useRealtimeEnrollmentStatus(currentUser?.uid, courseId);
+  } = useRealtimeEnrollmentStatus(currentUser?.uid, courseId, { enabled: !authLoading && Boolean(currentUser) });
   const { createEnrollment, loading: enrollmentCreating } =
     useRealtimeEnrollmentMutations();
 
-  const {
-    initializePayment,
-    isLoading: paymentLoading,
-    error: paymentError,
-  } = useRazorpay(currentUser, (enrollmentId, courseId) => {
-    navigate(`/learn/${courseId}`);
+  // Dynamic SEO for course page
+  const courseTitle = course?.title || '';
+  useSEO({
+    title: courseTitle ? courseTitle : undefined,
+    description: courseTitle
+      ? `Learn ${courseTitle} with interactive lessons, practice exercises, quizzes, flashcards and certification on Aikya I/O.`
+      : undefined,
+    canonical: courseTitle ? `https://aikya.io/course/${courseId}` : undefined,
+    jsonLd: courseTitle ? {
+      '@context': 'https://schema.org',
+      '@type': 'Course',
+      name: courseTitle,
+      description: course?.description || `Learn ${courseTitle} on Aikya I/O.`,
+      provider: {
+        '@type': 'Organization',
+        name: 'Aikya I/O',
+        sameAs: 'https://aikya.io',
+      },
+      url: `https://aikya.io/course/${courseId}`,
+      image: course?.imageUrl || course?.thumbnail || '/og-image.png',
+    } : undefined,
   });
 
   // Dummy data for when course is not found
@@ -144,30 +159,17 @@ const CourseDetailsPage = () => {
   ];
 
   const handleEnroll = async () => {
-    if (!isAuthenticated) {
+    if (authLoading) return;
+    if (!currentUser) {
       navigate("/auth/signin");
       return;
     }
 
     if (!displayCourse) return;
 
-    const priceNumber = Number(displayCourse.price);
-    if (!Number.isFinite(priceNumber) || priceNumber <= 0) {
-      alert("Invalid course price. Please contact support.");
-      return;
-    }
-
-    const paymentDetails = {
-      courseId: displayCourse.id,
-      courseTitle: displayCourse.title,
-      amount: priceNumber,
-      billingInfo: {
-        name: currentUser.displayName || "Learner",
-        email: currentUser.email,
-      },
-    };
-
-    await initializePayment(paymentDetails);
+    navigate(`/checkout/${displayCourse.id}`, {
+      state: { course: displayCourse },
+    });
   };
 
   if (courseLoading) {
@@ -339,7 +341,7 @@ const CourseDetailsPage = () => {
               </div>
 
               {/* Enrollment Status */}
-              {enrollmentLoading ? (
+              {enrollmentLoading || authLoading ? (
                 <div className="text-center">
                   <LoadingSpinner size="sm" />
                   <p className="text-sm text-muted-foreground mt-2">
@@ -360,11 +362,11 @@ const CourseDetailsPage = () => {
                 <div className="space-y-4">
                   <Button
                     onClick={handleEnroll}
-                    disabled={paymentLoading || enrollmentCreating || showDummyDataWarning}
+                    disabled={enrollmentCreating || showDummyDataWarning}
                     className="w-full"
                     size="lg"
                   >
-                    {paymentLoading || enrollmentCreating ? (
+                    {enrollmentCreating ? (
                       <>
                         <LoadingSpinner size="sm" className="mr-2" />
                         Processing...
@@ -382,7 +384,7 @@ const CourseDetailsPage = () => {
                     </p>
                   )}
 
-                  {!isAuthenticated && !showDummyDataWarning && (
+                  {!currentUser && !showDummyDataWarning && !authLoading && (
                     <p className="text-sm text-muted-foreground text-center">
                       <Button variant="link" asChild>
                         <a href="/auth/signin">Sign in</a>
@@ -393,13 +395,6 @@ const CourseDetailsPage = () => {
                 </div>
               )}
 
-              {/* Payment Error */}
-              {paymentError && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertIcon variant="destructive" />
-                  <AlertDescription>{paymentError}</AlertDescription>
-                </Alert>
-              )}
             </CardContent>
           </Card>
         </div>

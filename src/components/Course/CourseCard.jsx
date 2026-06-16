@@ -29,14 +29,20 @@ const CourseCard = ({
     }
   };
 
+  const DEFAULT_COURSE_IMAGE = "https://placehold.co/400x250/e2e8f0/1e293b?text=Course+Preview";
+  const courseImage = course.imageUrl || course.thumbnail || DEFAULT_COURSE_IMAGE;
+  const avgRating = course.averageRating ? course.averageRating.toFixed(1) : 'New';
+  const totalReviews = course.totalRatings || 0;
+
   return (
-    <Card className={cn('group hover:shadow-lg transition-all duration-300 hover:-translate-y-1', className)} {...props}>
+    <Card className={cn('group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col h-full', className)} {...props}>
       {/* Course Image */}
-      <div className="relative h-40 overflow-hidden rounded-t-lg">
+      <div className="relative h-40 overflow-hidden rounded-t-lg flex-shrink-0">
         <img
-          src={course.imageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUwCJYSnbBLMEGWKfSnWRGC_34iCCKkxePpg&s"}
-          alt={course.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          src={courseImage}
+          alt={course.title || "Course"}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 bg-surface-elevated"
+          onError={(e) => { e.target.src = DEFAULT_COURSE_IMAGE; }}
         />
 
         {/* Admin Status Badge */}
@@ -62,30 +68,30 @@ const CourseCard = ({
 
         {/* Rating Badge */}
         <div 
-          className="absolute top-3 right-3 text-white text-sm px-2 py-1 rounded-lg flex items-center font-semibold"
-          style={{ background: "var(--color-textLow)" }}
+          className="absolute top-3 right-3 text-white text-sm px-2 py-1 rounded-lg flex items-center font-semibold shadow-sm"
+          style={{ background: "var(--color-textLow)", backgroundColor: "rgba(0,0,0,0.6)" }}
         >
           <Star size={14} className="fill-yellow-400 text-yellow-400 mr-1" />
-          {course.rating || '4.5'}
+          {avgRating} {totalReviews > 0 ? `(${totalReviews})` : ''}
         </div>
       </div>
 
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg leading-snug line-clamp-2">
-          {course.title}
+      <CardHeader className="pb-3 flex-shrink-0">
+        <CardTitle className="text-lg leading-snug line-clamp-2" title={course.title || 'Untitled Course'}>
+          {course.title || <span className="text-muted italic">Untitled Course</span>}
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="pt-0 pb-3">
+      <CardContent className="pt-0 pb-3 flex-grow">
         {/* Course Details */}
         <div className="space-y-2 text-sm text-medium">
           <div className="flex items-center">
-            <Clock size={16} className="mr-2" />
-            <span>{course.duration || 'Self-Paced'}</span>
+            <Clock size={16} className="mr-2 flex-shrink-0" />
+            <span className="truncate">{course.duration || 'Self-Paced'}</span>
           </div>
           <div className="flex items-center">
-            <Globe size={16} className="mr-2" />
-            <span>{course.mode || 'Online'}</span>
+            <Globe size={16} className="mr-2 flex-shrink-0" />
+            <span className="truncate">{course.mode || 'Online'}</span>
           </div>
 
           {/* Admin-only additional info */}
@@ -95,12 +101,10 @@ const CourseCard = ({
                 <span className="font-medium mr-2">Students:</span>
                 <span>{course.students || 0}</span>
               </div>
-              {course.instructor && (
-                <div className="flex items-center text-xs">
-                  <span className="font-medium mr-2">Instructor:</span>
-                  <span>{course.instructor}</span>
-                </div>
-              )}
+              <div className="flex items-center text-xs">
+                <span className="font-medium mr-2">Instructor:</span>
+                <span className="truncate">{course.instructor || <span className="text-muted italic">Not specified</span>}</span>
+              </div>
             </>
           )}
         </div>

@@ -249,10 +249,10 @@ const VideoPlayer = ({
     
     if (!embedUrl) {
       return (
-        <div className="flex items-center justify-center h-full bg-gray-900 text-white">
+        <div className="flex items-center justify-center h-full bg-surface text-white">
           <div className="text-center">
             <p className="text-lg mb-2">Unsupported video format</p>
-            <p className="text-sm text-gray-400">Please contact support</p>
+            <p className="text-sm text-muted">Please contact support</p>
           </div>
         </div>
       );
@@ -291,10 +291,10 @@ const VideoPlayer = ({
 
   if (!video) {
     return (
-      <div className={`flex items-center justify-center bg-gray-900 text-white ${className}`}>
+      <div className={`flex items-center justify-center bg-surface text-white ${className}`}>
         <div className="text-center">
           <p className="text-lg mb-2">No video selected</p>
-          <p className="text-sm text-gray-400">Please select a video to play</p>
+          <p className="text-sm text-muted">Please select a video to play</p>
         </div>
       </div>
     );
@@ -303,12 +303,12 @@ const VideoPlayer = ({
   return (
     <div 
       ref={containerRef}
-      className={`relative bg-black rounded-lg overflow-hidden ${className}`}
+      className={`relative bg-background rounded-lg overflow-hidden ${className}`}
     >
       {/* Video Container */}
       <div className="relative w-full aspect-video">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-surface text-white z-10">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
               <p>Loading video...</p>
@@ -317,7 +317,7 @@ const VideoPlayer = ({
         )}
         
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-surface text-white z-10">
             <div className="text-center">
               <p className="text-red-400 mb-2">{error}</p>
               <button 
@@ -337,7 +337,7 @@ const VideoPlayer = ({
           <button
             type="button"
             onClick={() => setShowSettings((s) => !s)}
-            className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded bg-black/70 text-white text-xs hover:bg-black/80"
+            className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded bg-background/70 text-white text-xs hover:bg-background/80"
             title="Resources"
           >
             <Download className="w-4 h-4" />
@@ -428,7 +428,7 @@ const VideoPlayer = ({
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="absolute top-4 right-4 bg-black/90 text-white p-4 rounded-lg min-w-64">
+        <div className="absolute top-4 right-4 bg-background/90 text-white p-4 rounded-lg min-w-64">
           <h3 className="font-semibold mb-3">Video Resources</h3>
           
           {video?.resources && video.resources.length > 0 ? (
@@ -437,7 +437,7 @@ const VideoPlayer = ({
                 <div key={index} className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium">{resource.title}</p>
-                    <p className="text-xs text-gray-400">{resource.type.toUpperCase()}</p>
+                    <p className="text-xs text-muted">{resource.type.toUpperCase()}</p>
                   </div>
                   <a
                     href={resource.url}
@@ -450,7 +450,7 @@ const VideoPlayer = ({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400">No resources available</p>
+            <p className="text-sm text-muted">No resources available</p>
           )}
           
           <button
@@ -463,7 +463,7 @@ const VideoPlayer = ({
       )}
 
       {/* Keyboard Shortcuts Help */}
-      <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded-lg text-xs opacity-0 hover:opacity-100 transition-opacity">
+      <div className="absolute top-4 left-4 bg-background/90 text-white p-3 rounded-lg text-xs opacity-0 hover:opacity-100 transition-opacity">
         <div className="space-y-1">
           <p><kbd className="bg-gray-700 px-1 rounded">Space</kbd> Play/Pause</p>
           <p><kbd className="bg-gray-700 px-1 rounded">←</kbd> <kbd className="bg-gray-700 px-1 rounded">→</kbd> Seek</p>

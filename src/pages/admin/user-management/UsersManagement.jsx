@@ -32,7 +32,7 @@ const UsersManagement = () => {
   const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [toast, setToast] = useState({
     show: false,
@@ -66,14 +66,13 @@ const UsersManagement = () => {
     }
   }, [isAdmin, navigate]);
 
-  // Fetch users only when user is admin
-  useEffect(() => {
-    if (isAdmin) fetchUsers();
-  }, [isAdmin]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = async (searchTerm) => {
+    if (!searchTerm) {
+      setUsers([]);
+      return;
+    }
     setLoading(true);
-    const result = await getAllUsersData(500);
+    const result = await getAllUsersData(10, searchTerm);
     if (result.success) {
       const normalizedUsers = result.data.map((user) => ({
         ...user,
@@ -87,6 +86,14 @@ const UsersManagement = () => {
     setLoading(false);
   };
 
+  const handleSearch = () => {
+    if (searchTerm) {
+      fetchUsers(searchTerm);
+    } else {
+      setUsers([]);
+    }
+  };
+
   const handleAccountStatusToggle = async (user) => {
     const currentStatus = user.status || "active";
     const newStatus = currentStatus === "active" ? "inactive" : "active";
@@ -95,7 +102,7 @@ const UsersManagement = () => {
     if (
       window.confirm(
         `Are you sure you want to ${action} ${
-          user.displayName || user.email
+          user.username || user.email
         }'s account?`
       )
     ) {
@@ -106,7 +113,7 @@ const UsersManagement = () => {
           showToast(
             "success",
             `User ${
-              user.displayName || user.email
+              user.username || user.email
             }'s account has been ${newStatus}d.`,
             "Action Successful"
           );
@@ -129,7 +136,7 @@ const UsersManagement = () => {
   };
 
   const filteredUsers = users.filter((user) => {
-    const name = (user.displayName || "").toLowerCase();
+    const name = (user.username || "").toLowerCase();
     const email = (user.email || "").toLowerCase();
     const search = searchTerm.toLowerCase();
     return name.includes(search) || email.includes(search);
@@ -142,7 +149,7 @@ const UsersManagement = () => {
       case "inactive":
         return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-surface-elevated text-foreground";
     }
   };
 
@@ -155,7 +162,7 @@ const UsersManagement = () => {
       case "student":
         return "bg-green-100 text-green-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-surface-elevated text-foreground";
     }
   };
 
@@ -167,7 +174,7 @@ const UsersManagement = () => {
   }
 
   return (
-    <PageContainer items={items} className="min-h-screen bg-gray-50 py-8">
+    <PageContainer items={items} className="min-h-screen bg-background py-8">
       <PageTitle
         title="User Management"
         description="Manage platform users and their permissions"
@@ -177,14 +184,20 @@ const UsersManagement = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 max-w-md">
           <div className="relative">
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search users by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="w-full pl-4 pr-10 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+            <button
+              onClick={handleSearch}
+              className="absolute right-0 top-0 h-full px-3 text-muted hover:text-blue-600"
+            >
+              <Search className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
@@ -198,61 +211,61 @@ const UsersManagement = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mt-4">
+      <div className="bg-surface rounded-xl shadow-md border border-border overflow-hidden mt-4">
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600 mt-4">Loading users...</p>
+            <p className="text-muted mt-4">Loading users...</p>
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-muted">
             No users found matching your search criteria.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-background">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Courses
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Join Date
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-surface divide-y divide-border">
                 {filteredUsers.map((user) => (
                   <tr
                     key={user.uid}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-background transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                           <span className="text-blue-600 font-semibold">
-                            {(user.displayName || user.email || "U")
+                            {(user.username || user.email || "U")
                               .substring(0, 2)
                               .toUpperCase()}
                           </span>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.displayName || "No Name"}
+                          <div className="text-sm font-medium text-foreground">
+                            {user.username || "No Name"}
                           </div>
-                          <div className="text-sm text-gray-500 flex items-center">
+                          <div className="text-sm text-muted flex items-center">
                             <Mail className="w-3 h-3 mr-1" />
                             {user.email}
                           </div>
@@ -278,10 +291,10 @@ const UsersManagement = () => {
                         {user.status || "active"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                       {user.totalCoursesEnrolled || 0} courses
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
                       <div className="flex items-center">
                         <Calendar className="w-3 h-3 mr-1" />
                         {user.createdAt?.toDate?.()?.toLocaleDateString() ||
@@ -324,30 +337,30 @@ const UsersManagement = () => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <div className="text-2xl font-bold text-blue-600">{users.length}</div>
-          <div className="text-sm text-gray-600">Total Users</div>
+          <div className="text-sm text-muted">Total Users</div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <div className="text-2xl font-bold text-green-600">
             {users.filter((u) => u.status === "active" || !u.status).length}
           </div>
-          <div className="text-sm text-gray-600">Active Users</div>
+          <div className="text-sm text-muted">Active Users</div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <div className="text-2xl font-bold text-purple-600">
             {users.filter((u) => u.isAdmin).length}
           </div>
-          <div className="text-sm text-gray-600">Admins</div>
+          <div className="text-sm text-muted">Admins</div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+        <div className="bg-surface p-4 rounded-lg shadow border border-border text-center">
           <div className="text-2xl font-bold text-orange-600">
             {users.reduce(
               (acc, user) => acc + (user.totalCoursesEnrolled || 0),
               0
             )}
           </div>
-          <div className="text-sm text-gray-600">Total Enrollments</div>
+          <div className="text-sm text-muted">Total Enrollments</div>
         </div>
       </div>
     </PageContainer>

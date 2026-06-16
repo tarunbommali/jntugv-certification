@@ -14,7 +14,7 @@ import PageContainer from "../../../components/layout/PageContainer.jsx";
 import PageTitle from "../../../components/ui/PageTitle.jsx";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner.jsx";
 import { formatINR } from "../../../utils/currency.js";
-import { useRealtimeAdminUsers, useRealtimeAdminEnrollments, useRealtimeAdminPayments, useRealtimeCourses } from "../../../hooks/useRealtimeApi.js";
+import { useAdminDashboard } from "../../../hooks/useRealtimeApi.js";
 
 const items = [
   { label: "Admin", link: "/admin" },
@@ -31,24 +31,22 @@ const Analytics = () => {
 
   if (!isAdmin) return <Navigate to="/" replace />;
 
-  // Live data streams
-  const { data: users = [], loading: usersLoading } = useRealtimeAdminUsers({ enabled: true });
-  const { data: enrollments = [], loading: enrollmentsLoading } = useRealtimeAdminEnrollments({ enabled: true });
-  const { data: payments = [], loading: paymentsLoading } = useRealtimeAdminPayments({ enabled: true });
-  const { data: courses = [], loading: coursesLoading } = useRealtimeCourses({ publishedOnly: true });
+  // Live consolidated data stream
+  const { data: dashboardData, loading: dashboardLoading } = useAdminDashboard({ enabled: true });
+  const { users = [], enrollments = [], payments = [], courses = [] } = dashboardData || {};
 
   useEffect(() => {
-    if (!usersLoading && !enrollmentsLoading && !paymentsLoading && !coursesLoading) {
+    if (!dashboardLoading) {
       setLoading(false);
     }
-  }, [usersLoading, enrollmentsLoading, paymentsLoading, coursesLoading]);
+  }, [dashboardLoading]);
 
   const StatCard = ({ icon: Icon, label, value, color = "blue" }) => (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+    <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-600">{label}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{loading ? "..." : value}</p>
+          <p className="text-sm font-medium text-muted">{label}</p>
+          <p className="text-2xl font-bold text-foreground mt-2">{loading ? "..." : value}</p>
         </div>
         <div className={`p-3 rounded-lg bg-${color}-100`}>
           <Icon className={`w-6 h-6 text-${color}-600`} />
@@ -238,7 +236,7 @@ const Analytics = () => {
         {/* Tooltip */}
         {hover && data[hover.index] && (
           <div
-            className="pointer-events-none absolute bg-white text-gray-800 text-xs shadow rounded px-2 py-1 border border-gray-200"
+            className="pointer-events-none absolute bg-surface text-foreground text-xs shadow rounded px-2 py-1 border border-border"
             style={{ left: `calc(${(hover.x / W) * 100}% + 8px)`, top: Math.max(0, hover.y - 30) }}
           >
             <div className="font-medium">{data[hover.index].label}</div>
@@ -337,7 +335,7 @@ const Analytics = () => {
         {/* Tooltip */}
         {hover && data[hover.index] && (
           <div
-            className="pointer-events-none absolute bg-white text-gray-800 text-xs shadow rounded px-2 py-1 border border-gray-200"
+            className="pointer-events-none absolute bg-surface text-foreground text-xs shadow rounded px-2 py-1 border border-border"
             style={{ left: `calc(${(hover.x / W) * 100}% + 8px)`, top: Math.max(0, hover.y - 30) }}
           >
             <div className="font-medium">{data[hover.index].label}</div>
@@ -349,7 +347,7 @@ const Analytics = () => {
   };
 
   return (
-    <PageContainer items={items} className="min-h-screen  bg-gray-50 py-8">
+    <PageContainer items={items} className="min-h-screen  bg-background py-8">
       <PageTitle title="Analytics" description="Platform performance and insights" />
 
       {/* Time Range Selector */}
@@ -361,7 +359,7 @@ const Analytics = () => {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               timeRange === range
                 ? "bg-blue-600 text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                : "bg-surface text-muted hover:bg-background border border-border"
             }`}
           >
             {range}
@@ -379,16 +377,16 @@ const Analytics = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Enrollment Trends</h3>
+        <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Enrollment Trends</h3>
           {loading ? (
             <div className="h-64 grid place-items-center">
               <LoadingSpinner />
             </div>
           ) : (
-            <div className="h-64 bg-gray-50 rounded-lg border border-gray-200 p-2">
+            <div className="h-64 bg-background rounded-lg border border-border p-2">
               {series.enrollSeries.length === 0 || series.enrollSeries.every(p => (p?.value || 0) === 0) ? (
-                <div className="h-full grid place-items-center text-sm text-gray-500">
+                <div className="h-full grid place-items-center text-sm text-muted">
                   No data for this range
                 </div>
               ) : (
@@ -405,16 +403,16 @@ const Analytics = () => {
           )}
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue Analysis</h3>
+        <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Revenue Analysis</h3>
           {loading ? (
             <div className="h-64 grid place-items-center">
               <LoadingSpinner />
             </div>
           ) : (
-            <div className="h-64 bg-gray-50 rounded-lg border border-gray-200 p-2">
+            <div className="h-64 bg-background rounded-lg border border-border p-2">
               {series.revenueSeries.length === 0 || series.revenueSeries.every(p => (p?.value || 0) === 0) ? (
-                <div className="h-full grid place-items-center text-sm text-gray-500">
+                <div className="h-full grid place-items-center text-sm text-muted">
                   No data for this range
                 </div>
               ) : (

@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authApi } from "../api/index.js";
-import logo from "../assets/logo.jpg";
 import { Loader2, Eye, EyeOff, CheckCircle } from "lucide-react";
 
 const ForgotPassword = () => {
@@ -124,26 +123,23 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-            <div className="w-full max-w-lg bg-white shadow-2xl rounded-xl p-8 sm:p-10 border border-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+            <div className="w-full max-w-lg bg-surface shadow-2xl rounded-xl p-8 sm:p-10 border border-border">
 
                 {/* Logo and Branding - Same as SignIn/SignUp */}
                 <div className="text-center mb-8">
                     <Link to="/" className="inline-flex items-center justify-center space-x-2">
-                        <img src={logo} alt="JNTU-GV Logo" className="w-16 h-16" />
-                        <span className="text-2xl font-extrabold text-[var(--color-primary)]">
-                            NxtGen Certification
-                        </span>
+                        <img src="/logo-light.svg" alt="Aikya I/O" className="h-12 w-auto" />
                     </Link>
                 </div>
 
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                <h2 className="text-3xl font-bold text-foreground mb-2">
                     {step === 1 && "Forgot Password"}
                     {step === 2 && "Verify OTP"}
                     {step === 3 && "Set New Password"}
                 </h2>
 
-                <p className="text-gray-600 text-sm mb-6">
+                <p className="text-muted text-sm mb-6">
                     {step === 1 && "Enter your email to receive a one-time password (OTP)"}
                     {step === 2 && `Enter the 4-digit OTP sent to ${email}`}
                     {step === 3 && "Create a strong new password for your account"}
@@ -156,13 +152,13 @@ const ForgotPassword = () => {
                             <div
                                 className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${step >= s
                                         ? "bg-[var(--color-primary)] text-white"
-                                        : "bg-gray-200 text-gray-500"
+                                        : "bg-surface-elevated text-muted"
                                     }`}
                             >
                                 {step > s ? <CheckCircle className="w-5 h-5" /> : s}
                             </div>
                             {index < 2 && (
-                                <div className={`w-12 h-1 rounded-full ${step > s ? 'bg-[var(--color-primary)]' : 'bg-gray-200'}`} />
+                                <div className={`w-12 h-1 rounded-full ${step > s ? 'bg-[var(--color-primary)]' : 'bg-surface-elevated'}`} />
                             )}
                         </React.Fragment>
                     ))}
@@ -185,7 +181,7 @@ const ForgotPassword = () => {
                 {step === 1 && (
                     <form onSubmit={handleRequestOtp} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-muted mb-1">
                                 Email Address
                             </label>
                             <input
@@ -193,7 +189,7 @@ const ForgotPassword = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="your@email.com"
-                                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
+                                className="w-full border border-border p-3 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
                                 required
                             />
                         </div>
@@ -216,7 +212,7 @@ const ForgotPassword = () => {
                 {step === 2 && (
                     <form onSubmit={handleVerifyOtp} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-muted mb-1">
                                 Enter 4-Digit OTP
                             </label>
                             <input
@@ -225,13 +221,13 @@ const ForgotPassword = () => {
                                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
                                 placeholder="1234"
                                 maxLength={4}
-                                className="w-full border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition text-center text-3xl tracking-[0.5em] font-mono"
+                                className="w-full border border-border p-4 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition text-center text-3xl tracking-[0.5em] font-mono"
                                 required
                             />
                         </div>
 
                         {countdown > 0 && (
-                            <p className="text-sm text-gray-500 text-center">
+                            <p className="text-sm text-muted text-center">
                                 OTP expires in <span className="font-bold text-[var(--color-primary)]">{formatCountdown(countdown)}</span>
                             </p>
                         )}
@@ -261,7 +257,7 @@ const ForgotPassword = () => {
                         <button
                             type="button"
                             onClick={() => { setStep(1); setOtp(""); }}
-                            className="w-full py-2 text-gray-600 hover:text-gray-900 text-sm"
+                            className="w-full py-2 text-muted hover:text-foreground text-sm"
                         >
                             Use a different email
                         </button>
@@ -272,7 +268,7 @@ const ForgotPassword = () => {
                 {step === 3 && (
                     <form onSubmit={handleResetPassword} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-muted mb-1">
                                 New Password
                             </label>
                             <div className="relative">
@@ -281,14 +277,14 @@ const ForgotPassword = () => {
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full border border-gray-300 p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
+                                    className="w-full border border-border p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
                                     required
                                     minLength={8}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-muted focus:outline-none"
                                     tabIndex={-1}
                                 >
                                     {showPassword ? (
@@ -298,11 +294,11 @@ const ForgotPassword = () => {
                                     )}
                                 </button>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+                            <p className="text-xs text-muted mt-1">Must be at least 8 characters</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-muted mb-1">
                                 Confirm Password
                             </label>
                             <div className="relative">
@@ -311,13 +307,13 @@ const ForgotPassword = () => {
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full border border-gray-300 p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
+                                    className="w-full border border-border p-3 pr-12 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] outline-none transition"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-muted focus:outline-none"
                                     tabIndex={-1}
                                 >
                                     {showConfirmPassword ? (
@@ -347,7 +343,7 @@ const ForgotPassword = () => {
                 )}
 
                 {/* Back to Sign In Link */}
-                <p className="mt-6 text-sm text-center text-gray-600">
+                <p className="mt-6 text-sm text-center text-muted">
                     Remember your password?{" "}
                     <Link
                         to="/auth/signin"

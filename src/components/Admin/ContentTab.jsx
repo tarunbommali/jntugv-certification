@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { Plus, Trash2, BookOpen, Video, ListOrdered, FileText, Link, Image, Download } from 'lucide-react';
+import { Plus, Trash2, BookOpen, Video, ListOrdered, FileText, Link, Image, Download, ClipboardList, FileCheck } from 'lucide-react';
 import FormField from '../ui/FormField';
 
 const ContentTab = ({
@@ -15,6 +15,9 @@ const ContentTab = ({
     totalDuration,
     contentType = 'modules',
     onContentTypeChange,
+    onOpenPracticeQuiz = () => {},
+    onOpenAssignment = () => {},
+    onOpenModuleAssessment = () => {},
 }) => {
     const [expandedLessons, setExpandedLessons] = useState({});
 
@@ -94,23 +97,23 @@ const ContentTab = ({
     const safeModules = Array.isArray(modules) ? modules : [];
 
     return (
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+        <div className="bg-surface rounded-xl shadow-md border border-border p-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900">Course Content</h2>
-                    <p className="text-gray-600 mt-1">
+                    <h2 className="text-xl font-bold text-foreground">Course Content</h2>
+                    <p className="text-muted mt-1">
                         {totalLessons || 0} lessons • {totalDuration || 0} hours total
                     </p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="flex bg-gray-100 rounded-lg p-1">
+                    <div className="flex bg-surface-elevated rounded-lg p-1">
                         <button
                             type="button"
                             onClick={() => onContentTypeChange ? onContentTypeChange('modules') : null}
                             className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${contentType === 'modules'
-                                ? 'bg-white text-blue-600 shadow-sm'
-                                : 'text-gray-600 hover:text-gray-900'
+                                ? 'bg-surface text-blue-600 shadow-sm'
+                                : 'text-muted hover:text-foreground'
                                 }`}
                         >
                             <BookOpen className="w-4 h-4" />
@@ -120,8 +123,8 @@ const ContentTab = ({
                             type="button"
                             onClick={() => onContentTypeChange ? onContentTypeChange('series') : null}
                             className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${contentType === 'series'
-                                ? 'bg-white text-blue-600 shadow-sm'
-                                : 'text-gray-600 hover:text-gray-900'
+                                ? 'bg-surface text-blue-600 shadow-sm'
+                                : 'text-muted hover:text-foreground'
                                 }`}
                         >
                             <ListOrdered className="w-4 h-4" />
@@ -141,12 +144,12 @@ const ContentTab = ({
             </div>
 
             {safeModules.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-                    <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+                    <BookOpen className="w-12 h-12 text-muted mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">
                         No {contentType === 'modules' ? 'modules' : 'series'} yet
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-muted mb-4">
                         Start by adding your first {contentType === 'modules' ? 'module' : 'series'}
                     </p>
                     <button
@@ -163,7 +166,7 @@ const ContentTab = ({
                     const safeLessons = Array.isArray(module.lessons) ? module.lessons : [];
 
                     return (
-                        <div key={module.id || moduleIndex} className="border border-gray-200 rounded-lg p-4 mb-4">
+                        <div key={module.id || moduleIndex} className="border border-border rounded-lg p-4 mb-4">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex-1 space-y-3">
                                     <FormField
@@ -180,7 +183,7 @@ const ContentTab = ({
                                         onChange={(value) => handleModuleChange(module.id, { description: value })}
                                         placeholder={`${contentType === 'modules' ? 'Module' : 'Series'} Description`}
                                         className="mb-0"
-                                        inputClassName="text-gray-600 border-none focus:ring-0 p-0"
+                                        inputClassName="text-muted border-none focus:ring-0 p-0"
                                     />
                                 </div>
                                 <button
@@ -218,13 +221,21 @@ const ContentTab = ({
                                         <Plus className="w-3 h-3" />
                                         Add {contentType === 'modules' ? 'Lesson' : 'Video'}
                                     </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => onOpenModuleAssessment(module.id)}
+                                        className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm ml-2"
+                                    >
+                                        <ClipboardList className="w-3 h-3" />
+                                        Add Assessment
+                                    </button>
                                 </div>
                             </div>
 
                             {/* Lessons/Videos */}
                             <div className="space-y-3">
                                 {safeLessons.length === 0 ? (
-                                    <div className="text-center py-4 text-gray-500 border border-dashed border-gray-300 rounded-lg">
+                                    <div className="text-center py-4 text-muted border border-dashed border-border rounded-lg">
                                         No {contentType === 'modules' ? 'lessons' : 'videos'} added yet. Click "Add {contentType === 'modules' ? 'Lesson' : 'Video'}" to get started.
                                     </div>
                                 ) : (
@@ -233,9 +244,9 @@ const ContentTab = ({
                                         const safeResources = Array.isArray(lesson.resources) ? lesson.resources : [];
 
                                         return (
-                                            <div key={lesson.id || lessonIndex} className="border border-gray-200 rounded-lg overflow-hidden">
+                                            <div key={lesson.id || lessonIndex} className="border border-border rounded-lg overflow-hidden">
                                                 {/* Lesson Header */}
-                                                <div className="flex items-center gap-4 p-3 bg-gray-50">
+                                                <div className="flex items-center gap-4 p-3 bg-background">
                                                     <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-2">
                                                         <div className="md:col-span-4">
                                                             <FormField
@@ -285,6 +296,22 @@ const ContentTab = ({
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             type="button"
+                                                            onClick={() => onOpenPracticeQuiz(module.id, lesson.id)}
+                                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors text-sm flex items-center gap-1"
+                                                            title="Add Practice Quiz"
+                                                        >
+                                                            <ClipboardList className="w-4 h-4" /> Quiz
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onOpenAssignment(module.id, lesson.id)}
+                                                            className="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors text-sm flex items-center gap-1"
+                                                            title="Add Assignment"
+                                                        >
+                                                            <FileCheck className="w-4 h-4" /> Assignment
+                                                        </button>
+                                                        <button
+                                                            type="button"
                                                             onClick={() => toggleLessonExpansion(lesson.id)}
                                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
                                                         >
@@ -302,9 +329,9 @@ const ContentTab = ({
 
                                                 {/* Resources Section */}
                                                 {expandedLessons[lesson.id] && (
-                                                    <div className="p-4 bg-white border-t border-gray-200">
+                                                    <div className="p-4 bg-surface border-t border-border">
                                                         <div className="flex justify-between items-center mb-3">
-                                                            <h4 className="font-medium text-gray-900">Resources</h4>
+                                                            <h4 className="font-medium text-foreground">Resources</h4>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => addResource(module.id, lesson.id)}
@@ -317,12 +344,12 @@ const ContentTab = ({
 
                                                         <div className="space-y-2">
                                                             {safeResources.length === 0 ? (
-                                                                <div className="text-center py-4 text-gray-500">
+                                                                <div className="text-center py-4 text-muted">
                                                                     No resources added yet. Click "Add Resource" to attach files, links, or notes.
                                                                 </div>
                                                             ) : (
                                                                 safeResources.map((resource, resourceIndex) => (
-                                                                    <div key={resource.id || resourceIndex} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                                                    <div key={resource.id || resourceIndex} className="flex items-center gap-3 p-3 bg-background rounded-lg">
                                                                         <div className="flex-shrink-0">
                                                                             {getResourceIcon(resource.type)}
                                                                         </div>
@@ -366,7 +393,7 @@ const ContentTab = ({
                                                                                     <input
                                                                                         type="file"
                                                                                         onChange={(e) => handleFileUpload(module.id, lesson.id, resource.id, e.target.files[0])}
-                                                                                        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                                                                                        className="w-full p-2 border border-border rounded-lg text-sm"
                                                                                         accept={resource.type === 'image' ? 'image/*' : resource.type === 'pdf' ? '.pdf' : '*/*'}
                                                                                     />
                                                                                 )}

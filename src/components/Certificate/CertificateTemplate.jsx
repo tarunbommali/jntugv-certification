@@ -6,7 +6,7 @@ const CertificateTemplate = ({
     courseTitle,
     certificateId,
     issueDate,
-    instructor = "JNTU-GV Admin"
+    instructor = "Aikya I/O"
 }) => {
     // Use inline styles for critical layout to ensure html2canvas compatibility
     const containerStyle = {
@@ -63,7 +63,7 @@ const CertificateTemplate = ({
                         fontWeight: 'bold',
                         fontFamily: 'Arial, sans-serif',
                     }}>
-                        N
+                        A
                     </div>
                     <h1 style={{
                         fontSize: '36px',

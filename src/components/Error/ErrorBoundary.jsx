@@ -26,7 +26,7 @@ class ErrorBoundary extends Component {
                 <div className="p-10 bg-red-50 min-h-[400px] flex flex-col items-center justify-center rounded-xl shadow-lg border-2 border-red-300">
                     <AlertTriangle className="w-16 h-16 text-red-600 mb-4" />
                     <h1 className="text-xl font-bold text-red-700 mb-2">Something went wrong in the dashboard section.</h1>
-                    <p className="text-gray-600 text-center text-sm">
+                    <p className="text-muted text-center text-sm">
                         Please notify IT. Error Details: {this.state.error ? this.state.error.message : 'Unknown Error'}
                     </p>
                     <button 

@@ -22,10 +22,10 @@ const LoadingSpinner = ({ className, size = 'md', ...props }) => {
 };
 
 export const LoadingScreen = ({ message = 'Loading...', className }) => (
-  <div className={cn('min-h-screen flex items-center justify-center bg-gray-50', className)}>
+  <div className={cn('min-h-screen flex items-center justify-center bg-background', className)}>
     <div className="flex flex-col items-center gap-4">
       <LoadingSpinner size="lg" />
-      <p className="text-gray-600">{message}</p>
+      <p className="text-muted">{message}</p>
     </div>
   </div>
 );

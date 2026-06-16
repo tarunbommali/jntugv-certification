@@ -37,7 +37,7 @@ const Footer = () => {
 
           {/* Copyright text */}
           <p className="order-2 md:order-1 w-full md:w-auto text-left md:text-left mt-3 md:mt-0 text-white">
-            © {new Date().getFullYear()} JNTU-GV, Vizianagaram. All rights
+            © {new Date().getFullYear()} Aikya I/O. All rights
             reserved.
           </p>
         </div>

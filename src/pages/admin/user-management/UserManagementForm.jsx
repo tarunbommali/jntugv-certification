@@ -126,7 +126,7 @@ const UserManagementForm = () => {
             // Pre-fill form with user data
             setFormData((prev) => ({
               ...prev,
-              name: userResult.data.displayName || "",
+              name: userResult.data.username || "",
               email: userResult.data.email || "",
               phone: userResult.data.phone || "",
               // role remains handled on backend / update flow
@@ -215,7 +215,7 @@ const UserManagementForm = () => {
         const result = await createUserWithCredentials({
           email: formData.email,
           password: FIXED_INITIAL_PASSWORD, // use fixed password
-          displayName: formData.name,
+          username: formData.name,
           phone: formData.phone,
           role: "student", // role removed from UI; default to student
         });
@@ -388,7 +388,7 @@ const UserManagementForm = () => {
       window.confirm(
         `Are you sure you want to ${
           newStatus === "inactive" ? "DISABLE" : "ENABLE"
-        } ${user.displayName || user.email}'s account?`
+        } ${user.username || user.email}'s account?`
       )
     ) {
       setSubmitting(true);
@@ -426,14 +426,14 @@ const UserManagementForm = () => {
     return (
       <div className="p-8 text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="text-gray-600 mt-4">Loading...</p>
+        <p className="text-muted mt-4">Loading...</p>
       </div>
     );
   }
 
   const pageTitle = isCreationMode
     ? "Create New User"
-    : `Manage User: ${user?.displayName || user?.email || "Loading..."}`;
+    : `Manage User: ${user?.username || user?.email || "Loading..."}`;
 
   const items = [
     { label: "Admin", link: "/admin" },
@@ -445,7 +445,7 @@ const UserManagementForm = () => {
     : [
         ...items,
         {
-          label: user?.displayName || "User Details",
+          label: user?.username || "User Details",
           link: `/admin/users/manage/${userId}`,
         },
       ];
@@ -454,7 +454,7 @@ const UserManagementForm = () => {
   const totalAmountDisplay = toNumber(totalAmount).toFixed(2).replace(/\.00$/, "");
 
   return (
-    <PageContainer items={breadcrumbs} className="min-h-screen bg-gray-50 py-8">
+    <PageContainer items={breadcrumbs} className="min-h-screen bg-background py-8">
       <PageTitle
         title={pageTitle}
         description={
@@ -478,8 +478,8 @@ const UserManagementForm = () => {
         {/* Left Column - User Form & Management */}
         <div className="lg:col-span-1 space-y-4">
           {/* User Creation/Details Form */}
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+          <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
+            <h2 className="text-xl font-bold text-foreground mb-4 flex items-center space-x-2">
               <User className="w-5 h-5 text-blue-600" />
               <span>{isCreationMode ? "Create User" : "Account Details"}</span>
             </h2>
@@ -487,11 +487,11 @@ const UserManagementForm = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted mb-1">
                   Name
                 </label>
                 <div className="relative">
-                  <User className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                  <User className="w-5 h-5 text-muted absolute left-3 top-1/2 transform -translate-y-1/2" />
                   <input
                     type="text"
                     name="name"
@@ -499,18 +499,18 @@ const UserManagementForm = () => {
                     value={formData.name}
                     onChange={handleFormChange}
                     disabled={!isCreationMode}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-surface-elevated disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
 
               {/* Email Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted mb-1">
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                  <Mail className="w-5 h-5 text-muted absolute left-3 top-1/2 transform -translate-y-1/2" />
                   <input
                     type="email"
                     name="email"
@@ -518,7 +518,7 @@ const UserManagementForm = () => {
                     value={formData.email}
                     onChange={handleFormChange}
                     disabled={!isCreationMode}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-surface-elevated disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -558,31 +558,31 @@ const UserManagementForm = () => {
           {!isCreationMode && user && (
             <>
               {/* Account Status Card */}
-              <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+              <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
+                <h2 className="text-xl font-bold text-foreground mb-4 flex items-center space-x-2">
                   <UserX className="w-5 h-5 text-blue-600" />
                   <span>Account Status</span>
                 </h2>
                 <p className="mb-2">
-                  <strong className="text-gray-700">Name:</strong>{" "}
-                  {user.displayName || "N/A"}
+                  <strong className="text-muted">Name:</strong>{" "}
+                  {user.username || "N/A"}
                 </p>
                 <p className="mb-2">
-                  <strong className="text-gray-700">Email:</strong> {user.email}
+                  <strong className="text-muted">Email:</strong> {user.email}
                 </p>
                 <p className="mb-2">
-                  <strong className="text-gray-700">Total Courses:</strong>{" "}
+                  <strong className="text-muted">Total Courses:</strong>{" "}
                   {enrollmentStats?.totalEnrollments || user.totalCoursesEnrolled || 0}
                 </p>
                 {enrollmentStats && (
-                  <div className="mb-2 pl-4 text-sm text-gray-600">
+                  <div className="mb-2 pl-4 text-sm text-muted">
                     <p>• Online: {enrollmentStats.onlineEnrollments}</p>
                     <p>• Offline: {enrollmentStats.offlineEnrollments}</p>
                     <p>• Free: {enrollmentStats.freeEnrollments}</p>
                   </div>
                 )}
                 <p className="mb-4">
-                  <strong className="text-gray-700">Account Status:</strong>
+                  <strong className="text-muted">Account Status:</strong>
                   <span
                     className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       user.status === "active"
@@ -613,7 +613,7 @@ const UserManagementForm = () => {
               </div>
 
               {/* Enrollment Management Card */}
-              <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+              <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
                 <EnrollmentManagement 
                   userId={resolveUserId(user)} 
                   onEnrollmentChange={() => {
@@ -630,12 +630,12 @@ const UserManagementForm = () => {
         {/* Right Column - Course Enrollment & Payment (2/3 width) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Course Selection Card */}
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+          <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
+            <h2 className="text-xl font-bold text-foreground mb-4 flex items-center space-x-2">
               <BookOpen className="w-5 h-5 text-blue-600" />
               <span>Course Enrollment</span>
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted mb-4">
               {isCreationMode
                 ? "Select courses to automatically enroll the new user after creation."
                 : "Select courses to enroll this user. You can adjust individual course prices and choose payment method."}
@@ -652,7 +652,7 @@ const UserManagementForm = () => {
                   return (
                     <div
                       key={courseId || course.title}
-                      className="flex items-start p-3 border border-gray-100 rounded-lg hover:bg-gray-50"
+                      className="flex items-start p-3 border border-border rounded-lg hover:bg-background"
                     >
                       <input
                         type="checkbox"
@@ -672,18 +672,18 @@ const UserManagementForm = () => {
                         className="mt-1 mr-3 rounded text-blue-600 focus:ring-blue-500"
                       />
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-foreground">
                           {course.title}
                         </div>
-                        <div className="text-sm text-gray-500 mb-2">
+                        <div className="text-sm text-muted mb-2">
                           {course.category || "Uncategorized"} • {
                             course.duration || "Self-paced"
                           }
                         </div>
                         <div className="flex items-center space-x-4">
                           <div className="flex items-center space-x-2">
-                            <IndianRupee className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm text-gray-600">Price:</span>
+                            <IndianRupee className="w-4 h-4 text-muted" />
+                            <span className="text-sm text-muted">Price:</span>
                           </div>
                           <input
                             type="number"
@@ -693,10 +693,10 @@ const UserManagementForm = () => {
                             onChange={(e) =>
                               handleCoursePriceChange(courseId, e.target.value)
                             }
-                            className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                            className="w-24 px-2 py-1 border border-border rounded text-sm"
                             placeholder="0.00"
                           />
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-muted">
                             (Original: ₹{toNumber(course?.price)})
                           </span>
                         </div>
@@ -705,7 +705,7 @@ const UserManagementForm = () => {
                   );
                 })
               ) : (
-                <p className="text-gray-500 text-center py-4">
+                <p className="text-muted text-center py-4">
                   No courses available.
                 </p>
               )}
@@ -744,8 +744,8 @@ const UserManagementForm = () => {
 
           {/* Payment Method Card */}
           {selectedCourses.length > 0 && (
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+            <div className="bg-surface p-6 rounded-xl shadow-md border border-border">
+              <h2 className="text-xl font-bold text-foreground mb-4 flex items-center space-x-2">
                 <CreditCard className="w-5 h-5 text-blue-600" />
                 <span>Payment Method</span>
               </h2>
@@ -753,7 +753,7 @@ const UserManagementForm = () => {
               <div className="space-y-4">
                 {/* Payment Method Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-muted mb-2">
                     Select Payment Method
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -763,12 +763,12 @@ const UserManagementForm = () => {
                       className={`p-3 border rounded-lg text-center transition-colors ${
                         paymentMethod === "offline"
                           ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-300 hover:border-gray-400"
+                          : "border-border hover:border-gray-400"
                       }`}
                     >
                       <CreditCard className="w-5 h-5 mx-auto mb-1" />
                       <div className="font-medium">Offline Payment</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-muted">
                         Cash, Bank Transfer
                       </div>
                     </button>
@@ -779,12 +779,12 @@ const UserManagementForm = () => {
                       className={`p-3 border rounded-lg text-center transition-colors ${
                         paymentMethod === "free"
                           ? "border-green-500 bg-green-50 text-green-700"
-                          : "border-gray-300 hover:border-gray-400"
+                          : "border-border hover:border-gray-400"
                       }`}
                     >
                       <IndianRupee className="w-5 h-5 mx-auto mb-1" />
                       <div className="font-medium">Free Enrollment</div>
-                      <div className="text-xs text-gray-500">Complimentary</div>
+                      <div className="text-xs text-muted">Complimentary</div>
                     </button>
 
                     <button
@@ -793,12 +793,12 @@ const UserManagementForm = () => {
                       className={`p-3 border rounded-lg text-center transition-colors ${
                         paymentMethod === "online"
                           ? "border-purple-500 bg-purple-50 text-purple-700"
-                          : "border-gray-300 hover:border-gray-400"
+                          : "border-border hover:border-gray-400"
                       }`}
                     >
                       <CreditCard className="w-5 h-5 mx-auto mb-1" />
                       <div className="font-medium">Online Payment</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-muted">
                         Card, UPI, etc.
                       </div>
                     </button>
@@ -863,8 +863,8 @@ const UserManagementForm = () => {
                 )}
 
                 {/* Payment Summary */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-800 mb-2">
+                <div className="bg-background p-4 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-2">
                     Payment Summary
                   </h4>
                   <div className="flex justify-between text-sm">
